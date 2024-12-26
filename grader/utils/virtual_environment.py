@@ -38,7 +38,7 @@ class VirtualEnvironment:
         logger.info("Creating new venv")
 
         # TODO - Assuming python3 is valid
-        subprocess.run(["python3", "-m", "venv", self._venv_path], check=False, capture_output=True)
+        subprocess.run(["python", "-m", "venv", self._venv_path], check=False, capture_output=True)
 
         # Install requirements
         if does_requirements_exist:
@@ -54,10 +54,11 @@ class VirtualEnvironment:
         # TODO - Missing error handling
 
     def teardown(self):
-        subprocess.run(["deactivate"], check=False, capture_output=True)
-        shutil.rmtree(self._venv_path)
+        # subprocess.run(["deactivate"], check=False, capture_output=True)
+        # shutil.rmtree(self._venv_path)
+        pass
 
     @staticmethod
     def __install_requirements(venv_path: str, requirements_path: str):
-        pip_path = os.path.join(venv_path, "bin", "pip")
+        pip_path = os.path.join(venv_path, "Scripts", "pip.exe")  # TODO - Replace with OS agnostic solution
         output = subprocess.run([pip_path, "install", "-r", requirements_path], check=False, capture_output=True)

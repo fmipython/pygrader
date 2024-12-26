@@ -1,0 +1,18 @@
+{
+    "max_points": 10,
+    "checks": [
+        {
+            "name": "pylint",
+            "points": 3
+        },
+        {
+            "name": "coverage",
+            "points": 5
+        },
+        {
+            "name": "requirements",
+            "points": 1,
+            "command": "stat ${PROJECT_ROOT}/requirements.txt"
+        }
+    ]
+}

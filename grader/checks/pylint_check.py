@@ -1,4 +1,3 @@
-import subprocess
 from io import StringIO
 
 from pylint import lint
@@ -11,12 +10,13 @@ from grader.utils.files import find_all_python_files
 class PylintCheck(AbstractCheck):
     def __init__(self, name: str, max_points: int, project_root: str):
         AbstractCheck.__init__(self, name, max_points, project_root)
+        self.__pylint_max_score = 10
 
     def run(self) -> float:
         results = lint.Run(find_all_python_files(self._project_root), reporter=PylintCustomReporter(), exit=False)
         pylint_score = results.linter.stats.global_note
 
-        return pylint_score
+        return pylint_score / self.__pylint_max_score * self._max_points
 
 
 class PylintCustomReporter(TextReporter):

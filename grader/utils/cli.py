@@ -14,6 +14,8 @@ def get_args() -> dict[str, Any]:
     parser.add_argument("project_root", type=str, help="The path to the project directory")
     parser.add_argument("-c", "--config", type=str, help="The path to the config file to use")
     parser.add_argument("--student-id", type=str, help="The student's id")
-    parser.add_argument("--debug", action="store_true", help="Enable debug mode", default=False)
+    parser.add_argument(
+        "-v", "--verbosity", action="count", default=0, help="Set verbosity (0: DEBUG, 1: VERBOSE, 2: INFO)"
+    )
 
     return parser.parse_args().__dict__

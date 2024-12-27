@@ -10,3 +10,11 @@ class AbstractCheck(ABC):
     @abstractmethod
     def run(self) -> float:
         pass
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @property
+    def max_points(self) -> int:
+        return self._max_points

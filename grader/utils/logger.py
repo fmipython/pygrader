@@ -2,14 +2,30 @@ import logging
 
 from typing import Optional
 
+VERBOSE = 15
+logging.addLevelName(VERBOSE, "VERBOSE")
 
-def setup_logger(student_id: Optional[str] = None, debug_mode: bool = False) -> logging.Logger:
+
+# Add a custom logging method to the logger class
+def verbose(self, message, *args, **kwargs):
+    if self.isEnabledFor(VERBOSE):
+        self._log(VERBOSE, message, args, **kwargs)
+
+
+def setup_logger(student_id: Optional[str] = None, verbosity: int = 2) -> logging.Logger:
     student_id = student_id or "grader"
+    logging.Logger.verbose = verbose
     logger = logging.getLogger("grader")
 
-    level = logging.DEBUG if debug_mode else logging.INFO
+    match verbosity:
+        case 0:
+            level = logging.DEBUG
+        case 1:
+            level = VERBOSE
+        case _:
+            level = logging.INFO
 
-    if debug_mode:
+    if verbosity < 2:
         log_format = "%(asctime)s - %(levelname)s - %(message)s"
     else:
         log_format = "%(levelname)s - %(message)s"

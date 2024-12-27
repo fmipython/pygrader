@@ -1,12 +1,16 @@
 from grader.utils.cli import get_args
+from grader.utils.logger import setup_logger
 from grader.utils.virtual_environment import VirtualEnvironment
-from grader.checks.pylint import PylintCheck
+from grader.checks.pylint_check import PylintCheck
 
 if __name__ == "__main__":
-    print("Python project grader, v0.1")
     args = get_args()
-    print(args)
+    logger = setup_logger(args["student_id"], debug_mode=args["debug"])
 
+    logger.info("Python project grader, v0.1")
+    logger.debug("Arguments: %s", args)
+
+    scores = []
     with VirtualEnvironment(args["project_root"]) as venv:
-        pylint = PylintCheck("pylint", 3)
-        pylint.run()
+        pylint = PylintCheck("pylint", 3, args["project_root"])
+        scores.append((pylint.name, pylint.run()))

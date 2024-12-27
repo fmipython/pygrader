@@ -12,23 +12,25 @@ def verbose(self, message, *args, **kwargs):
         self._log(VERBOSE, message, args, **kwargs)
 
 
-def setup_logger(student_id: Optional[str] = None, verbosity: int = 2) -> logging.Logger:
+def setup_logger(student_id: Optional[str] = None, verbosity: int = 0) -> logging.Logger:
     student_id = student_id or "grader"
     logging.Logger.verbose = verbose
     logger = logging.getLogger("grader")
 
     match verbosity:
         case 0:
-            level = logging.DEBUG
+            level = logging.INFO
         case 1:
             level = VERBOSE
+        case 2:
+            level = logging.DEBUG
         case _:
-            level = logging.INFO
+            level = logging.DEBUG
 
-    if verbosity < 2:
+    if verbosity > 0:
         log_format = "%(asctime)s - %(levelname)s - %(message)s"
     else:
-        log_format = "%(levelname)s - %(message)s"
+        log_format = "%(message)s"
 
     logging.basicConfig(
         level=level,

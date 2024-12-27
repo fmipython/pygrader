@@ -24,7 +24,7 @@ class VirtualEnvironment:
 
         for path in possible_venv_paths:
             if os.path.exists(path):
-                logger.info("Found existing venv at %s", path)
+                logger.verbose("Found existing venv at %s", path)
                 shutil.rmtree(path)
 
         # Check for requirements.txt
@@ -35,18 +35,18 @@ class VirtualEnvironment:
             logger.error("No requirements.txt file found in the project directory")
 
         # Create new venv
-        logger.info("Creating new venv")
+        logger.verbose("Creating new venv")
 
         # TODO - Assuming python3 is valid
         subprocess.run(["python", "-m", "venv", self._venv_path], check=False, capture_output=True)
 
         # Install requirements
         if does_requirements_exist:
-            logger.info("Installing requirements")
+            logger.verbose("Installing requirements")
             VirtualEnvironment.__install_requirements(self._venv_path, requirements_path)
 
         # Install grader dependencies
-        logger.info("Installing grader dependencies")
+        logger.verbose("Installing grader dependencies")
         # TODO - This needs fixing
         grader_requirements_path = os.path.join(os.path.dirname(__file__), "grader_requirements.txt")
         VirtualEnvironment.__install_requirements(self._venv_path, grader_requirements_path)

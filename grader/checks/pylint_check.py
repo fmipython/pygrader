@@ -36,6 +36,8 @@ class PylintCheck(AbstractCheck):
             if start <= pylint_score < end:
                 return score
 
+        return 0
+
 
 class PylintCustomReporter(TextReporter):
     """

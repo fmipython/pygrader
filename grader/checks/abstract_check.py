@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import Callable
+from typing import Callable, Optional
 
 
 class AbstractCheck(ABC):
-    def __init__(self, name: str, max_points: int, project_root: str, scores_mapping: Callable[[float], float]):
+    def __init__(
+        self, name: str, max_points: int, project_root: str, scores_mapping: Optional[Callable[[float], float]] = None
+    ):
         self._name = name
         self._max_points = max_points
         self._project_root = project_root

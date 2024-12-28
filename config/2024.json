@@ -11,8 +11,11 @@
         },
         {
             "name": "requirements",
-            "points": 1,
-            "command": "stat ${PROJECT_ROOT}/requirements.txt"
+            "points": 1
+        },
+        {
+            "name": "type-hints",
+            "points": 2
         }
     ]
 }

@@ -3,6 +3,8 @@ import os
 import shutil
 import subprocess
 
+from grader.utils.constants import REQUIREMENTS_FILENAME
+
 logger = logging.getLogger("grader")
 
 
@@ -28,7 +30,7 @@ class VirtualEnvironment:
                 shutil.rmtree(path)
 
         # Check for requirements.txt
-        requirements_path = os.path.join(self._project_path, "requirements.txt")
+        requirements_path = os.path.join(self._project_path, REQUIREMENTS_FILENAME)
 
         does_requirements_exist = os.path.exists(requirements_path)
         if not does_requirements_exist:

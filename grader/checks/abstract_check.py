@@ -9,6 +9,8 @@ class AbstractCheck(ABC):
         self._project_root = project_root
         self._scores_mapping = scores_mapping
 
+        # TODO - Add a check if running inside a virtual environment
+
     @abstractmethod
     def run(self) -> float:
         pass

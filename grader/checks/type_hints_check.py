@@ -4,6 +4,7 @@ import subprocess
 from grader.checks.abstract_check import AbstractCheck
 from grader.utils.constants import MYPY_TYPE_HINT_CONFIG, REPORTS_TEMP_DIR, MYPY_LINE_COUNT_REPORT
 from grader.utils.files import find_all_python_files
+from grader.utils.logger import VERBOSE
 
 logger = logging.getLogger("grader")
 
@@ -16,7 +17,7 @@ class TypeHintsCheck(AbstractCheck):
         self.__mypy_arguments = ["--config-file", MYPY_TYPE_HINT_CONFIG, "--linecount-report", REPORTS_TEMP_DIR]
 
     def run(self) -> float:
-        logger.verbose("Running mypy")
+        logger.log(VERBOSE, "Running mypy")
 
         # Gather all files
         files = find_all_python_files(self._project_root)  # TODO - Should it only be ran on production code?

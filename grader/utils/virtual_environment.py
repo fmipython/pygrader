@@ -4,6 +4,7 @@ import shutil
 import subprocess
 
 from grader.utils.constants import REQUIREMENTS_FILENAME
+from grader.utils.logger import VERBOSE
 
 logger = logging.getLogger("grader")
 
@@ -26,7 +27,7 @@ class VirtualEnvironment:
 
         for path in possible_venv_paths:
             if os.path.exists(path):
-                logger.verbose("Found existing venv at %s", path)
+                logger.log(VERBOSE, "Found existing venv at %s", path)
                 shutil.rmtree(path)
 
         # Check for requirements.txt
@@ -37,18 +38,18 @@ class VirtualEnvironment:
             logger.error("No requirements.txt file found in the project directory")
 
         # Create new venv
-        logger.verbose("Creating new venv")
+        logger.log(VERBOSE, "Creating new venv")
 
         # TODO - Assuming python3 is valid
         subprocess.run(["python", "-m", "venv", self._venv_path], check=False, capture_output=True)
 
         # Install requirements
         if does_requirements_exist:
-            logger.verbose("Installing requirements")
+            logger.log(VERBOSE, "Installing requirements")
             VirtualEnvironment.__install_requirements(self._venv_path, requirements_path)
 
         # Install grader dependencies
-        logger.verbose("Installing grader dependencies")
+        logger.log(VERBOSE, "Installing grader dependencies")
         # TODO - This needs fixing
         grader_requirements_path = os.path.join(os.path.dirname(__file__), "grader_requirements.txt")
         VirtualEnvironment.__install_requirements(self._venv_path, grader_requirements_path)

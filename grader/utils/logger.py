@@ -14,7 +14,6 @@ def verbose(self, message, *args, **kwargs):
 
 def setup_logger(student_id: Optional[str] = None, verbosity: int = 0) -> logging.Logger:
     student_id = student_id or "grader"
-    logging.Logger.verbose = verbose
     logger = logging.getLogger("grader")
 
     match verbosity:

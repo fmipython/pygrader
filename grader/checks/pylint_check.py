@@ -6,6 +6,7 @@ from pylint.reporters.text import TextReporter
 
 from grader.checks.abstract_check import AbstractCheck
 from grader.utils.files import find_all_python_files
+from grader.utils.logger import VERBOSE
 
 logger = logging.getLogger("grader")
 
@@ -16,7 +17,7 @@ class PylintCheck(AbstractCheck):
         self.__pylint_max_score = 10
 
     def run(self) -> float:
-        logger.verbose("Running pylint")
+        logger.log(VERBOSE, "Running pylint")
         # TODO - Check if running outside of the virtual environment of the project is okay
         results = lint.Run(find_all_python_files(self._project_root), reporter=PylintCustomReporter(), exit=False)
         pylint_score = results.linter.stats.global_note

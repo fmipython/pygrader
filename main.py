@@ -1,19 +1,23 @@
-import logging
 from grader.utils.cli import get_args
 
 # from grader.utils.virtual_environment import VirtualEnvironment
 from grader.checks.pylint_check import PylintCheck
 from grader.checks.type_hints_check import TypeHintsCheck
-from grader.utils.logger import setup_logger
+from grader.checks.requirements_check import RequirementsCheck
+from grader.utils.logger import setup_logger, VERBOSE
 
 if __name__ == "__main__":
     args = get_args()
     logger = setup_logger(args["student_id"], verbosity=args["verbosity"])
 
-    logger.verbose("Python project grader, v0.1")
+    # logger.verbose()
+    logger.log(VERBOSE, "Python project grader, v0.1")
     logger.debug("Arguments: %s", args)
 
     scores = []
+
+    requirements = RequirementsCheck("requirements.txt", 1, args["project_root"])
+    scores.append((requirements.name, requirements.run()))
 
     pylint = PylintCheck("pylint", 3, args["project_root"])
     scores.append((pylint.name, pylint.run()))

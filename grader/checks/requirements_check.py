@@ -3,6 +3,7 @@ import os
 
 from grader.checks.abstract_check import AbstractCheck
 from grader.utils.constants import REQUIREMENTS_FILENAME
+from grader.utils.logger import VERBOSE
 
 logger = logging.getLogger("grader")
 
@@ -14,6 +15,6 @@ class RequirementsCheck(AbstractCheck):
         self.__requirements_path = os.path.join(self._project_root, REQUIREMENTS_FILENAME)
 
     def run(self) -> float:
-        logger.verbose(f"Running {self.name}")
+        logger.log(VERBOSE, f"Running {self.name}")
 
         return int(os.path.exists(self.__requirements_path)) * self.max_points

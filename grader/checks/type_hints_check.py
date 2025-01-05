@@ -1,3 +1,7 @@
+"""
+Module containing the type hints check.
+It calls mypy as a subprocess to generate a report and then read from the report.
+"""
 import logging
 import subprocess
 
@@ -10,6 +14,9 @@ logger = logging.getLogger("grader")
 
 
 class TypeHintsCheck(AbstractCheck):
+    """
+    The TypeHints check class.
+    """
     def __init__(self, name: str, max_points: int, project_root: str):
         super().__init__(name, max_points, project_root)
 
@@ -17,6 +24,16 @@ class TypeHintsCheck(AbstractCheck):
         self.__mypy_arguments = ["--config-file", MYPY_TYPE_HINT_CONFIG, "--linecount-report", REPORTS_TEMP_DIR]
 
     def run(self) -> float:
+        """
+        Run the mypy check on the project.
+
+        First, find all python files in the project, then run mypy on all files with the special config.
+        Mypy then generates a report with the amount of lines with type hints and the total amount of lines.
+
+        The first line in the report contains the values for all files.
+        The line contains a lot of stuff, we just need the type-hinted lines and the total amount of lines.
+        Returns the score from the mypy check.
+        """
         logger.log(VERBOSE, "Running %s", self.name)
 
         # Gather all files
@@ -27,7 +44,7 @@ class TypeHintsCheck(AbstractCheck):
         subprocess.run(command, check=False, capture_output=True)
 
         # Read mypy linecount report
-        with open(MYPY_LINE_COUNT_REPORT, "r") as f:
+        with open(MYPY_LINE_COUNT_REPORT, "r", encoding="utf-8") as f:
             report = f.readline().strip().split()
 
         # Fancy way to get the needed values - I need the 3rd and 4th values, out of 5 total

@@ -1,3 +1,8 @@
+"""
+Module containing the pylint check.
+It uses the pylint python library directly to run the check.
+"""
+
 import logging
 from io import StringIO
 
@@ -12,11 +17,21 @@ logger = logging.getLogger("grader")
 
 
 class PylintCheck(AbstractCheck):
+    """
+    The Pylint check class.
+    """
     def __init__(self, name: str, max_points: int, project_root: str):
         AbstractCheck.__init__(self, name, max_points, project_root, self.__translate_score)
         self.__pylint_max_score = 10
 
     def run(self) -> float:
+        """
+        Run the pylint check on the project.
+        First, find all python files in the project, then create a custom reporter (to suppress all output).
+        Run the pylint check itself and map the score withing the desired bounds.
+
+        Returns the score from the pylint check.
+        """
         logger.log(VERBOSE, "Running pylint")
         # TODO - Check if running outside of the virtual environment of the project is okay
         results = lint.Run(find_all_python_files(self._project_root), reporter=PylintCustomReporter(), exit=False)
@@ -46,7 +61,8 @@ class PylintCheck(AbstractCheck):
 
 class PylintCustomReporter(TextReporter):
     """
-    Custom reported to suppress all output
+    Custom reported to suppress all output.
+    By default, the pylint library shows everything on the stdout.
     """
 
     def __init__(self):
@@ -57,7 +73,4 @@ class PylintCustomReporter(TextReporter):
         pass
 
     def display_reports(self, layout):
-        pass
-
-    def display_score(self):
         pass

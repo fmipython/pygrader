@@ -8,8 +8,11 @@ init:
 
 lint: venv
     python3 -m pylint $(git ls-files '*.py') --fail-under 9
-    mypy src --ignore-missing-imports
-    flake8 src
+    mypy grader --ignore-missing-imports
+
+lint_file file: venv
+    python3 -m pylint {{file}} --fail-under 9
+    mypy {{file}} --ignore-missing-imports
 
 test: venv
     python3 -m unittest discover -s tst

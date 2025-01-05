@@ -21,7 +21,7 @@ class PylintCheck(AbstractCheck):
     The Pylint check class.
     """
     def __init__(self, name: str, max_points: int, project_root: str):
-        AbstractCheck.__init__(self, name, max_points, project_root, self.__translate_score)
+        AbstractCheck.__init__(self, name, max_points, project_root)
         self.__pylint_max_score = 10
 
     def run(self) -> float:
@@ -37,7 +37,7 @@ class PylintCheck(AbstractCheck):
         results = lint.Run(find_all_python_files(self._project_root), reporter=PylintCustomReporter(), exit=False)
         pylint_score = results.linter.stats.global_note
 
-        return self._scores_mapping(pylint_score)
+        return self.__translate_score(pylint_score)
 
     def __translate_score(self, pylint_score: float) -> float:
         """

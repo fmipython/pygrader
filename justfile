@@ -9,6 +9,7 @@ init:
 lint: venv
     python3 -m pylint $(git ls-files '*.py') --fail-under 9
     mypy grader --ignore-missing-imports
+    flake8 grader
 
 lint_file file: venv
     python3 -m pylint {{file}} --fail-under 9

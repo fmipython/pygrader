@@ -1,3 +1,7 @@
+"""
+Main entry point of the program.
+Calls all the checks, and stores their results
+"""
 from grader.utils.cli import get_args
 
 # from grader.utils.virtual_environment import VirtualEnvironment
@@ -10,7 +14,6 @@ if __name__ == "__main__":
     args = get_args()
     logger = setup_logger(args["student_id"], verbosity=args["verbosity"])
 
-    # logger.verbose()
     logger.log(VERBOSE, "Python project grader, v0.1")
     logger.debug("Arguments: %s", args)
 

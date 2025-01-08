@@ -1,3 +1,6 @@
+"""
+Module containing the logger setup function and the custom VERBOSE level.
+"""
 import logging
 
 from typing import Optional
@@ -6,13 +9,17 @@ VERBOSE = 15
 logging.addLevelName(VERBOSE, "VERBOSE")
 
 
-# Add a custom logging method to the logger class
-def verbose(self, message, *args, **kwargs):
-    if self.isEnabledFor(VERBOSE):
-        self._log(VERBOSE, message, args, **kwargs)
-
-
 def setup_logger(student_id: Optional[str] = None, verbosity: int = 0) -> logging.Logger:
+    """
+    Setup the logger with the given verbosity level and student id
+
+    Args:
+        student_id: The id of the student. Defaults to None.
+        verbosity: . Defaults to 0.
+
+    Returns:
+        logging.Logger: The configured logger object.
+    """
     student_id = student_id or "grader"
     logger = logging.getLogger("grader")
 

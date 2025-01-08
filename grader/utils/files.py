@@ -1,3 +1,6 @@
+"""
+Module containing the file-related functions.
+"""
 import os
 
 

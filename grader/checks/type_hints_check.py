@@ -44,8 +44,8 @@ class TypeHintsCheck(AbstractCheck):
         subprocess.run(command, check=False, capture_output=True)
 
         # Read mypy linecount report
-        with open(MYPY_LINE_COUNT_REPORT, "r", encoding="utf-8") as f:
-            report = f.readline().strip().split()
+        with open(MYPY_LINE_COUNT_REPORT, "r", encoding="utf-8") as report_file:
+            report = report_file.readline().strip().split()
 
         # Fancy way to get the needed values - I need the 3rd and 4th values, out of 5 total
         *_, lines_with_type_annotations, lines_total, _ = report

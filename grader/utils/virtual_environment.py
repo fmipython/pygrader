@@ -1,3 +1,6 @@
+"""
+Module containing the virtual environment class.
+"""
 import logging
 import os
 import shutil
@@ -10,6 +13,10 @@ logger = logging.getLogger("grader")
 
 
 class VirtualEnvironment:
+    """
+    Class that handles the creation and deletion of a virtual environment.
+    Acts as a context manager. Everything executed within it, can assume that the venv is setup.
+    """
     def __init__(self, project_path: str):
         self._project_path = project_path
         self._venv_path = os.path.join(project_path, ".venv")
@@ -22,6 +29,13 @@ class VirtualEnvironment:
         self.teardown()
 
     def setup(self):
+        """
+        Setup the virtual environment.
+        Check if there is an existing venv, if so, delete it.
+        Check if there is a requirements.txt file.
+        Create a new venv and install the requirements.
+        Install the grader dependencies as well.
+        """
         # Check for existing venv
         possible_venv_paths = [os.path.join(self._project_path, "venv"), os.path.join(self._project_path, ".venv")]
 
@@ -57,11 +71,13 @@ class VirtualEnvironment:
         # TODO - Missing error handling
 
     def teardown(self):
+        """
+        Delete the virtual environment.
+        """
         # subprocess.run(["deactivate"], check=False, capture_output=True)
-        # shutil.rmtree(self._venv_path)
-        pass
+        shutil.rmtree(self._venv_path)
 
     @staticmethod
     def __install_requirements(venv_path: str, requirements_path: str):
         pip_path = os.path.join(venv_path, "Scripts", "pip.exe")  # TODO - Replace with OS agnostic solution
-        output = subprocess.run([pip_path, "install", "-r", requirements_path], check=False, capture_output=True)
+        _ = subprocess.run([pip_path, "install", "-r", requirements_path], check=False, capture_output=True)

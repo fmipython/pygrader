@@ -6,7 +6,7 @@ import os
 import shutil
 import subprocess
 
-from grader.utils.constants import REQUIREMENTS_FILENAME
+from grader.utils.constants import REQUIREMENTS_FILENAME, VENV_NAME
 from grader.utils.logger import VERBOSE
 
 logger = logging.getLogger("grader")
@@ -19,7 +19,7 @@ class VirtualEnvironment:
     """
     def __init__(self, project_path: str):
         self._project_path = project_path
-        self._venv_path = os.path.join(project_path, ".venv")
+        self._venv_path = os.path.join(project_path, VENV_NAME)
 
     def __enter__(self):
         self.setup()

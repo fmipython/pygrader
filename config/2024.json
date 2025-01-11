@@ -1,21 +1,21 @@
 {
-    "max_points": 10,
-    "checks": [
-        {
-            "name": "pylint",
-            "points": 3
-        },
-        {
-            "name": "coverage",
-            "points": 5
-        },
-        {
-            "name": "requirements",
-            "points": 1
-        },
-        {
-            "name": "type-hints",
-            "points": 2
-        }
-    ]
+  "max_points": 10,
+  "checks": [
+    {
+      "name": "pylint",
+      "points": 3
+    },
+    {
+      "name": "coverage",
+      "points": 5
+    },
+    {
+      "name": "requirements",
+      "points": 1
+    },
+    {
+      "name": "type-hints",
+      "points": 3
+    }
+  ]
 }

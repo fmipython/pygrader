@@ -6,7 +6,8 @@ import os
 import shutil
 import subprocess
 
-from grader.utils.constants import REQUIREMENTS_FILENAME, VENV_NAME
+import grader.utils.constants as const
+
 from grader.utils.logger import VERBOSE
 
 logger = logging.getLogger("grader")
@@ -19,7 +20,7 @@ class VirtualEnvironment:
     """
     def __init__(self, project_path: str):
         self._project_path = project_path
-        self._venv_path = os.path.join(project_path, VENV_NAME)
+        self._venv_path = os.path.join(project_path, const.VENV_NAME)
 
     def __enter__(self):
         self.setup()
@@ -45,7 +46,7 @@ class VirtualEnvironment:
                 shutil.rmtree(path)
 
         # Check for requirements.txt
-        requirements_path = os.path.join(self._project_path, REQUIREMENTS_FILENAME)
+        requirements_path = os.path.join(self._project_path, const.REQUIREMENTS_FILENAME)
 
         does_requirements_exist = os.path.exists(requirements_path)
         if not does_requirements_exist:
@@ -55,7 +56,7 @@ class VirtualEnvironment:
         logger.log(VERBOSE, "Creating new venv")
 
         # TODO - Assuming python3 is valid
-        subprocess.run(["python", "-m", "venv", self._venv_path], check=False, capture_output=True)
+        subprocess.run([const.PYTHON_BIN, "-m", "venv", self._venv_path], check=False, capture_output=True)
 
         # Install requirements
         if does_requirements_exist:
@@ -65,7 +66,7 @@ class VirtualEnvironment:
         # Install grader dependencies
         logger.log(VERBOSE, "Installing grader dependencies")
         # TODO - This needs fixing
-        grader_requirements_path = os.path.join(os.path.dirname(__file__), "grader_requirements.txt")
+        grader_requirements_path = const.GRADER_REQUIREMENTS
         VirtualEnvironment.__install_requirements(self._venv_path, grader_requirements_path)
 
         # TODO - Missing error handling
@@ -74,10 +75,12 @@ class VirtualEnvironment:
         """
         Delete the virtual environment.
         """
-        # subprocess.run(["deactivate"], check=False, capture_output=True)
-        shutil.rmtree(self._venv_path)
+        # shutil.rmtree(self._venv_path)
+        pass
 
     @staticmethod
     def __install_requirements(venv_path: str, requirements_path: str):
-        pip_path = os.path.join(venv_path, "Scripts", "pip.exe")  # TODO - Replace with OS agnostic solution
-        _ = subprocess.run([pip_path, "install", "-r", requirements_path], check=False, capture_output=True)
+        pip_path = os.path.join(venv_path, const.PIP_PATH)
+
+        output = subprocess.run([pip_path, "install", "-r", requirements_path], check=False, capture_output=True, text=True)
+        logger.debug(output.stdout)

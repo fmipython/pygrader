@@ -3,10 +3,10 @@ Module containing the unit test code coverage check.
 """
 import logging
 import os
-import subprocess
 
 from grader.checks.abstract_check import AbstractCheck
 from grader.utils.constants import COVERAGE_PATH, COVERAGE_RUN_ARGS, COVERAGE_RUN_PYTEST_ARGS, COVERAGE_REPORT_ARGS
+from grader.utils.files import find_all_source_files
 from grader.utils.logger import VERBOSE
 from grader.utils.process import run
 
@@ -44,10 +44,22 @@ class CoverageCheck(AbstractCheck):
 
     def __translate_score(self, coverage_score: float) -> float:
         """
-        The coverage score is a percentage of the amount of lines covered in the project.
-        The number is between 0 and max_points.
+        Split the coverage score into regions and assign a score based on the region.
+        The amount of regions depends on the max points for the criteria.
+
+        :param coverage_score: The score from pylint to be translated
+        :return: The translated score
         """
-        return coverage_score
+        step = 100 / self._max_points
+        steps = [i * step for i in range(self._max_points + 1)]
+
+        regions = list(zip(steps, steps[1:]))
+
+        for score, (start, end) in enumerate(regions, start=1):
+            if start <= coverage_score < end:
+                return score
+
+        return 0
 
     def __coverage_run(self):
         """
@@ -67,7 +79,7 @@ class CoverageCheck(AbstractCheck):
         """
         Generate a report from the coverage tool.
         """
-        source_files = []  # TODO - Implement this
+        source_files = find_all_source_files(self._project_root)
         command = [self.__coverage_full_path] + COVERAGE_REPORT_ARGS + source_files
         output = run(command)
 

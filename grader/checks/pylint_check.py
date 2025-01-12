@@ -33,7 +33,6 @@ class PylintCheck(AbstractCheck):
         Returns the score from the pylint check.
         """
         logger.log(VERBOSE, "Running pylint")
-        # TODO - Check if running outside of the virtual environment of the project is okay
         results = lint.Run(find_all_python_files(self._project_root), reporter=PylintCustomReporter(), exit=False)
         pylint_score = results.linter.stats.global_note
 

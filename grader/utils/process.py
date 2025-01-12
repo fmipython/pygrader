@@ -11,5 +11,7 @@ def run(command):
     output = subprocess.run(command, check=False, capture_output=True, text=True)
 
     if output.returncode != 0:
-        logger.error("Command failed: %d %s %s", output.returncode, output.stdout, output.stderr)
+        logger.debug("Command failed: %d %s %s", output.returncode, output.stdout, output.stderr)
+    else:
+        logger.debug("Command succeeded: %s", output.stdout)
     return output

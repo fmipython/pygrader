@@ -4,6 +4,8 @@ Module containing the constants
 
 import os
 
+VERSION = "1.0.0"
+
 # Directories
 ROOT_DIR = os.path.dirname(os.path.realpath(__name__))
 REPORTS_TEMP_DIR = os.path.join(ROOT_DIR, "reports")

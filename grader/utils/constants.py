@@ -22,6 +22,7 @@ MYPY_LINE_COUNT_REPORT = os.path.join(REPORTS_TEMP_DIR, "linecount.txt")
 # Virtual environment constants
 REQUIREMENTS_FILENAME = "requirements.txt"
 VENV_NAME = ".venv"
+POSSIBLE_VENV_DIRS = ["venv", ".venv"]
 PIP_PATH_WINDOWS = os.path.join("Scripts", "pip.exe")
 PIP_PATH_UNIX = os.path.join("bin", "pip")
 

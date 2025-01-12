@@ -38,7 +38,7 @@ class VirtualEnvironment:
         Install the grader dependencies as well.
         """
         # Check for existing venv
-        possible_venv_paths = [os.path.join(self._project_path, "venv"), os.path.join(self._project_path, ".venv")]
+        possible_venv_paths = [os.path.join(self._project_path, venv_path) for venv_path in const.POSSIBLE_VENV_DIRS]
 
         for path in possible_venv_paths:
             if os.path.exists(path):

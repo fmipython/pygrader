@@ -55,7 +55,6 @@ class VirtualEnvironment:
         # Create new venv
         logger.log(VERBOSE, "Creating new venv")
 
-        # TODO - Assuming python3 is valid
         subprocess.run([const.PYTHON_BIN, "-m", "venv", self._venv_path], check=False, capture_output=True)
 
         # Install requirements
@@ -65,7 +64,7 @@ class VirtualEnvironment:
 
         # Install grader dependencies
         logger.log(VERBOSE, "Installing grader dependencies")
-        # TODO - This needs fixing
+
         grader_requirements_path = const.GRADER_REQUIREMENTS
         VirtualEnvironment.__install_requirements(self._venv_path, grader_requirements_path)
 
@@ -75,12 +74,12 @@ class VirtualEnvironment:
         """
         Delete the virtual environment.
         """
-        # shutil.rmtree(self._venv_path)
-        pass
+        shutil.rmtree(self._venv_path)
 
     @staticmethod
     def __install_requirements(venv_path: str, requirements_path: str):
         pip_path = os.path.join(venv_path, const.PIP_PATH)
 
-        output = subprocess.run([pip_path, "install", "-r", requirements_path], check=False, capture_output=True, text=True)
+        output = subprocess.run([pip_path, "install", "-r", requirements_path],
+                                check=False, capture_output=True, text=True)
         logger.debug(output.stdout)

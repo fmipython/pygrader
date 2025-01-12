@@ -1,3 +1,6 @@
+"""
+Module containing a wrapper for launching shell commands
+"""
 import logging
 import subprocess
 
@@ -7,6 +10,16 @@ logger = logging.getLogger("grader")
 
 
 def run(command):
+    """
+    Execute a command in the terminal.
+    Wraps the subprocess.run function, with the check=False, capture_output=True and text=True flags.
+
+    If the command passes, log the stdout.
+    If the command fails, log the returncode, stdout and stderr.
+
+    :param command: The command to execute
+    :return: The output of the command (returncode, stdout, stderr)
+    """
     logger.debug("Running command: %s", command)
     output = subprocess.run(command, check=False, capture_output=True, text=True)
 

@@ -1,6 +1,6 @@
 # PythonProjectGrader
 
-A grader for Python projects
+A grader for Python projects, used in the ["Programming with Python"](https://github.com/fmipython) course at Sofia University "St. Kliment Ohridski", Faculty of Mathematics and Informatics.
 
 Automatically grader Python projects based on a set of checks.
 Current supported set of checks are:

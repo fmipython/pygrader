@@ -8,6 +8,7 @@ from grader.checks.pylint_check import PylintCheck
 from grader.checks.type_hints_check import TypeHintsCheck
 from grader.checks.requirements_check import RequirementsCheck
 from grader.utils.cli import get_args
+from grader.utils.files import is_tests_directory_present
 from grader.utils.logger import setup_logger, VERBOSE
 from grader.utils.virtual_environment import VirtualEnvironment
 
@@ -17,6 +18,9 @@ if __name__ == "__main__":
 
     logger.log(VERBOSE, "Python project grader, v0.1")
     logger.debug("Arguments: %s", args)
+
+    if not is_tests_directory_present(args["project_root"]):
+        logger.warning("No tests directory found in the project directory. Either it is missing or named differently.")
 
     scores = []
 

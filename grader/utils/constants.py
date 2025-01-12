@@ -35,3 +35,6 @@ COVERAGE_PATH = os.path.join(VENV_NAME, "bin", COVERAGE_BIN)
 COVERAGE_RUN_ARGS = ["run", "-m"]
 COVERAGE_RUN_PYTEST_ARGS = ["pytest"]
 COVERAGE_REPORT_ARGS = ["report", "--format=total"]
+
+# Tests constants
+POSSIBLE_TEST_DIRS = ["tests", "test", "tst"]

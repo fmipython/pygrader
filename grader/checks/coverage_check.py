@@ -8,6 +8,7 @@ import subprocess
 from grader.checks.abstract_check import AbstractCheck
 from grader.utils.constants import COVERAGE_PATH, COVERAGE_RUN_ARGS, COVERAGE_RUN_PYTEST_ARGS, COVERAGE_REPORT_ARGS
 from grader.utils.logger import VERBOSE
+from grader.utils.process import run
 
 logger = logging.getLogger("grader")
 
@@ -52,11 +53,12 @@ class CoverageCheck(AbstractCheck):
         """
         Run the coverage tool on the project.
         """
-        command = [self.__coverage_full_path] + COVERAGE_RUN_ARGS + COVERAGE_RUN_PYTEST_ARGS
-        output = subprocess.run(command, check=False, capture_output=True)
+        command = [self.__coverage_full_path] + COVERAGE_RUN_ARGS + COVERAGE_RUN_PYTEST_ARGS + [self._project_root]
+
+        output = run(command)
 
         if output.returncode != 0:
-            logger.error("Coverage run failed: %s", output.stderr)
+            logger.error("Coverage run failed: %d %s %s", output.returncode, output.stdout, output.stderr)
             return False
 
         return True
@@ -65,8 +67,9 @@ class CoverageCheck(AbstractCheck):
         """
         Generate a report from the coverage tool.
         """
-        command = [self.__coverage_full_path] + COVERAGE_REPORT_ARGS
-        output = subprocess.run(command, check=False, capture_output=True)
+        source_files = []  # TODO - Implement this
+        command = [self.__coverage_full_path] + COVERAGE_REPORT_ARGS + source_files
+        output = run(command)
 
         if output.returncode != 0:
             logger.error("Coverage report failed: %s", output.stderr)

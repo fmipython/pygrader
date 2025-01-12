@@ -4,11 +4,13 @@ It uses the pylint python library directly to run the check.
 """
 
 import logging
+import os
 from io import StringIO
 
 from pylint import lint
 from pylint.reporters.text import TextReporter
 
+import grader.utils.constants as const
 from grader.checks.abstract_check import AbstractCheck
 from grader.utils.files import find_all_python_files
 from grader.utils.logger import VERBOSE
@@ -33,7 +35,14 @@ class PylintCheck(AbstractCheck):
         Returns the score from the pylint check.
         """
         logger.log(VERBOSE, "Running pylint")
-        results = lint.Run(find_all_python_files(self._project_root), reporter=PylintCustomReporter(), exit=False)
+
+        pylint_args = find_all_python_files(self._project_root)
+
+        pylintrc_path = const.PYLINTRC
+        if os.path.exists(pylintrc_path):
+            pylint_args.extend(['--rcfile', pylintrc_path])
+
+        results = lint.Run(pylint_args, reporter=PylintCustomReporter(), exit=False)
         pylint_score = results.linter.stats.global_note
 
         return self.__translate_score(pylint_score)

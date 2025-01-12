@@ -17,6 +17,9 @@ PYTHON_BIN_UNIX = "python3"
 
 PYTHON_BIN = PYTHON_BIN_WINDOWS if os.name == "nt" else PYTHON_BIN_UNIX
 
+# Pylint constants
+PYLINTRC = os.path.join(CONFIG_DIR, "2024.pylintrc")
+
 # Type hints constants
 MYPY_TYPE_HINT_CONFIG = os.path.join(ROOT_DIR, "config", "mypy_type_hints_2024.ini")
 MYPY_LINE_COUNT_REPORT = os.path.join(REPORTS_TEMP_DIR, "linecount.txt")

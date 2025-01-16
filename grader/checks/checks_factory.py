@@ -19,6 +19,14 @@ NAME_TO_CHECK: dict[str, type[AbstractCheck]] = {
 
 
 def create_checks(config: dict, project_root: str) -> tuple[list[AbstractCheck], list[AbstractCheck]]:
+    """
+    Build two lists, containing the non-venv checks and the venv checks.
+
+    :param config: The configuration dictionary.
+    :param project_root: The root of the project.
+    :raises ValueError: If the check name is unknown.
+    :return: A tuple containing the non-venv checks and the venv checks.
+    """
     checks = config["checks"]
 
     non_venv_checks = []

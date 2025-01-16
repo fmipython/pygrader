@@ -49,8 +49,8 @@ class AbstractCheck(ABC):
         """
         return self._max_points
 
-    @abstractmethod
-    def is_running_within_venv(self) -> bool:
+    @staticmethod
+    def is_running_within_venv() -> bool:
         """
         Determine if the check is running within a virtual environment.
 

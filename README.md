@@ -14,7 +14,6 @@ The tool supports configuration files, where you can specify the score for each 
 
 The tool is still WIP:
 
-- Add actually loading things from the configuration file
 - Add unit tests
 - Add functional tests
 - Add documentation

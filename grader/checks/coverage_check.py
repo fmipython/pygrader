@@ -71,7 +71,7 @@ class CoverageCheck(AbstractCheck):
         output = run(command)
 
         if output.returncode != 0:
-            logger.error("Coverage run failed: %d %s %s", output.returncode, output.stdout, output.stderr)
+            logger.error("Coverage run failed")
             return False
 
         return True

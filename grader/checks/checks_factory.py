@@ -10,7 +10,7 @@ from grader.checks.requirements_check import RequirementsCheck
 from grader.checks.type_hints_check import TypeHintsCheck
 
 
-NAME_TO_CHECK = {
+NAME_TO_CHECK: dict[str, type[AbstractCheck]] = {
     "coverage": CoverageCheck,
     "pylint": PylintCheck,
     "requirements": RequirementsCheck,

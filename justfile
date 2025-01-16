@@ -16,13 +16,13 @@ lint_file file: venv
     mypy {{file}} --ignore-missing-imports
 
 test: venv
-    python3 -m unittest discover -s tst
+    python3 -m unittest discover -s tests/*
 
 push: venv lint test
     git push
 
 coverage: venv
-    coverage run --source="src" -m unittest discover -s tst
+    coverage run --source="grader" -m unittest discover -s tests/*
     coverage report -m --fail-under 75
     coverage lcov -o lcov.info
 

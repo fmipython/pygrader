@@ -4,7 +4,6 @@ It calls mypy as a subprocess to generate a report and then read from the report
 """
 
 import logging
-import subprocess
 
 from grader.checks.abstract_check import AbstractCheck
 from grader.utils.constants import MYPY_TYPE_HINT_CONFIG, REPORTS_TEMP_DIR, MYPY_LINE_COUNT_REPORT
@@ -45,9 +44,17 @@ class TypeHintsCheck(AbstractCheck):
         command = [self.__mypy_binary] + self.__mypy_arguments + files
         result = run(command)  # TODO Add error handling
 
+        if result.returncode != 0:
+            logger.error("Mypy run failed")
+            return 0.0
+
         # Read mypy linecount report
-        with open(MYPY_LINE_COUNT_REPORT, "r", encoding="utf-8") as report_file:
-            report = report_file.readline().strip().split()
+        try:
+            with open(MYPY_LINE_COUNT_REPORT, "r", encoding="utf-8") as report_file:
+                report = report_file.readline().strip().split()
+        except FileNotFoundError:
+            logger.error("Mypy linecount report not found")
+            return 0.0
 
         # Fancy way to get the needed values - I need the 3rd and 4th values, out of 5 total
         *_, lines_with_type_annotations, lines_total, _ = report

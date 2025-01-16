@@ -2,6 +2,7 @@
 Module containing the requirements.txt check.
 It checks if requirements.txt exists in the project root.
 """
+
 import logging
 import os
 
@@ -16,6 +17,7 @@ class RequirementsCheck(AbstractCheck):
     """
     The requirements.txt check class.
     """
+
     def __init__(self, name: str, max_points: int, project_root: str):
         super().__init__(name, max_points, project_root)
 
@@ -28,6 +30,7 @@ class RequirementsCheck(AbstractCheck):
 
         Returns the score from the requirements.txt check
         """
+        super().run()
         logger.log(VERBOSE, "Running %s", self.name)
 
         return int(os.path.exists(self.__requirements_path)) * self.max_points

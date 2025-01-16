@@ -2,6 +2,7 @@
 Module containing the type hints check.
 It calls mypy as a subprocess to generate a report and then read from the report.
 """
+
 import logging
 import subprocess
 
@@ -17,6 +18,7 @@ class TypeHintsCheck(AbstractCheck):
     """
     The TypeHints check class.
     """
+
     def __init__(self, name: str, max_points: int, project_root: str):
         super().__init__(name, max_points, project_root)
 
@@ -34,6 +36,7 @@ class TypeHintsCheck(AbstractCheck):
         The line contains a lot of stuff, we just need the type-hinted lines and the total amount of lines.
         Returns the score from the mypy check.
         """
+        super().run()
         logger.log(VERBOSE, "Running %s", self.name)
 
         # Gather all files

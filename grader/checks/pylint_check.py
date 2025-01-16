@@ -22,6 +22,7 @@ class PylintCheck(AbstractCheck):
     """
     The Pylint check class.
     """
+
     def __init__(self, name: str, max_points: int, project_root: str):
         AbstractCheck.__init__(self, name, max_points, project_root)
         self.__pylint_max_score = 10
@@ -34,13 +35,14 @@ class PylintCheck(AbstractCheck):
 
         Returns the score from the pylint check.
         """
+        super().run()
         logger.log(VERBOSE, "Running pylint")
 
         pylint_args = find_all_python_files(self._project_root)
 
         pylintrc_path = const.PYLINTRC
         if os.path.exists(pylintrc_path):
-            pylint_args.extend(['--rcfile', pylintrc_path])
+            pylint_args.extend(["--rcfile", pylintrc_path])
 
         results = lint.Run(pylint_args, reporter=PylintCustomReporter(), exit=False)
         pylint_score = results.linter.stats.global_note

@@ -1,6 +1,7 @@
 """
 Module containing the unit test code coverage check.
 """
+
 import logging
 import os
 
@@ -17,6 +18,7 @@ class CoverageCheck(AbstractCheck):
     """
     The Coverage check class.
     """
+
     def __init__(self, name: str, max_points: int, project_root: str):
         super().__init__(name, max_points, project_root)
 
@@ -28,6 +30,7 @@ class CoverageCheck(AbstractCheck):
 
         Returns the score from the coverage check.
         """
+        super().run()
         logger.log(VERBOSE, "Running %s", self.name)
 
         is_coverage_run_okay = self.__coverage_run()

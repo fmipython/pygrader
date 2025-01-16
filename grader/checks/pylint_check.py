@@ -13,7 +13,6 @@ from pylint.reporters.text import TextReporter
 import grader.utils.constants as const
 from grader.checks.abstract_check import AbstractCheck
 from grader.utils.files import find_all_python_files
-from grader.utils.logger import VERBOSE
 
 logger = logging.getLogger("grader")
 
@@ -36,7 +35,6 @@ class PylintCheck(AbstractCheck):
         Returns the score from the pylint check.
         """
         super().run()
-        logger.log(VERBOSE, "Running pylint")
 
         pylint_args = find_all_python_files(self._project_root)
 

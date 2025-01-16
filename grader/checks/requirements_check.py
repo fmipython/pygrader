@@ -8,7 +8,6 @@ import os
 
 from grader.checks.abstract_check import AbstractCheck
 from grader.utils.constants import REQUIREMENTS_FILENAME
-from grader.utils.logger import VERBOSE
 
 logger = logging.getLogger("grader")
 
@@ -31,6 +30,5 @@ class RequirementsCheck(AbstractCheck):
         Returns the score from the requirements.txt check
         """
         super().run()
-        logger.log(VERBOSE, "Running %s", self.name)
 
         return int(os.path.exists(self.__requirements_path)) * self.max_points

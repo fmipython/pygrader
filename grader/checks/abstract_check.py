@@ -3,10 +3,15 @@ Module containing a class representing an abstract check.
 Each check should inherit from this class.
 """
 
+import logging
 from abc import ABC, abstractmethod
+
+from grader.utils.logger import VERBOSE
 
 # Bad design, but I can't figure out a better way to check if running within a virtual environment
 from grader.utils.virtual_environment import VirtualEnvironment
+
+logger = logging.getLogger("grader")
 
 
 class AbstractCheck(ABC):
@@ -31,6 +36,7 @@ class AbstractCheck(ABC):
         if self._is_venv_required and not self.is_running_within_venv():
             raise RuntimeError("Virtual environment is required for this check")
 
+        logger.log(VERBOSE, "Running %s", self.name)
         raise NotImplementedError("Method run() must be implemented")
 
     @property

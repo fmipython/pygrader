@@ -8,7 +8,6 @@ import os
 from grader.checks.abstract_check import AbstractCheck
 from grader.utils.constants import COVERAGE_PATH, COVERAGE_RUN_ARGS, COVERAGE_RUN_PYTEST_ARGS, COVERAGE_REPORT_ARGS
 from grader.utils.files import find_all_source_files
-from grader.utils.logger import VERBOSE
 from grader.utils.process import run
 
 logger = logging.getLogger("grader")
@@ -31,7 +30,6 @@ class CoverageCheck(AbstractCheck):
         Returns the score from the coverage check.
         """
         super().run()
-        logger.log(VERBOSE, "Running %s", self.name)
 
         is_coverage_run_okay = self.__coverage_run()
 

@@ -3,6 +3,7 @@ Main entry point of the program.
 Calls all the checks, and stores their results
 """
 
+import sys
 import grader.utils.constants as const
 
 from grader.checks.checks_factory import create_checks
@@ -24,7 +25,7 @@ if __name__ == "__main__":
     except FileNotFoundError as exc:
         logger.error("Configuration file not found")
         logger.debug("Exception: %s", exc)
-        exit(1)
+        sys.exit(1)
 
     logger.info("Running checks for student %s", student_id)
     logger.debug("Arguments: %s", args)

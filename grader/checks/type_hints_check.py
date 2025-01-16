@@ -42,7 +42,7 @@ class TypeHintsCheck(AbstractCheck):
 
         # Run mypy on all files
         command = [self.__mypy_binary] + self.__mypy_arguments + files
-        result = run(command)  # TODO Add error handling
+        result = run(command)
 
         if result.returncode != 0:
             logger.error("Mypy run failed")

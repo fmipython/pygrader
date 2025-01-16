@@ -1,6 +1,7 @@
 """
 Module for loading the configuration file.
 """
+
 import json
 
 

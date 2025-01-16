@@ -10,6 +10,7 @@ import subprocess
 import grader.utils.constants as const
 
 from grader.utils.logger import VERBOSE
+from grader.utils.process import run
 
 logger = logging.getLogger("grader")
 
@@ -86,7 +87,4 @@ class VirtualEnvironment:
     def __install_requirements(venv_path: str, requirements_path: str):
         pip_path = os.path.join(venv_path, const.PIP_PATH)
 
-        output = subprocess.run(
-            [pip_path, "install", "-r", requirements_path], check=False, capture_output=True, text=True
-        )
-        logger.debug(output.stdout)
+        output = run([pip_path, "install", "-r", requirements_path])  # TODO - Missing error handling

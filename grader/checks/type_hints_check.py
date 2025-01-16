@@ -9,6 +9,7 @@ import subprocess
 from grader.checks.abstract_check import AbstractCheck
 from grader.utils.constants import MYPY_TYPE_HINT_CONFIG, REPORTS_TEMP_DIR, MYPY_LINE_COUNT_REPORT
 from grader.utils.files import find_all_source_files
+from grader.utils.process import run
 
 logger = logging.getLogger("grader")
 
@@ -42,7 +43,7 @@ class TypeHintsCheck(AbstractCheck):
 
         # Run mypy on all files
         command = [self.__mypy_binary] + self.__mypy_arguments + files
-        subprocess.run(command, check=False, capture_output=True)
+        result = run(command)  # TODO Add error handling
 
         # Read mypy linecount report
         with open(MYPY_LINE_COUNT_REPORT, "r", encoding="utf-8") as report_file:

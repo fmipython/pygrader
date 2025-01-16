@@ -36,7 +36,7 @@ def create_checks(config: dict, project_root: str) -> tuple[list[AbstractCheck],
         max_points = check["max_points"]
 
         if name not in NAME_TO_CHECK:
-            raise ValueError(f"Unknown check name: {name}")  # TODO - Replace with custom exception
+            raise InvalidCheckError(f"Unknown check name: {name}")
 
         is_venv = check.get("venv", False)
 
@@ -49,3 +49,9 @@ def create_checks(config: dict, project_root: str) -> tuple[list[AbstractCheck],
             non_venv_checks.append(created_check)
 
     return non_venv_checks, venv_checks
+
+
+class InvalidCheckError(Exception):
+    """
+    Custom exception for invalid check names.
+    """

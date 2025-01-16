@@ -1,6 +1,7 @@
 """
 Module containing the virtual environment class.
 """
+
 import logging
 import os
 import shutil
@@ -18,16 +19,21 @@ class VirtualEnvironment:
     Class that handles the creation and deletion of a virtual environment.
     Acts as a context manager. Everything executed within it, can assume that the venv is setup.
     """
+
+    is_initialized = False
+
     def __init__(self, project_path: str):
         self._project_path = project_path
         self._venv_path = os.path.join(project_path, const.VENV_NAME)
 
     def __enter__(self):
         self.setup()
+        VirtualEnvironment.is_initialized = True
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.teardown()
+        VirtualEnvironment.is_initialized = False
 
     def setup(self):
         """
@@ -80,6 +86,7 @@ class VirtualEnvironment:
     def __install_requirements(venv_path: str, requirements_path: str):
         pip_path = os.path.join(venv_path, const.PIP_PATH)
 
-        output = subprocess.run([pip_path, "install", "-r", requirements_path],
-                                check=False, capture_output=True, text=True)
+        output = subprocess.run(
+            [pip_path, "install", "-r", requirements_path], check=False, capture_output=True, text=True
+        )
         logger.debug(output.stdout)

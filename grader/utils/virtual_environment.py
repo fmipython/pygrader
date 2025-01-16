@@ -5,7 +5,6 @@ Module containing the virtual environment class.
 import logging
 import os
 import shutil
-import subprocess
 
 import grader.utils.constants as const
 
@@ -62,7 +61,10 @@ class VirtualEnvironment:
         # Create new venv
         logger.log(VERBOSE, "Creating new venv")
 
-        subprocess.run([const.PYTHON_BIN, "-m", "venv", self._venv_path], check=False, capture_output=True)
+        create_venv_result = run([const.PYTHON_BIN, "-m", "venv", self._venv_path])
+        if create_venv_result.returncode != 0:
+            logger.error("Failed to create virtual environment")
+            raise VirtualEnvironmentError("Failed to create virtual environment")
 
         # Install requirements
         if does_requirements_exist:
@@ -75,8 +77,6 @@ class VirtualEnvironment:
         grader_requirements_path = const.GRADER_REQUIREMENTS
         VirtualEnvironment.__install_requirements(self._venv_path, grader_requirements_path)
 
-        # TODO - Missing error handling
-
     def teardown(self):
         """
         Delete the virtual environment.
@@ -87,4 +87,14 @@ class VirtualEnvironment:
     def __install_requirements(venv_path: str, requirements_path: str):
         pip_path = os.path.join(venv_path, const.PIP_PATH)
 
-        output = run([pip_path, "install", "-r", requirements_path])  # TODO - Missing error handling
+        output = run([pip_path, "install", "-r", requirements_path])
+
+        if output.returncode != 0:
+            logger.error("Failed to install requirements from %s", requirements_path)
+            raise VirtualEnvironmentError(f"Failed to install requirements from {requirements_path}")
+
+
+class VirtualEnvironmentError(Exception):
+    """
+    Exception raised when an error occurs during the virtual environment setup.
+    """

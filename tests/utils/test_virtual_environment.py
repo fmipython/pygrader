@@ -1,13 +1,22 @@
 import unittest
 
+from grader.utils.virtual_environment import VirtualEnvironment
+
 
 class TestsVirtualEnvironment(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        
+        return super().setUpClass()
+
     def test_01_existing_venv(self):
         """
         Verify that the VirtualEnvironment class cleans pre-existing virtual enviroments
         """
         # Arrange
         # Act
+
+        with VirtualEnvironment()
         # Assert
         pass
 

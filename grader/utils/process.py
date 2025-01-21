@@ -1,6 +1,7 @@
 """
 Module containing a wrapper for launching shell commands
 """
+
 import logging
 import subprocess
 
@@ -9,7 +10,7 @@ import subprocess
 logger = logging.getLogger("grader")
 
 
-def run(command):
+def run(command: list[str]) -> subprocess.CompletedProcess[str]:
     """
     Execute a command in the terminal.
     Wraps the subprocess.run function, with the check=False, capture_output=True and text=True flags.

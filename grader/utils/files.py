@@ -1,6 +1,7 @@
 """
 Module containing the file-related functions.
 """
+
 import os
 from typing import Optional
 
@@ -79,10 +80,7 @@ def find_all_files_under_directory(directory: str, extension: str) -> list[str]:
         list[str]: A list of all files under the directory with the specified extension
     """
     files = [
-        os.path.join(root, file)
-        for root, _, files in os.walk(directory)
-        for file in files
-        if file.endswith(extension)
+        os.path.join(root, file) for root, _, files in os.walk(directory) for file in files if file.endswith(extension)
     ]
 
     return files

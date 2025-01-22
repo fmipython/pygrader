@@ -1,4 +1,5 @@
 import os
+import shutil
 import unittest
 from typing import TypeAlias
 from unittest.mock import patch, MagicMock
@@ -110,3 +111,31 @@ class TestFindAllFilesUnderDirectory(unittest.TestCase):
         subdirs = [["folder1", "folder2"], ["subfolder1"], []]
 
         return [result for result in zip(root_dirs, subdirs, files)]
+
+
+class TestGetTestsDirectoryName(unittest.TestCase):
+    def __init__(self, methodName="runTest"):
+        self.__sample_dir = "sample_dir"
+        super().__init__(methodName)
+
+    def tearDown(self):
+        if os.path.exists(self.__sample_dir):
+            shutil.rmtree(self.__sample_dir)
+        return super().tearDown()
+
+    def test_01_tests_directory(self):
+        # Arrange
+        test_dir_name = "tests"
+        expected_test_dir = os.path.join(self.__sample_dir, test_dir_name)
+        self.__create_structure(self.__sample_dir, test_dir_name)
+
+        # Act
+        actual_test_dir = get_tests_directory_name(self.__sample_dir)
+
+        # Assert
+        self.assertEqual(expected_test_dir, actual_test_dir)
+
+    @staticmethod
+    def __create_structure(root_dir: str, tests_dir: str):
+        full_path = os.path.join(root_dir, tests_dir)
+        os.makedirs(full_path)

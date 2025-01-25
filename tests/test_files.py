@@ -135,7 +135,46 @@ class TestGetTestsDirectoryName(unittest.TestCase):
         # Assert
         self.assertEqual(expected_test_dir, actual_test_dir)
 
+    def test_02_test_directory(self):
+        # Arrange
+        test_dir_name = "test"
+        expected_test_dir = os.path.join(self.__sample_dir, test_dir_name)
+        self.__create_structure(self.__sample_dir, test_dir_name)
+
+        # Act
+        actual_test_dir = get_tests_directory_name(self.__sample_dir)
+
+        # Assert
+        self.assertEqual(expected_test_dir, actual_test_dir)
+
+    def test_03_tst_directory(self):
+        # Arrange
+        test_dir_name = "tst"
+        expected_test_dir = os.path.join(self.__sample_dir, test_dir_name)
+        self.__create_structure(self.__sample_dir, test_dir_name)
+
+        # Act
+        actual_test_dir = get_tests_directory_name(self.__sample_dir)
+
+        # Assert
+        self.assertEqual(expected_test_dir, actual_test_dir)
+
+    def test_04_no_directory(self):
+        # Arrange
+        test_dir_name = "some_other_name"
+        self.__create_structure(self.__sample_dir, test_dir_name)
+
+        # Act
+        actual_test_dir = get_tests_directory_name(self.__sample_dir)
+
+        # Assert
+        self.assertIsNone(actual_test_dir)
+
     @staticmethod
     def __create_structure(root_dir: str, tests_dir: str):
         full_path = os.path.join(root_dir, tests_dir)
         os.makedirs(full_path)
+
+
+class Test(unittest.TestCase):
+    pass

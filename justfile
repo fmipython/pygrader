@@ -23,8 +23,8 @@ push: venv lint test
 
 coverage: venv
     coverage run --source="grader" -m unittest discover -s tests
-    coverage report -m --fail-under 75
     coverage lcov -o lcov.info
+    coverage report -m --fail-under 75
 
 run: venv
     python3 src/main.py

@@ -9,6 +9,7 @@ from grader.utils.process import run
 from grader.utils.virtual_environment import VirtualEnvironment, VirtualEnvironmentError
 
 
+# TODO - These tests take some time to run, also aren't exactly unit tests. Consider refactoring
 class TestsVirtualEnvironment(unittest.TestCase):
     def __init__(self, methodName="runTest"):
         self.__sample_root_dir_path = "sample_root_dir"

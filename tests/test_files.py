@@ -29,6 +29,7 @@ class TestFindAllPythonFiles(unittest.TestCase):
 
         # Assert
         self.assertEqual(expected_files, actual_files)
+        mocked_function.assert_called_once_with(self.__sample_dir, ".py")
 
     def __build_sample_files(self) -> tuple[list[str], list[str]]:
         root_dir = self.__sample_dir
@@ -69,8 +70,10 @@ class TestFindAllSourceFiles(unittest.TestCase):
 
     @patch("grader.utils.files.find_all_test_files")
     @patch("grader.utils.files.find_all_python_files")
-    def test_01_test_name(
+    @patch("grader.utils.files.get_tests_directory_name")
+    def test_01_find_all_source_files(
         self,
+        mocked_tests_directory_name: MagicMock,
         mocked_all_python_files: MagicMock,
         mocked_find_all_test_files: MagicMock,
     ):
@@ -85,6 +88,7 @@ class TestFindAllSourceFiles(unittest.TestCase):
 
         mocked_all_python_files.return_value = python_file_paths
         mocked_find_all_test_files.return_value = test_file_paths
+        mocked_tests_directory_name.return_value = self.__sample_dir
 
         expected_files = list(set(python_file_paths) - set(test_file_paths))
 
@@ -93,6 +97,9 @@ class TestFindAllSourceFiles(unittest.TestCase):
 
         # Assert
         self.assertEqual(sorted(expected_files), sorted(actual_files))
+        mocked_all_python_files.assert_called_once_with(self.__sample_dir)
+        mocked_find_all_test_files.assert_called_once_with(self.__sample_dir)
+        mocked_tests_directory_name.assert_called_once_with(self.__sample_dir)
 
 
 class TestFindAllTestFiles(unittest.TestCase):

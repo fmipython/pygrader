@@ -63,7 +63,36 @@ class TestFindAllPythonFiles(unittest.TestCase):
 
 
 class TestFindAllSourceFiles(unittest.TestCase):
-    pass
+    def __init__(self, methodName="runTest"):
+        self.__sample_dir = "sample_dir"
+        super().__init__(methodName)
+
+    @patch("grader.utils.files.find_all_test_files")
+    @patch("grader.utils.files.find_all_python_files")
+    def test_01_test_name(
+        self,
+        mocked_all_python_files: MagicMock,
+        mocked_find_all_test_files: MagicMock,
+    ):
+        # Arrange
+        python_file_names = [f"file{i}" for i in range(1, 11)]
+        python_file_paths = [
+            os.path.join(self.__sample_dir, python_file_name) for python_file_name in python_file_names
+        ]
+
+        test_file_names = [f"file{i}" for i in range(1, 11, 3)]
+        test_file_paths = [os.path.join(self.__sample_dir, test_file_name) for test_file_name in test_file_names]
+
+        mocked_all_python_files.return_value = python_file_paths
+        mocked_find_all_test_files.return_value = test_file_paths
+
+        expected_files = list(set(python_file_paths) - set(test_file_paths))
+
+        # Act
+        actual_files = find_all_source_files(self.__sample_dir)
+
+        # Assert
+        self.assertEqual(sorted(expected_files), sorted(actual_files))
 
 
 class TestFindAllTestFiles(unittest.TestCase):

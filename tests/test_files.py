@@ -14,7 +14,50 @@ from grader.utils.files import (
 
 
 class TestFindAllPythonFiles(unittest.TestCase):
-    pass
+    DirectoryStructure: TypeAlias = list[tuple[str, list[str], list[str]]]
+
+    def __init__(self, methodName="runTest"):
+        self.__sample_dir = "sample_dir"
+        super().__init__(methodName)
+
+    @patch("grader.utils.files.find_all_files_under_directory")
+    def test_01_find_all_python_files(self, mocked_function: MagicMock):
+        # Arrange
+        all_files, expected_files = self.__build_sample_files()
+        mocked_function.return_value = all_files
+
+        # Act
+        actual_files = find_all_python_files(self.__sample_dir)
+
+        # Assert
+        self.assertEqual(expected_files, actual_files)
+
+    def __build_sample_files(self) -> tuple[DirectoryStructure, list[str]]:
+        root_dir = self.__sample_dir
+        folder_1 = os.path.join(root_dir, "folder1")
+        folder_2 = os.path.join(root_dir, "folder2")
+        subfolder_1 = os.path.join(folder_1, "subfolder1")
+        subfolder_2 = os.path.join(folder_2, "subfolder2")
+        subfolder_3 = os.path.join(folder_2, "subfolder3")
+        venv_dir_1 = os.path.join(root_dir, "venv")
+        venv_dir_2 = os.path.join(root_dir, ".venv")
+
+        all_files = [
+            (root_dir, ["folder1", "folder2", "venv", ".venv"], []),
+            (folder_1, ["subfolder1"], ["file1.txt", "file2.py", "file3.py"]),
+            (folder_2, ["subfolder2", "subfolder3"], ["file4.txt", "file5.py", "file6.cpp"]),
+            (subfolder_1, [], ["file7.txt"]),
+            (subfolder_2, [], ["file8.txt", "file9.py"]),
+            (subfolder_3, [], ["file10.py"]),
+            (venv_dir_1, [], ["file11.py", "file12.py"]),
+            (venv_dir_2, [], ["file13.txt", "file14.py"]),
+        ]
+        expected_files = [
+            os.path.join(folder_1, "file2.py"),
+            os.path.join(folder_1, "file3.py"),
+        ]
+
+        return all_files, expected_files
 
 
 class TestFindAllSourceFiles(unittest.TestCase):
@@ -175,13 +218,12 @@ class TestFindAllFilesUnderDirectory(unittest.TestCase):
         # Assert
         self.assertEqual(expected_files, actual_files)
 
-    @staticmethod
-    def __build_sample_files(files: list[list[str]]) -> DirectoryStructure:
+    def __build_sample_files(self, files: list[list[str]]) -> DirectoryStructure:
         root_dirs = [
-            os.path.join(os.sep, "root"),
-            os.path.join(os.sep, "root", "folder1"),
-            os.path.join(os.sep, "root", "folder1", "subfolder1"),
-            os.path.join(os.sep, "root", "folder2"),
+            os.path.join(os.sep, self.__sample_dir),
+            os.path.join(os.sep, self.__sample_dir, "folder1"),
+            os.path.join(os.sep, self.__sample_dir, "folder1", "subfolder1"),
+            os.path.join(os.sep, self.__sample_dir, "folder2"),
         ]
         subdirs = [["folder1", "folder2"], ["subfolder1"], []]
 

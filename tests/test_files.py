@@ -96,7 +96,38 @@ class TestFindAllSourceFiles(unittest.TestCase):
 
 
 class TestFindAllTestFiles(unittest.TestCase):
-    pass
+    def __init__(self, methodName="runTest"):
+        self.__sample_dir = "sample_dir"
+        super().__init__(methodName)
+
+    @patch("grader.utils.files.find_all_files_under_directory")
+    def test_01_no_directory_provided(self, mocked_find_all_files_under_directory: MagicMock):
+        # Arrange
+        expected_value: list[str] = []
+
+        # Act
+        actual_value = find_all_test_files(tests_directory=None)
+
+        # Assert
+        self.assertEqual(expected_value, actual_value)
+        mocked_find_all_files_under_directory.assert_not_called()
+
+    @patch("grader.utils.files.find_all_files_under_directory")
+    def test_02_directory_provided(self, mocked_find_all_files_under_directory: MagicMock):
+        # Arrange
+        expected_value: list[str] = [
+            os.path.join(self.__sample_dir, "file1.py"),
+            os.path.join(self.__sample_dir, "file2.py"),
+        ]
+
+        mocked_find_all_files_under_directory.return_value = expected_value
+
+        # Act
+        actual_value = find_all_test_files(self.__sample_dir)
+
+        # Assert
+        self.assertEqual(expected_value, actual_value)
+        mocked_find_all_files_under_directory.assert_called_once_with(self.__sample_dir, ".py")
 
 
 class TestGetTestsDirectoryName(unittest.TestCase):

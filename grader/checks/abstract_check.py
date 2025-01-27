@@ -4,7 +4,7 @@ Each check should inherit from this class.
 """
 
 import logging
-from abc import ABC, abstractmethod
+from abc import ABC
 
 from grader.utils.logger import VERBOSE
 
@@ -26,7 +26,6 @@ class AbstractCheck(ABC):
         self._project_root = project_root
         self._is_venv_required = is_venv_requred
 
-    @abstractmethod
     def run(self) -> float:
         """
         Main method that executes the check.
@@ -37,7 +36,8 @@ class AbstractCheck(ABC):
             raise RuntimeError("Virtual environment is required for this check")
 
         logger.log(VERBOSE, "Running %s", self.name)
-        raise NotImplementedError("Method run() must be implemented")
+
+        return 0.0
 
     @property
     def name(self) -> str:

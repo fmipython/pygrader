@@ -51,16 +51,16 @@ class CoverageCheck(AbstractCheck):
         :param coverage_score: The score from pylint to be translated
         :return: The translated score
         """
-        step = 100 / self._max_points
-        steps = [i * step for i in range(self._max_points + 1)]
+        step = 100 / (self._max_points + 1)
+        steps = [i * step for i in range(self._max_points + 2)]
 
         regions = list(zip(steps, steps[1:]))
 
-        for score, (start, end) in enumerate(regions, start=1):
+        for score, (start, end) in enumerate(regions):
             if start <= coverage_score < end:
                 return score
 
-        return 0
+        return self._max_points
 
     def __coverage_run(self):
         """
@@ -85,7 +85,7 @@ class CoverageCheck(AbstractCheck):
         output = run(command)
 
         if output.returncode != 0:
-            logger.error("Coverage report failed: %s", output.stderr)
+            logger.error("Coverage report failed")
             return None
 
         return int(output.stdout)

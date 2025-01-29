@@ -55,16 +55,16 @@ class PylintCheck(AbstractCheck):
         :param pylint_score: The score from pylint to be translated
         :return: The translated score
         """
-        step = self.__pylint_max_score / self._max_points
-        steps = [i * step for i in range(self._max_points + 1)]
+        step = self.__pylint_max_score / (self._max_points + 1)
+        steps = [i * step for i in range(self._max_points + 2)]
 
         regions = list(zip(steps, steps[1:]))
 
-        for score, (start, end) in enumerate(regions, start=1):
+        for score, (start, end) in enumerate(regions):
             if start <= pylint_score < end:
                 return score
 
-        return 0
+        return self._max_points
 
 
 class PylintCustomReporter(TextReporter):

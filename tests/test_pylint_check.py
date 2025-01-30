@@ -12,7 +12,7 @@ class TestPylintCheck(unittest.TestCase):
         return super().setUp()
 
     @patch("pylint.lint.Run")
-    @patch("grader.utils.files.find_all_python_files")
+    @patch("grader.utils.files.find_all_files_under_directory")
     def test_01_pylint_called(self, mocked_find_python_files: MagicMock, mocked_pylint: MagicMock):
         # Arrange
         mocked_find_python_files.return_value = ["file1.py", "file2.py"]
@@ -24,6 +24,7 @@ class TestPylintCheck(unittest.TestCase):
 
         # Assert
         mocked_pylint.assert_called_once()
+        mocked_find_python_files.assert_called_once()
         # called_with[0] is *args. First arg is the list of "args" of lint.Run
         self.assertIn("file1.py", called_with[0][0])
         self.assertIn("file2.py", called_with[0][0])

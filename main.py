@@ -15,13 +15,14 @@ from grader.utils.virtual_environment import VirtualEnvironment
 
 if __name__ == "__main__":
     args = get_args()
+    print(args)
     student_id = args["student_id"]
     logger = setup_logger(student_id, verbosity=args["verbosity"])
 
     logger.info("Python project grader, %s", const.VERSION)
 
     try:
-        config = load_config(args["config_file"])
+        config = load_config(args["config"])
     except FileNotFoundError as exc:
         logger.error("Configuration file not found")
         logger.debug("Exception: %s", exc)

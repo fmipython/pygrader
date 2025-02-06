@@ -38,7 +38,7 @@ def create_checks(config: dict, project_root: str) -> tuple[list[AbstractCheck],
         if name not in NAME_TO_CHECK:
             raise InvalidCheckError(f"Unknown check name: {name}")
 
-        is_venv = check.get("venv", False)
+        is_venv = check.get("requires_venv", False)
 
         check_class = NAME_TO_CHECK[name]
         created_check = check_class(name, max_points, project_root)

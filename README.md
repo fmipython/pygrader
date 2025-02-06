@@ -21,7 +21,40 @@ The tool is still WIP:
 
 ## Installation
 
+1. Clone the repository and create a virtual environment:
+
+```bash
+git clone https://github.com/fmipython/PythonProjectGrader
+cd PythonProjectGrader
+python3 -m venv .venv
+```
+
+2. Activate the virtual environment:
+   Linux/MacOS
+
+```bash
+source .venv/bin/activate
+```
+
+Or for Windows:
+
+```bash
+.venv\Scripts\activate
+```
+
+3. Install the package:
+
+```bash
+pip install -r requirements.txt
+```
+
 ## Usage
+
+```bash
+python3 main.py -c ./config/2024.json PROJECT_PATH
+```
+
+Where `PROJECT_PATH` is the path to the project you want to grade.
 
 ## Configuration
 

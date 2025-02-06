@@ -68,7 +68,7 @@ class CoverageCheck(AbstractCheck):
         """
         command = [self.__coverage_full_path] + COVERAGE_RUN_ARGS + COVERAGE_RUN_PYTEST_ARGS + [self._project_root]
 
-        output = run(command)
+        output = run(command, current_directory=self._project_root)
 
         if output.returncode != 0:
             logger.error("Coverage run failed")

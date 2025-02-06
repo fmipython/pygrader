@@ -36,8 +36,13 @@ PIP_PATH = PIP_PATH_WINDOWS if os.name == "nt" else PIP_PATH_UNIX
 GRADER_REQUIREMENTS = os.path.join(CONFIG_DIR, "grader_requirements.txt")
 
 # Coverage constants
-COVERAGE_BIN = "coverage"
-COVERAGE_PATH = os.path.join(VENV_NAME, "bin", COVERAGE_BIN)
+COVERAGE_BIN_WINDOWS = "coverage.exe"
+COVERAGE_BIN_UNIX = "coverage"
+COVERAGE_BIN = COVERAGE_BIN_WINDOWS if os.name == "nt" else COVERAGE_BIN_UNIX
+
+COVERAGE_PATH_WINDOWS = os.path.join(VENV_NAME, "Scripts", COVERAGE_BIN)
+COVERAGE_PATH_UNIX = os.path.join(VENV_NAME, "bin", COVERAGE_BIN)
+COVERAGE_PATH = COVERAGE_PATH_WINDOWS if os.name == "nt" else COVERAGE_PATH_UNIX
 COVERAGE_RUN_ARGS = ["run", "-m"]
 COVERAGE_RUN_PYTEST_ARGS = ["pytest"]
 COVERAGE_REPORT_ARGS = ["report", "--format=total"]

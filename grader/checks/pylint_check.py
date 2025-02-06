@@ -38,6 +38,7 @@ class PylintCheck(AbstractCheck):
 
         pylint_args = find_all_python_files(self._project_root)
 
+        logger.debug("Running pylint check on files: %s", pylint_args)
         pylintrc_path = const.PYLINTRC
         if os.path.exists(pylintrc_path):
             pylint_args.extend(["--rcfile", pylintrc_path])
@@ -45,6 +46,7 @@ class PylintCheck(AbstractCheck):
         results = lint.Run(pylint_args, reporter=PylintCustomReporter(), exit=False)
         pylint_score = results.linter.stats.global_note
 
+        logger.debug("Pylint score: %s", pylint_score)
         return self.__translate_score(pylint_score)
 
     def __translate_score(self, pylint_score: float) -> float:

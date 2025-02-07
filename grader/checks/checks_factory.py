@@ -24,9 +24,13 @@ def create_checks(config: dict, project_root: str) -> tuple[list[AbstractCheck],
     Build two lists, containing the non-venv checks and the venv checks.
 
     :param config: The configuration dictionary.
+    :type config: dict
     :param project_root: The root of the project.
-    :raises ValueError: If the check name is unknown.
+    :type project_root: str
+    :raises InvalidConfigError: If no checks are found in the configuration file.
+    :raises InvalidCheckError: If the check name is unknown.
     :return: A tuple containing the non-venv checks and the venv checks.
+    :rtype: tuple[list[AbstractCheck], list[AbstractCheck]]
     """
     if "checks" not in config:
         raise InvalidConfigError("No checks found in the configuration file")

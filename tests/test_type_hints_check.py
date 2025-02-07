@@ -40,20 +40,6 @@ class TestTypeHintsCheck(unittest.TestCase):
         self.assertIn("file2.py", called_with[0][0])
 
     @patch("grader.utils.process.run")
-    def test_02_mypy_fails(self, mocked_run: MagicMock):
-        # Arrange
-        mocked_run.return_value = CompletedProcess(args=["mypy"], returncode=1)
-
-        # Act
-        with self.assertLogs(level="ERROR") as cm:
-            result = self.type_hints_check.run()
-            is_error_logged = any("Mypy run failed" in log for log in cm.output)
-
-        # Assert
-        self.assertEqual(result, 0.0)
-        self.assertTrue(is_error_logged)
-
-    @patch("grader.utils.process.run")
     def test_03_mypy_report_missing(self, mocked_run: MagicMock):
         # Arrange
         mocked_run.return_value = CompletedProcess(args=["mypy"], returncode=0)

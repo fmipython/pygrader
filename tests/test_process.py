@@ -33,7 +33,9 @@ class TestRunProcess(unittest.TestCase):
         self.assertEqual(expected_subprocess_result, actual_subprocess_result)
         self.assertTrue(is_command_name_logged)
         self.assertTrue(is_additional_information_logged)
-        mocked_subprocess.assert_called_once_with([expected_command], check=False, capture_output=True, text=True)
+        mocked_subprocess.assert_called_once_with(
+            [expected_command], check=False, capture_output=True, text=True, cwd=None
+        )
 
     @patch("subprocess.run")
     def test_02_zero_return_code(self, mocked_subprocess: MagicMock):
@@ -59,4 +61,6 @@ class TestRunProcess(unittest.TestCase):
         self.assertEqual(expected_subprocess_result, actual_subprocess_result)
         self.assertTrue(is_command_name_logged)
         self.assertTrue(is_additional_information_logged)
-        mocked_subprocess.assert_called_once_with([expected_command], check=False, capture_output=True, text=True)
+        mocked_subprocess.assert_called_once_with(
+            [expected_command], check=False, capture_output=True, text=True, cwd=None
+        )

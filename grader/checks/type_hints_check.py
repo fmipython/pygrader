@@ -34,7 +34,9 @@ class TypeHintsCheck(AbstractCheck):
 
         The first line in the report contains the values for all files.
         The line contains a lot of stuff, we just need the type-hinted lines and the total amount of lines.
-        Returns the score from the mypy check.
+
+        :returns: The score from the mypy check.
+        :rtype: float
         """
         super().run()
 

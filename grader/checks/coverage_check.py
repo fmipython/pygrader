@@ -27,7 +27,8 @@ class CoverageCheck(AbstractCheck):
         """
         Run the coverage check on the project.
 
-        Returns the score from the coverage check.
+        :returns: The score from the coverage check.
+        :rtype: float
         """
         super().run()
 

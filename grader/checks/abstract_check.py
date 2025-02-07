@@ -7,8 +7,6 @@ import logging
 from abc import ABC
 
 from grader.utils.logger import VERBOSE
-
-# Bad design, but I can't figure out a better way to check if running within a virtual environment
 from grader.utils.virtual_environment import VirtualEnvironment
 
 logger = logging.getLogger("grader")
@@ -30,7 +28,8 @@ class AbstractCheck(ABC):
         """
         Main method that executes the check.
 
-        Returns the score of the check.
+        :returns: The score of the check.
+        :rtype: float
         """
         if self._is_venv_required and not self.is_running_within_venv():
             raise RuntimeError("Virtual environment is required for this check")
@@ -44,14 +43,16 @@ class AbstractCheck(ABC):
         """
         Get the name of the check.
 
-        Returns the name of the check
+        :returns: The name of the check.
+        :rtype: str
         """
         return self._name
 
     @property
     def max_points(self) -> int:
         """
-        Returns the maximum amount of points that can be achieved by the check.
+        :returns: The maximum amount of points that can be achieved by the check.
+        :rtype: int
         """
         return self._max_points
 
@@ -60,7 +61,7 @@ class AbstractCheck(ABC):
         """
         Determine if the check is running within a virtual environment.
 
-        Returns True if running within a virtual environment, False otherwise.
+        :returns: True if running within a virtual environment, False otherwise.
+        :rtype: bool
         """
-
         return VirtualEnvironment.is_initialized

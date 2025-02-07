@@ -14,7 +14,6 @@ The tool supports configuration files, where you can specify the score for each 
 
 The tool is still WIP:
 
-- Add unit tests
 - Add functional tests
 - Add documentation
 - Add Github workflows

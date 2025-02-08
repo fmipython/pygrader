@@ -30,9 +30,10 @@ class PylintCheck(AbstractCheck):
         """
         Run the pylint check on the project.
         First, find all python files in the project, then create a custom reporter (to suppress all output).
-        Run the pylint check itself and map the score withing the desired bounds.
+        Run the pylint check itself and map the score within the desired bounds.
 
-        Returns the score from the pylint check.
+        :returns: The score from the pylint check.
+        :rtype: float
         """
         super().run()
 

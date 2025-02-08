@@ -61,6 +61,8 @@ Where `PROJECT_PATH` is the path to the project you want to grade.
 
 ## Documentation
 
+Link to the documentation [here](https://fmipython.github.io/PythonProjectGrader/)
+
 ## Contributing
 
 ## Licence

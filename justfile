@@ -7,7 +7,7 @@ init:
     pip install -r requirements.txt
 
 lint: venv
-    python3 -m pylint $(git ls-files '*.py') --fail-under 9
+    python3 -m pylint grader tests main.py --fail-under 9
     mypy grader --ignore-missing-imports
     flake8 grader
 
@@ -28,3 +28,7 @@ coverage: venv
 
 run: venv
     python3 src/main.py
+
+docs: venv
+    sphinx-apidoc -o docs/source grader
+    sphinx-build -b html docs/source docs/build

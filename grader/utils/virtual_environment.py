@@ -85,6 +85,17 @@ class VirtualEnvironment:
 
     @staticmethod
     def __install_requirements(venv_path: str, requirements_path: str):
+        """
+        Install the requirements specified in the requirements file into the virtual environment.
+        :param venv_path: The path to the virtual environment.
+        :type venv_path: str
+        :param requirements_path: The path to the requirements file.
+        :type requirements_path: str
+        :raises VirtualEnvironmentError: If the installation of requirements fails.
+        :return: None
+        :rtype: None
+        """
+
         pip_path = os.path.join(venv_path, const.PIP_PATH)
 
         output = run([pip_path, "install", "-r", requirements_path])

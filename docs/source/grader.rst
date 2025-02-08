@@ -8,6 +8,7 @@ Subpackages
    :maxdepth: 4
 
    grader.checks
+   grader.utils
 
 Module contents
 ---------------

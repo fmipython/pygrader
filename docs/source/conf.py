@@ -22,6 +22,7 @@ extensions = [
     "sphinx.ext.autodoc",  # Automatically document from docstrings
     "sphinx.ext.napoleon",  # Support for Google-style or NumPy-style docstrings
     "sphinx.ext.viewcode",  # Add links to source code in documentation]
+    "sphinx_rtd_theme_ext_color_contrast",
 ]
 templates_path = ["_templates"]
 exclude_patterns = []

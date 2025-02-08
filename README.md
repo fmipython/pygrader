@@ -14,12 +14,6 @@ Current supported set of checks are:
 
 The tool supports configuration files, where you can specify the score for each check.
 
-The tool is still WIP:
-
-- Add functional tests
-- Add documentation
-- Add Github workflows
-
 ## Installation
 
 1. Clone the repository and create a virtual environment:

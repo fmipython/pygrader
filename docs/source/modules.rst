@@ -1,5 +1,5 @@
-grader
-======
+Source code reference
+=====================
 
 .. toctree::
    :maxdepth: 4

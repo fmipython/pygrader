@@ -45,8 +45,8 @@ class PylintCheck(AbstractCheck):
         if os.path.exists(pylintrc_path):
             pylint_args.extend(["--rcfile", pylintrc_path])
 
-        command = ["pylint"] + pylint_args
-        results = process.run(command, self._project_root)
+        command = [os.path.join(self._project_root, const.PYLINT_PATH)] + pylint_args
+        results = process.run(command, current_directory=self._project_root)
 
         if results.returncode != 0:
             return 0

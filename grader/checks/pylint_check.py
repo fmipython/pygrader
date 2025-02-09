@@ -44,9 +44,6 @@ class PylintCheck(AbstractCheck):
         if os.path.exists(pylintrc_path):
             pylint_args.extend(["--rcfile", pylintrc_path])
 
-        # pylint emits false positives for the dynamic properties of Django models
-        # so there is a plugin to suppress those
-        pylint_args.append("--load-plugins=pylint_django")
 
         results = lint.Run(pylint_args, reporter=PylintCustomReporter(), exit=False)
         pylint_score = results.linter.stats.global_note

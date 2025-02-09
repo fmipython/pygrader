@@ -8,7 +8,6 @@ import os
 import re
 from io import StringIO
 
-from pylint import lint
 from pylint.reporters.text import TextReporter
 
 import grader.utils.constants as const
@@ -71,7 +70,7 @@ class PylintCheck(AbstractCheck):
         regions = list(zip(steps, steps[1:]))
 
         for score, (start, end) in enumerate(regions):
-            if start <= pylint_score < end:
+            if round(start, 2) <= round(pylint_score, 2) < round(end, 2):
                 return score
 
         return self._max_points

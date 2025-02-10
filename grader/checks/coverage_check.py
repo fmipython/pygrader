@@ -83,7 +83,7 @@ class CoverageCheck(AbstractCheck):
         """
         source_files = find_all_source_files(self._project_root)
         command = [self.__coverage_full_path] + COVERAGE_REPORT_ARGS + source_files
-        output = run(command)
+        output = run(command, current_directory=self._project_root)
 
         if output.returncode != 0:
             logger.error("Coverage report failed")

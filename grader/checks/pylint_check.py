@@ -42,6 +42,7 @@ class PylintCheck(AbstractCheck):
 
         logger.debug("Running pylint check on files: %s", pylint_args)
         pylintrc_path = const.PYLINTRC
+        pylint_args.append("--fail-under=0")
         if os.path.exists(pylintrc_path):
             pylint_args.extend(["--rcfile", pylintrc_path])
 

@@ -6,7 +6,13 @@ import logging
 import os
 
 from grader.checks.abstract_check import AbstractCheck
-from grader.utils.constants import COVERAGE_PATH, COVERAGE_RUN_ARGS, COVERAGE_RUN_PYTEST_ARGS, COVERAGE_REPORT_ARGS
+from grader.utils.constants import (
+    COVERAGE_PATH,
+    COVERAGE_RUN_ARGS,
+    COVERAGE_RUN_PYTEST_ARGS,
+    COVERAGE_REPORT_ARGS,
+    COVERAGE_REPORT_ARGS_NO_FORMAT,
+)
 from grader.utils.files import find_all_source_files
 from grader.utils.process import run
 
@@ -82,6 +88,10 @@ class CoverageCheck(AbstractCheck):
         Generate a report from the coverage tool.
         """
         source_files = find_all_source_files(self._project_root)
+
+        command = [self.__coverage_full_path] + COVERAGE_REPORT_ARGS_NO_FORMAT + source_files
+        output = run(command, current_directory=self._project_root)
+
         command = [self.__coverage_full_path] + COVERAGE_REPORT_ARGS + source_files
         output = run(command, current_directory=self._project_root)
 

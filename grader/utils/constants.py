@@ -50,6 +50,7 @@ COVERAGE_PATH = COVERAGE_PATH_WINDOWS if os.name == "nt" else COVERAGE_PATH_UNIX
 COVERAGE_RUN_ARGS = ["run", "-m"]
 COVERAGE_RUN_PYTEST_ARGS = ["pytest"]
 COVERAGE_REPORT_ARGS = ["report", "--format=total"]
+COVERAGE_REPORT_ARGS_NO_FORMAT = ["report"]
 
 # Tests constants
 POSSIBLE_TEST_DIRS = ["tests", "test", "tst"]

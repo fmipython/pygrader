@@ -1,6 +1,7 @@
 """
 Module containing the logger setup function and the custom VERBOSE level.
 """
+
 import logging
 
 from typing import Optional
@@ -22,30 +23,34 @@ def setup_logger(student_id: Optional[str] = None, verbosity: int = 0) -> loggin
     """
     student_id = student_id or "grader"
     logger = logging.getLogger("grader")
+    logger.setLevel(logging.DEBUG)  # Set the logger to the lowest level to capture all messages
 
     match verbosity:
         case 0:
-            level = logging.INFO
+            console_level = logging.INFO
         case 1:
-            level = VERBOSE
+            console_level = VERBOSE
         case 2:
-            level = logging.DEBUG
+            console_level = logging.DEBUG
         case _:
-            level = logging.DEBUG
+            console_level = logging.DEBUG
 
     if verbosity > 0:
-        log_format = "%(asctime)s - %(levelname)s - %(message)s"
+        console_format = "%(asctime)s - %(levelname)s - %(message)s"
     else:
-        log_format = "%(message)s"
+        console_format = "%(message)s"
 
-    logging.basicConfig(
-        level=level,
-        format=log_format,
-        handlers=[
-            logging.StreamHandler(),
-            logging.FileHandler(student_id + ".log"),
-        ],
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
+    file_format = "%(asctime)s - %(levelname)s - %(message)s"
+
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(console_level)
+    console_handler.setFormatter(logging.Formatter(console_format))
+
+    file_handler = logging.FileHandler(student_id + ".log")
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(logging.Formatter(file_format))
+
+    logger.addHandler(console_handler)
+    logger.addHandler(file_handler)
 
     return logger

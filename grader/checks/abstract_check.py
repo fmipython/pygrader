@@ -69,5 +69,3 @@ class AbstractCheck(ABC):
 
 class CheckError(Exception):
     """Custom exception for check errors."""
-
-    pass

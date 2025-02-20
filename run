@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# check if docker is installed
+if ! [ -x "$(command -v docker)" ]; then
+  echo "Error: docker is not installed. Please install Docker and try again. You can download and install from here: https://docs.docker.com/get-docker/" >&2
+  exit 1
+fi
+
+# script argument $1 should be the python project directory
+if [ -z "$1" ]; then
+  echo "Usage: $0 <path_to_python_project>"
+  exit 1
+fi
+
+docker pull ghcr.io/fmipython/grader:latest
+
+# run, making the container ephemeral
+# TODO: don't hardcode the config file and verbosity options
+docker run --rm -v "$1:/project" fmipython/grader -c /app/config/2024.json -vv

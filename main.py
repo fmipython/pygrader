@@ -6,6 +6,7 @@ Calls all the checks, and stores their results
 import sys
 import grader.utils.constants as const
 
+from grader.checks.abstract_check import CheckError
 from grader.checks.checks_factory import create_checks
 from grader.utils.cli import get_args
 from grader.utils.config import load_config
@@ -40,12 +41,22 @@ if __name__ == "__main__":
     non_venv_checks, venv_checks = create_checks(config, project_root)
 
     for check in non_venv_checks:
-        check_score = check.run()
+        try:
+            check_score = check.run()
+        except CheckError as error:
+            logger.error("Check failed: %s", error)
+            check_score = 0.0
+
         scores.append((check.name, check_score, check.max_points))
 
     with VirtualEnvironment(project_root) as venv:
         for check in venv_checks:
-            check_score = check.run()
+            try:
+                check_score = check.run()
+            except CheckError as error:
+                logger.error("Check failed: %s", error)
+                check_score = 0.0
+
             scores.append((check.name, check_score, check.max_points))
 
     for name, score, max_score in scores:

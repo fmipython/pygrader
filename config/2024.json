@@ -8,7 +8,7 @@
     {
       "name": "pylint",
       "max_points": 3,
-      "requires_venv": false
+      "requires_venv": true
     },
     {
       "name": "type-hints",

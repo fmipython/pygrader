@@ -5,12 +5,13 @@ It uses the pylint python library directly to run the check.
 
 import logging
 import os
+import re
 from io import StringIO
 
-from pylint import lint
 from pylint.reporters.text import TextReporter
 
 import grader.utils.constants as const
+from grader.utils import process
 from grader.checks.abstract_check import AbstractCheck
 from grader.utils.files import find_all_python_files
 
@@ -30,9 +31,10 @@ class PylintCheck(AbstractCheck):
         """
         Run the pylint check on the project.
         First, find all python files in the project, then create a custom reporter (to suppress all output).
-        Run the pylint check itself and map the score withing the desired bounds.
+        Run the pylint check itself and map the score within the desired bounds.
 
-        Returns the score from the pylint check.
+        :returns: The score from the pylint check.
+        :rtype: float
         """
         super().run()
 
@@ -40,11 +42,17 @@ class PylintCheck(AbstractCheck):
 
         logger.debug("Running pylint check on files: %s", pylint_args)
         pylintrc_path = const.PYLINTRC
+        pylint_args.append("--fail-under=0")
         if os.path.exists(pylintrc_path):
             pylint_args.extend(["--rcfile", pylintrc_path])
 
-        results = lint.Run(pylint_args, reporter=PylintCustomReporter(), exit=False)
-        pylint_score = results.linter.stats.global_note
+        command = [os.path.join(self._project_root, const.PYLINT_PATH)] + pylint_args
+        results = process.run(command, current_directory=self._project_root)
+
+        if results.returncode != 0:
+            return 0
+
+        pylint_score = self.__get_pylint_score(results.stdout)
 
         logger.debug("Pylint score: %s", pylint_score)
         return self.__translate_score(pylint_score)
@@ -63,10 +71,33 @@ class PylintCheck(AbstractCheck):
         regions = list(zip(steps, steps[1:]))
 
         for score, (start, end) in enumerate(regions):
-            if start <= pylint_score < end:
+            if round(start, 2) <= round(pylint_score, 2) < round(end, 2):
                 return score
 
         return self._max_points
+
+    def __get_pylint_score(self, pylint_output: str) -> float:
+        """
+        Get the score from the pylint output.
+        The score is the last value in the output.
+
+        :param pylint_output: The output from the pylint check
+        :return: The score from the pylint check
+        """
+        expression = re.compile(r"[a-zA-Z ]*(\d*.\d*)\/.*")
+
+        for line in pylint_output.strip().split("\n"):
+            if "Your code has been rated at" in line:
+                match expression.match(line):
+                    case re.Match() as match_result:
+                        score = match_result.group(1)
+                        return float(score)
+                    case None:
+                        logger.error("Pylint score not found")
+                        return 0.0
+
+        logger.error("Pylint score not found")
+        return 0.0
 
 
 class PylintCustomReporter(TextReporter):

@@ -173,3 +173,4 @@ cython_debug/
 
 reports
 lcov.info
+.vscode

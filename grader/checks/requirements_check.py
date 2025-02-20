@@ -26,8 +26,8 @@ class RequirementsCheck(AbstractCheck):
         """
         Run the requirements check on the project.
         Check if requirements.txt exists in the project root - the score is either 0 or full points.
-
-        Returns the score from the requirements.txt check
+        :return: The score from the requirements.txt check
+        :rtype: float
         """
         super().run()
 

@@ -5,13 +5,22 @@ from grader.checks.requirements_check import RequirementsCheck
 
 
 class TestRequirementsCheck(unittest.TestCase):
-    def setUp(self):
-        self.coverage_check = RequirementsCheck("requirements", 1, "sample_dir")
+    """
+    Unit tests for the RequirementsCheck class.
+    """
 
+    def setUp(self):
+        """
+        Set up the test case environment.
+        """
+        self.coverage_check = RequirementsCheck("requirements", 1, "sample_dir")
         return super().setUp()
 
     @patch("os.path.exists")
     def test_01_requirements_exist(self, mocked_exists: MagicMock):
+        """
+        Test that the requirements file exists.
+        """
         # Arrange
         mocked_exists.return_value = True
         expected_score = 1
@@ -24,6 +33,9 @@ class TestRequirementsCheck(unittest.TestCase):
 
     @patch("os.path.exists")
     def test_02_requirements_does_not_exist(self, mocked_exists: MagicMock):
+        """
+        Test that the requirements file does not exist.
+        """
         # Arrange
         mocked_exists.return_value = False
         expected_score = 0

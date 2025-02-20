@@ -1,5 +1,7 @@
 # PythonProjectGrader
 
+[![Tests](https://github.com/fmipython/PythonProjectGrader/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/fmipython/PythonProjectGrader/actions/workflows/tests.yml)[![GPL-3.0](https://img.shields.io/badge/license-GPL_3.0-blue.svg)](https://github.com/lyubolp/slightly-better-cut/blob/main/LICENSE)
+
 A grader for Python projects, used in the ["Programming with Python"](https://github.com/fmipython) course at Sofia University "St. Kliment Ohridski", Faculty of Mathematics and Informatics.
 
 Automatically grader Python projects based on a set of checks.
@@ -12,12 +14,6 @@ Current supported set of checks are:
 
 The tool supports configuration files, where you can specify the score for each check.
 
-The tool is still WIP:
-
-- Add unit tests
-- Add functional tests
-- Add documentation
-- Add Github workflows
 
 ## How to use (easier way)
 
@@ -77,4 +73,10 @@ Where `PROJECT_PATH` is the path to the project you want to grade.
 
 ## Documentation
 
+Link to the documentation [here](https://fmipython.github.io/PythonProjectGrader/)
+
 ## Contributing
+
+## Licence
+
+[GPL-3.0](https://choosealicense.com/licenses/gpl-3.0/)

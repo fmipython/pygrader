@@ -54,11 +54,9 @@ def get_tests_directory_name(project_root_dir: str) -> Optional[str]:
     """
     Check if the project directory contains a tests directory.
 
-    Args:
-        project_root_dir: The path to the project directory
-
-    Returns:
-        bool: True if the project directory contains a tests directory, False otherwise
+    :param project_root_dir: The path to the project directory
+    :returns: The path to the tests directory if found, otherwise None
+    :rtype: Optional[str]
     """
     for possible_directory in const.POSSIBLE_TEST_DIRS:
         possible_tests_path = os.path.join(project_root_dir, possible_directory)
@@ -72,12 +70,10 @@ def find_all_files_under_directory(directory: str, extension: str) -> list[str]:
     """
     Find all files under a directory with a specific extension.
 
-    Args:
-        directory: The directory to search in
-        extension: The extension of the files to search for
-
-    Returns:
-        list[str]: A list of all files under the directory with the specified extension
+    :param directory: The directory to search in
+    :param extension: The extension of the files to search for
+    :return: A list of all files under the directory with the specified extension
+    :rtype: list[str]
     """
     files = [
         os.path.join(root, file) for root, _, files in os.walk(directory) for file in files if file.endswith(extension)

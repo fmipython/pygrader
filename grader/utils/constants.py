@@ -17,9 +17,6 @@ PYTHON_BIN_UNIX = "python3"
 
 PYTHON_BIN = PYTHON_BIN_WINDOWS if os.name == "nt" else PYTHON_BIN_UNIX
 
-# Pylint constants
-PYLINTRC = os.path.join(CONFIG_DIR, "2024.pylintrc")
-
 # Type hints constants
 MYPY_TYPE_HINT_CONFIG = os.path.join(ROOT_DIR, "config", "mypy_type_hints_2024.ini")
 MYPY_LINE_COUNT_REPORT = os.path.join(REPORTS_TEMP_DIR, "linecount.txt")
@@ -35,6 +32,13 @@ PIP_PATH = PIP_PATH_WINDOWS if os.name == "nt" else PIP_PATH_UNIX
 
 GRADER_REQUIREMENTS = os.path.join(CONFIG_DIR, "grader_requirements.txt")
 
+# Pylint constants
+PYLINT_BIN_WINDOWS = os.path.join("Scripts", "pylint.exe")
+PYLINT_BIN_UNIX = os.path.join("bin", "pylint")
+PYLINT_BIN = PYLINT_BIN_WINDOWS if os.name == "nt" else PYLINT_BIN_UNIX
+PYLINT_PATH = os.path.join(VENV_NAME, PYLINT_BIN)
+PYLINTRC = os.path.join(CONFIG_DIR, "2024.pylintrc")
+
 # Coverage constants
 COVERAGE_BIN_WINDOWS = "coverage.exe"
 COVERAGE_BIN_UNIX = "coverage"
@@ -46,6 +50,7 @@ COVERAGE_PATH = COVERAGE_PATH_WINDOWS if os.name == "nt" else COVERAGE_PATH_UNIX
 COVERAGE_RUN_ARGS = ["run", "-m"]
 COVERAGE_RUN_PYTEST_ARGS = ["pytest"]
 COVERAGE_REPORT_ARGS = ["report", "--format=total"]
+COVERAGE_REPORT_ARGS_NO_FORMAT = ["report"]
 
 # Tests constants
 POSSIBLE_TEST_DIRS = ["tests", "test", "tst"]

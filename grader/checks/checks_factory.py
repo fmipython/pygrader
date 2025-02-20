@@ -8,6 +8,7 @@ from grader.checks.coverage_check import CoverageCheck
 from grader.checks.pylint_check import PylintCheck
 from grader.checks.requirements_check import RequirementsCheck
 from grader.checks.type_hints_check import TypeHintsCheck
+from grader.utils.config import InvalidConfigError
 
 
 NAME_TO_CHECK: dict[str, type[AbstractCheck]] = {
@@ -23,15 +24,25 @@ def create_checks(config: dict, project_root: str) -> tuple[list[AbstractCheck],
     Build two lists, containing the non-venv checks and the venv checks.
 
     :param config: The configuration dictionary.
+    :type config: dict
     :param project_root: The root of the project.
-    :raises ValueError: If the check name is unknown.
+    :type project_root: str
+    :raises InvalidConfigError: If no checks are found in the configuration file.
+    :raises InvalidCheckError: If the check name is unknown.
     :return: A tuple containing the non-venv checks and the venv checks.
+    :rtype: tuple[list[AbstractCheck], list[AbstractCheck]]
     """
+    if "checks" not in config:
+        raise InvalidConfigError("No checks found in the configuration file")
+
     checks = config["checks"]
 
     non_venv_checks = []
     venv_checks = []
     for check in checks:
+        if "name" not in check or "max_points" not in check:
+            raise InvalidConfigError("Invalid check configuration")
+
         name = check["name"]
         max_points = check["max_points"]
 

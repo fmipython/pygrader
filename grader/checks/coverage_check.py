@@ -38,10 +38,7 @@ class CoverageCheck(AbstractCheck):
         """
         super().run()
 
-        is_coverage_run_okay = self.__coverage_run()
-
-        if not is_coverage_run_okay:
-            raise CheckError("Coverage run failed")
+        self.__coverage_run()
 
         coverage_report_result = self.__coverage_report()
 
@@ -87,9 +84,7 @@ class CoverageCheck(AbstractCheck):
 
         if output.returncode != 0:
             logger.error("Coverage run failed")
-            return False
-
-        return True
+            raise CheckError("Coverage run failed")
 
     def __coverage_report(self):
         """
@@ -113,6 +108,6 @@ class CoverageCheck(AbstractCheck):
 
         if output.returncode != 0:
             logger.error("Coverage report failed")
-            return None
+            raise CheckError("Coverage report failed")
 
         return int(output.stdout)

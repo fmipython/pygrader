@@ -41,12 +41,12 @@ class CoverageCheck(AbstractCheck):
         is_coverage_run_okay = self.__coverage_run()
 
         if not is_coverage_run_okay:
-            return 0.0
+            raise CheckError("Coverage run failed")
 
         coverage_report_result = self.__coverage_report()
 
         if coverage_report_result is None:
-            return 0.0
+            raise CheckError("Coverage report generation failed")
 
         return self.__translate_score(coverage_report_result)
 

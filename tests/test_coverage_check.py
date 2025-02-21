@@ -6,6 +6,7 @@ import unittest
 from subprocess import CompletedProcess
 from unittest.mock import patch, MagicMock
 
+from grader.checks.abstract_check import CheckError
 from grader.checks.coverage_check import CoverageCheck
 
 
@@ -25,18 +26,18 @@ class TestCoverageCheck(unittest.TestCase):
     @patch("subprocess.run")
     def test_01_coverage_run_fail(self, mocked_run: MagicMock):
         """
-        Test that a failed coverage run logs an error and returns a score of 0.0.
+        Test that a failed coverage run logs an error and raises an exception.
         """
         # Arrange
         mocked_run.return_value = CompletedProcess(args=["coverage", "run"], returncode=1)
 
         # Act
         with self.assertLogs("grader", level="ERROR") as log:
-            result = self.coverage_check.run()
+            with self.assertRaises(CheckError):
+                self.coverage_check.run()
             is_message_logged = "ERROR:grader:Coverage run failed" in log.output
 
         # Assert
-        self.assertEqual(0.0, result)
         self.assertTrue(is_message_logged)
 
     @patch("subprocess.run")
@@ -55,11 +56,11 @@ class TestCoverageCheck(unittest.TestCase):
         mocked_run.side_effect = mocked_run_side_effect
         # Act
         with self.assertLogs("grader", level="ERROR") as log:
-            result = self.coverage_check.run()
+            with self.assertRaises(CheckError):
+                self.coverage_check.run()
             is_message_logged = "ERROR:grader:Coverage report failed" in log.output
 
         # Assert
-        self.assertEqual(0.0, result)
         self.assertTrue(is_message_logged)
 
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_run")

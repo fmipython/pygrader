@@ -9,6 +9,7 @@ from subprocess import CompletedProcess
 from unittest.mock import patch, MagicMock
 
 import grader.utils.constants as const
+from grader.checks.abstract_check import CheckError
 from grader.checks.type_hints_check import TypeHintsCheck
 
 
@@ -71,11 +72,11 @@ class TestTypeHintsCheck(unittest.TestCase):
 
         # Act
         with self.assertLogs(level="ERROR") as cm:
-            result = self.type_hints_check.run()
+            with self.assertRaises(CheckError):
+                self.type_hints_check.run()
             is_error_logged = any("Mypy linecount report not found" in log for log in cm.output)
 
         # Assert
-        self.assertEqual(result, 0.0)
         self.assertTrue(is_error_logged)
 
     @patch("grader.utils.process.run")

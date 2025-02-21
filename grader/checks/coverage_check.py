@@ -5,7 +5,7 @@ Module containing the unit test code coverage check.
 import logging
 import os
 
-from grader.checks.abstract_check import AbstractCheck
+from grader.checks.abstract_check import AbstractCheck, CheckError
 from grader.utils.constants import (
     COVERAGE_PATH,
     COVERAGE_RUN_ARGS,
@@ -38,15 +38,12 @@ class CoverageCheck(AbstractCheck):
         """
         super().run()
 
-        is_coverage_run_okay = self.__coverage_run()
-
-        if not is_coverage_run_okay:
-            return 0.0
+        self.__coverage_run()
 
         coverage_report_result = self.__coverage_report()
 
         if coverage_report_result is None:
-            return 0.0
+            raise CheckError("Coverage report generation failed")
 
         return self.__translate_score(coverage_report_result)
 
@@ -58,6 +55,10 @@ class CoverageCheck(AbstractCheck):
         :param coverage_score: The score from pylint to be translated
         :return: The translated score
         """
+
+        if self._max_points == -1:
+            raise CheckError("Max points for coverage check is set to -1")
+
         step = 100 / (self._max_points + 1)
         steps = [i * step for i in range(self._max_points + 2)]
 
@@ -75,13 +76,15 @@ class CoverageCheck(AbstractCheck):
         """
         command = [self.__coverage_full_path] + COVERAGE_RUN_ARGS + COVERAGE_RUN_PYTEST_ARGS + [self._project_root]
 
-        output = run(command, current_directory=self._project_root)
+        try:
+            output = run(command, current_directory=self._project_root)
+        except (OSError, ValueError) as e:
+            logger.error("Coverage run failed: %s", e)
+            raise CheckError("Coverage run failed") from e
 
         if output.returncode != 0:
             logger.error("Coverage run failed")
-            return False
-
-        return True
+            raise CheckError("Coverage run failed")
 
     def __coverage_report(self):
         """
@@ -89,14 +92,22 @@ class CoverageCheck(AbstractCheck):
         """
         source_files = find_all_source_files(self._project_root)
 
-        command = [self.__coverage_full_path] + COVERAGE_REPORT_ARGS_NO_FORMAT + source_files
-        output = run(command, current_directory=self._project_root)
+        try:
+            command = [self.__coverage_full_path] + COVERAGE_REPORT_ARGS_NO_FORMAT + source_files
+            output = run(command, current_directory=self._project_root)
+        except (OSError, ValueError) as e:
+            logger.error("Coverage report (no format) failed: %s", e)
+            raise CheckError("Coverage report (no format) failed") from e
 
-        command = [self.__coverage_full_path] + COVERAGE_REPORT_ARGS + source_files
-        output = run(command, current_directory=self._project_root)
+        try:
+            command = [self.__coverage_full_path] + COVERAGE_REPORT_ARGS + source_files
+            output = run(command, current_directory=self._project_root)
+        except (OSError, ValueError) as e:
+            logger.error("Coverage report (with format) failed: %s", e)
+            raise CheckError("Coverage report (with format) failed") from e
 
         if output.returncode != 0:
             logger.error("Coverage report failed")
-            return None
+            raise CheckError("Coverage report failed")
 
         return int(output.stdout)

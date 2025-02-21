@@ -12,7 +12,7 @@ from pylint.reporters.text import TextReporter
 
 import grader.utils.constants as const
 from grader.utils import process
-from grader.checks.abstract_check import AbstractCheck
+from grader.checks.abstract_check import AbstractCheck, CheckError
 from grader.utils.files import find_all_python_files
 
 logger = logging.getLogger("grader")
@@ -38,7 +38,11 @@ class PylintCheck(AbstractCheck):
         """
         super().run()
 
-        pylint_args = find_all_python_files(self._project_root)
+        try:
+            pylint_args = find_all_python_files(self._project_root)
+        except OSError as error:
+            logger.error("Error while finding python files: %s", error)
+            raise CheckError("Error while finding python files") from error
 
         logger.debug("Running pylint check on files: %s", pylint_args)
         pylintrc_path = const.PYLINTRC
@@ -47,10 +51,14 @@ class PylintCheck(AbstractCheck):
             pylint_args.extend(["--rcfile", pylintrc_path])
 
         command = [os.path.join(self._project_root, const.PYLINT_PATH)] + pylint_args
-        results = process.run(command, current_directory=self._project_root)
+        try:
+            results = process.run(command, current_directory=self._project_root)
+        except (OSError, ValueError) as error:
+            logger.error("Error while running pylint: %s", error)
+            raise CheckError("Error while running pylint") from error
 
         if results.returncode != 0:
-            return 0
+            raise CheckError("Pylint check failed")
 
         pylint_score = self.__get_pylint_score(results.stdout)
 
@@ -65,6 +73,9 @@ class PylintCheck(AbstractCheck):
         :param pylint_score: The score from pylint to be translated
         :return: The translated score
         """
+        if self._max_points == -1:
+            raise CheckError("Max points for pylint check is set to -1")
+
         step = self.__pylint_max_score / (self._max_points + 1)
         steps = [i * step for i in range(self._max_points + 2)]
 
@@ -94,10 +105,10 @@ class PylintCheck(AbstractCheck):
                         return float(score)
                     case None:
                         logger.error("Pylint score not found")
-                        return 0.0
+                        raise CheckError("Pylint score not found")
 
         logger.error("Pylint score not found")
-        return 0.0
+        raise CheckError("Pylint score not found")
 
 
 class PylintCustomReporter(TextReporter):

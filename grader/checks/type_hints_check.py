@@ -5,7 +5,7 @@ It calls mypy as a subprocess to generate a report and then read from the report
 
 import logging
 
-from grader.checks.abstract_check import AbstractCheck
+from grader.checks.abstract_check import AbstractCheck, CheckError
 from grader.utils.constants import MYPY_TYPE_HINT_CONFIG, REPORTS_TEMP_DIR, MYPY_LINE_COUNT_REPORT
 from grader.utils import files
 from grader.utils import process
@@ -41,19 +41,27 @@ class TypeHintsCheck(AbstractCheck):
         super().run()
 
         # Gather all files
-        all_source_files = files.find_all_source_files(self._project_root)
+        try:
+            all_source_files = files.find_all_source_files(self._project_root)
+        except OSError as error:
+            logger.error("Error while finding python files: %s", error)
+            raise CheckError("Error while finding python files") from error
 
         # Run mypy on all files
         command = [self.__mypy_binary] + self.__mypy_arguments + all_source_files
-        _ = process.run(command)
+        try:
+            _ = process.run(command)
+        except (OSError, ValueError) as error:
+            logger.error("Error while running mypy: %s", error)
+            raise CheckError("Error while running mypy") from error
 
         # Read mypy linecount report
         try:
             with open(MYPY_LINE_COUNT_REPORT, "r", encoding="utf-8") as report_file:
                 report = report_file.readline().strip().split()
-        except FileNotFoundError:
+        except FileNotFoundError as error:
             logger.error("Mypy linecount report not found")
-            return 0.0
+            raise CheckError("Mypy linecount report not found") from error
 
         # Fancy way to get the needed values - I need the 3rd and 4th values, out of 5 total
         *_, lines_with_type_annotations, lines_total, _ = report
@@ -73,6 +81,9 @@ class TypeHintsCheck(AbstractCheck):
         :param pylint_score: The score from pylint to be translated
         :return: The translated score
         """
+        if self._max_points == -1:
+            raise CheckError("Max points for type hints check is set to -1")
+
         step = self.__mypy_max_score / (self._max_points + 1)
         steps = [i * step for i in range(self._max_points + 2)]
 

@@ -4,7 +4,7 @@ Unit tests for the AbstractCheck class in the abstract_check module.
 
 import unittest
 
-from grader.checks.abstract_check import AbstractCheck
+from grader.checks.abstract_check import AbstractCheck, CheckError
 
 
 class TestAbstractCheck(unittest.TestCase):
@@ -29,5 +29,5 @@ class TestAbstractCheck(unittest.TestCase):
         check = DummyCheck("dummy", 1, "dummy", is_venv_requred=True)
 
         # Act & Assert
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(CheckError):
             check.run()

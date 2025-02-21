@@ -32,7 +32,7 @@ class AbstractCheck(ABC):
         :rtype: float
         """
         if self._is_venv_required and not self.is_running_within_venv():
-            raise RuntimeError("Virtual environment is required for this check")
+            raise CheckError("Virtual environment is required for this check")
 
         logger.log(VERBOSE, "Running %s", self.name)
 
@@ -65,3 +65,7 @@ class AbstractCheck(ABC):
         :rtype: bool
         """
         return VirtualEnvironment.is_initialized
+
+
+class CheckError(Exception):
+    """Custom exception for check errors."""

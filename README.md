@@ -14,7 +14,6 @@ Current supported set of checks are:
 
 The tool supports configuration files, where you can specify the score for each check.
 
-
 ## How to use (easier way)
 
 1. If you don't have Docker (or Docker Desktop) already, install it from [here](https://docs.docker.com/get-docker).
@@ -29,8 +28,7 @@ The tool supports configuration files, where you can specify the score for each 
 
 Replace `<path_to_Python_project>` with the path to your project directory. This command should work on all operating systems.
 
-⚠️ *If you are on Windows, `<path_to_Python_project>` should be a full path, not a relative one. For example, write `C:\Users\YourName\Documents\Project` instead of just `..\Project`.*
-
+⚠️ _If you are on Windows, `<path_to_Python_project>` should be a full path, not a relative one. For example, write `C:\Users\YourName\Documents\Project` instead of just `..\Project`._
 
 ## How to use 2.0 (raw way)
 
@@ -43,13 +41,14 @@ python3 -m venv .venv
 ```
 
 2. Activate the virtual environment:
-      * On Linux/MacOS:
+
+   - On Linux/MacOS:
 
    ```bash
    source .venv/bin/activate
    ```
 
-   * On Windows:
+   - On Windows:
 
    ```bash
    .venv\Scripts\activate
@@ -70,6 +69,10 @@ python3 main.py -c ./config/2024.json PROJECT_PATH
 Where `PROJECT_PATH` is the path to the project you want to grade.
 
 ## Configuration
+
+The grader supports configuration files in JSON format.
+The configuration specifies which checks to run, their maximum score, as well as other requirements.
+Refer to the [documentation](https://fmipython.github.io/PythonProjectGrader/config.html) for more information.
 
 ## Documentation
 

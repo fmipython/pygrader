@@ -1,0 +1,10 @@
+{
+    "checks": [
+        {
+            "name": "structure",
+            "max_points": 0,
+            "requires_venv": false,
+            "structure_file": "config/project_structure.yml"
+        }
+    ]
+}

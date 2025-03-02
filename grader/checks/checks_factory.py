@@ -7,6 +7,7 @@ from grader.checks.abstract_check import AbstractCheck
 from grader.checks.coverage_check import CoverageCheck
 from grader.checks.pylint_check import PylintCheck
 from grader.checks.requirements_check import RequirementsCheck
+from grader.checks.structure_check import StructureCheck
 from grader.checks.type_hints_check import TypeHintsCheck
 from grader.utils.config import InvalidConfigError
 
@@ -16,6 +17,7 @@ NAME_TO_CHECK: dict[str, type[AbstractCheck]] = {
     "pylint": PylintCheck,
     "requirements": RequirementsCheck,
     "type-hints": TypeHintsCheck,
+    "structure": StructureCheck,
 }
 
 
@@ -51,8 +53,13 @@ def create_checks(config: dict, project_root: str) -> tuple[list[AbstractCheck],
 
         is_venv = check.get("requires_venv", False)
 
+        other_args = {**check}
+        del other_args["name"]
+        del other_args["max_points"]
+        del other_args["requires_venv"]
+
         check_class = NAME_TO_CHECK[name]
-        created_check = check_class(name, max_points, project_root)
+        created_check = check_class(name, max_points, project_root, **other_args)
 
         if is_venv:
             venv_checks.append(created_check)

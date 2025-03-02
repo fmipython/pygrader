@@ -49,6 +49,7 @@ if __name__ == "__main__":
 
         scores.append((check.name, check_score, check.max_points))
 
+    # TODO - Not the best way to do this
     if not args["skip_venv_creation"]:
         with VirtualEnvironment(project_root) as venv:
             for check in venv_checks:

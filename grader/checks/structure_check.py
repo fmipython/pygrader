@@ -13,6 +13,8 @@ logger = logging.getLogger("grader")
 # TODO - This whole thing can be re-used to extract tests, source code, etc.
 # Still need to think about how though.
 
+# TODO - It also needs to work with multiple structures, depending on the project type.
+
 
 @dataclass
 class StructureInformation:

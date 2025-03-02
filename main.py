@@ -49,15 +49,16 @@ if __name__ == "__main__":
 
         scores.append((check.name, check_score, check.max_points))
 
-    with VirtualEnvironment(project_root) as venv:
-        for check in venv_checks:
-            try:
-                check_score = check.run()
-            except CheckError as error:
-                logger.error("Check failed: %s", error)
-                check_score = 0.0
+    if not args["skip_venv_creation"]:
+        with VirtualEnvironment(project_root) as venv:
+            for check in venv_checks:
+                try:
+                    check_score = check.run()
+                except CheckError as error:
+                    logger.error("Check failed: %s", error)
+                    check_score = 0.0
 
-            scores.append((check.name, check_score, check.max_points))
+                scores.append((check.name, check_score, check.max_points))
 
     for name, score, max_score in scores:
         logger.info("Check: %s, Score: %s/%s", name, score, max_score)

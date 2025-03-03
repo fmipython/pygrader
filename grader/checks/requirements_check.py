@@ -6,13 +6,13 @@ It checks if requirements.txt exists in the project root.
 import logging
 import os
 
-from grader.checks.abstract_check import AbstractCheck
+from grader.checks.abstract_check import ScoredCheck
 from grader.utils.constants import REQUIREMENTS_FILENAME
 
 logger = logging.getLogger("grader")
 
 
-class RequirementsCheck(AbstractCheck):
+class RequirementsCheck(ScoredCheck):
     """
     The requirements.txt check class.
     """

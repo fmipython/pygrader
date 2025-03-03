@@ -5,7 +5,7 @@ It calls mypy as a subprocess to generate a report and then read from the report
 
 import logging
 
-from grader.checks.abstract_check import AbstractCheck, CheckError
+from grader.checks.abstract_check import ScoredCheck, CheckError
 from grader.utils.constants import MYPY_TYPE_HINT_CONFIG, REPORTS_TEMP_DIR, MYPY_LINE_COUNT_REPORT
 from grader.utils import files
 from grader.utils import process
@@ -13,7 +13,7 @@ from grader.utils import process
 logger = logging.getLogger("grader")
 
 
-class TypeHintsCheck(AbstractCheck):
+class TypeHintsCheck(ScoredCheck):
     """
     The TypeHints check class.
     """

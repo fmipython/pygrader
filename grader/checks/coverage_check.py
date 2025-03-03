@@ -5,7 +5,7 @@ Module containing the unit test code coverage check.
 import logging
 import os
 
-from grader.checks.abstract_check import AbstractCheck, CheckError
+from grader.checks.abstract_check import ScoredCheck, CheckError
 from grader.utils.constants import (
     COVERAGE_PATH,
     COVERAGE_RUN_ARGS,
@@ -19,7 +19,7 @@ from grader.utils.process import run
 logger = logging.getLogger("grader")
 
 
-class CoverageCheck(AbstractCheck):
+class CoverageCheck(ScoredCheck):
     """
     The Coverage check class.
     """

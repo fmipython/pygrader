@@ -12,19 +12,19 @@ from pylint.reporters.text import TextReporter
 
 import grader.utils.constants as const
 from grader.utils import process
-from grader.checks.abstract_check import AbstractCheck, CheckError
+from grader.checks.abstract_check import ScoredCheck, CheckError
 from grader.utils.files import find_all_python_files
 
 logger = logging.getLogger("grader")
 
 
-class PylintCheck(AbstractCheck):
+class PylintCheck(ScoredCheck):
     """
     The Pylint check class.
     """
 
     def __init__(self, name: str, max_points: int, project_root: str):
-        AbstractCheck.__init__(self, name, max_points, project_root)
+        super().__init__(name, max_points, project_root)
         self.__pylint_max_score = 10
 
     def run(self) -> float:

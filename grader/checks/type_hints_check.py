@@ -18,8 +18,8 @@ class TypeHintsCheck(ScoredCheck):
     The TypeHints check class.
     """
 
-    def __init__(self, name: str, max_points: int, project_root: str):
-        super().__init__(name, max_points, project_root)
+    def __init__(self, name: str, max_points: int, project_root: str, is_venv_required: bool):
+        super().__init__(name, max_points, project_root, is_venv_required)
 
         self.__mypy_binary = "mypy"
         self.__mypy_arguments = ["--config-file", MYPY_TYPE_HINT_CONFIG, "--linecount-report", REPORTS_TEMP_DIR]

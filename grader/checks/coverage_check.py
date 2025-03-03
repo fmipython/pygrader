@@ -24,8 +24,8 @@ class CoverageCheck(ScoredCheck):
     The Coverage check class.
     """
 
-    def __init__(self, name: str, max_points: int, project_root: str):
-        super().__init__(name, max_points, project_root)
+    def __init__(self, name: str, max_points: int, project_root: str, is_venv_required: bool):
+        super().__init__(name, max_points, project_root, is_venv_required)
 
         self.__coverage_full_path = os.path.join(project_root, COVERAGE_PATH)
 

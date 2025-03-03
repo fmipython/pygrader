@@ -13,14 +13,6 @@ from grader.utils.virtual_environment import VirtualEnvironment
 logger = logging.getLogger("grader")
 
 
-# TODO - Currently, all checks have to have a score.
-# This is not always the case. Some checks are just for validation (or true/false).
-# Idea is to have separate interface for scored checks and non-scored checks.
-
-
-# TODO - StructureCheck needs additional arguments to be passed to the constructor.
-# This should be handled in all checks.
-
 T = TypeVar("T")
 
 

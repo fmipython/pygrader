@@ -9,7 +9,7 @@ from pathlib import Path
 
 import yaml
 
-from grader.checks.abstract_check import AbstractCheck, CheckError
+from grader.checks.abstract_check import NonScoredCheck, CheckError
 from grader.utils.logger import VERBOSE
 
 logger = logging.getLogger("grader")
@@ -32,16 +32,16 @@ class StructureInformation:
     patterns: list[str]
 
 
-class StructureCheck(AbstractCheck):
+class StructureCheck(NonScoredCheck):
     """
     The Structure check class.
     """
 
-    def __init__(self, name, max_points, project_root, structure_file: str):
-        super().__init__(name, max_points, project_root)
+    def __init__(self, name: str, project_root: str, structure_file: str, is_venv_required: bool = False):
+        super().__init__(name, project_root, is_venv_required)
         self.__structure_file = structure_file
 
-    def run(self) -> float:
+    def run(self) -> bool:
         """
         Run the structure check on the project.
 
@@ -59,9 +59,9 @@ class StructureCheck(AbstractCheck):
             logger.log(VERBOSE, "Is %s structure valid ? %s", element.name, is_element_valid)
 
             if element.required and not is_element_valid:
-                raise CheckError(f"Structure check failed: {element.name}")  # TODO - Not sure about this
+                return False
 
-        return 0.0
+        return True
 
     @staticmethod
     def __load_structure_file(filepath: str) -> list[StructureInformation]:

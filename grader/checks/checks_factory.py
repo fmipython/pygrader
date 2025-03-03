@@ -46,7 +46,6 @@ def create_checks(config: dict, project_root: str) -> tuple[list[AbstractCheck],
             raise InvalidConfigError("Invalid check configuration")
 
         name = check["name"]
-        max_points = check["max_points"]
 
         if name not in NAME_TO_CHECK:
             raise InvalidCheckError(f"Unknown check name: {name}")
@@ -55,11 +54,9 @@ def create_checks(config: dict, project_root: str) -> tuple[list[AbstractCheck],
 
         other_args = {**check}
         del other_args["name"]
-        del other_args["max_points"]
-        del other_args["requires_venv"]
 
         check_class = NAME_TO_CHECK[name]
-        created_check = check_class(name, max_points, project_root, **other_args)
+        created_check = check_class(name, project_root, **other_args)
 
         if is_venv:
             venv_checks.append(created_check)

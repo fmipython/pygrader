@@ -6,7 +6,7 @@ Calls all the checks, and stores their results
 import sys
 import grader.utils.constants as const
 
-from grader.checks.abstract_check import CheckError
+from grader.checks.abstract_check import CheckError, ScoredCheck
 from grader.checks.checks_factory import create_checks
 from grader.utils.cli import get_args
 from grader.utils.config import load_config
@@ -42,24 +42,25 @@ if __name__ == "__main__":
 
     for check in non_venv_checks:
         try:
-            check_score = check.run()
+            check_result = check.run()
         except CheckError as error:
             logger.error("Check failed: %s", error)
-            check_score = 0.0
-
-        scores.append((check.name, check_score, check.max_points))
+        else:
+            if isinstance(check, ScoredCheck):
+                scores.append((check.name, check_result, check.max_points))
 
     # TODO - Not the best way to do this
     if not args["skip_venv_creation"]:
         with VirtualEnvironment(project_root) as venv:
             for check in venv_checks:
                 try:
-                    check_score = check.run()
+                    check_result = check.run()
                 except CheckError as error:
                     logger.error("Check failed: %s", error)
-                    check_score = 0.0
-
-                scores.append((check.name, check_score, check.max_points))
+                    check_result = 0.0
+                else:
+                    if isinstance(check, ScoredCheck):
+                        scores.append((check.name, check_result, check.max_points))
 
     for name, score, max_score in scores:
         logger.info("Check: %s, Score: %s/%s", name, score, max_score)

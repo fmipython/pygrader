@@ -3,6 +3,7 @@ Module containing the logger setup function and the custom VERBOSE level.
 """
 
 import logging
+import sys
 
 from typing import Optional
 
@@ -42,7 +43,7 @@ def setup_logger(student_id: Optional[str] = None, verbosity: int = 0) -> loggin
 
     file_format = "%(asctime)s - %(levelname)s - %(message)s"
 
-    console_handler = logging.StreamHandler()
+    console_handler = logging.StreamHandler(stream=sys.stdout)  # Change to stdout
     console_handler.setLevel(console_level)
     console_handler.setFormatter(logging.Formatter(console_format))
 

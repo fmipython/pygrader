@@ -1,3 +1,22 @@
+"""
+
+- Score the code for PEP-8 compliance => 100% only
+- Score the code based on type-hints usage => 100% only
+- Score the code based on tests code coverage => 100% only
+
+- Support configuration files for specifying the checks to be executed
+
+- Support configuration files for specifying the score for each check =>
+
+- Accept a student's project path as an argument
+
+- Accept a student's ID as an argument
+
+- Run certain checks inside a virtual environment
+
+- Detect source and test directories
+"""
+
 import os
 import shutil
 import unittest
@@ -108,7 +127,7 @@ class TestFunctionalGoodWeather(unittest.TestCase):
         log_file = f"{student_id}.log"
         if os.path.exists(log_file):
             os.remove(log_file)
-        command = build_command(project_path="/tmp/PythonProjectGrader") + ["--student-id", student_id]
+        command = build_command(project_path="/tmp/PythonProjectGrader", student_id=student_id)
 
         # Act
         run_result = run(command)
@@ -117,6 +136,22 @@ class TestFunctionalGoodWeather(unittest.TestCase):
         self.assertEqual(run_result.returncode, 0, run_result.stdout)
         self.assertTrue(os.path.exists(log_file), f"Log file with student ID '{student_id}' was not created")
         os.remove(log_file)
+
+    @clone_repo("https://github.com/fmipython/PythonProjectGrader", "/tmp/PythonProjectGrader")
+    def test_09_student_id_in_output(self):
+        # Arrange
+        student_id = "student123"
+        expected_output = f"Running check for student {student_id}"
+        command = build_command(project_path="/tmp/PythonProjectGrader", student_id=student_id)
+
+        # Act
+        run_result = run(command)
+
+        # Assert
+        self.assertEqual(run_result.returncode, 0, run_result.stdout)
+        self.assertIn(
+            expected_output, run_result.stdout, f"Expected output '{expected_output}' not found in the tool's output"
+        )
 
 
 class TestFunctionalBadWeather(unittest.TestCase):
@@ -151,7 +186,7 @@ class TestFunctionalBadWeather(unittest.TestCase):
         self.assertIn("Error: No configuration file provided", run_result.stdout)
 
 
-def build_command(project_path: str, config_file: str = "full.json") -> list[str]:
+def build_command(project_path: str, config_file: str = "full.json", student_id: str = None) -> list[str]:
     python_binary = "python3" if os.name == "posix" else "python"
     grader_entrypoint = "main.py"
 
@@ -159,6 +194,8 @@ def build_command(project_path: str, config_file: str = "full.json") -> list[str
     base_command = [python_binary, os.path.join(const.ROOT_DIR, grader_entrypoint)]
 
     command = base_command + ["--config", full_config_path] + [project_path]
+    if student_id is not None:
+        command += ["--student-id", student_id]
     return command
 
 

@@ -1,16 +1,11 @@
 """
 
-- Score the code for PEP-8 compliance => 100% only
-- Score the code based on type-hints usage => 100% only
-- Score the code based on tests code coverage => 100% only
+To Do:
+- Score the code for PEP-8 compliance => non-max score
+- Score the code based on type-hints usage => non-max score
+- Score the code based on tests code coverage => non-max score
 
 - Support configuration files for specifying the checks to be executed
-
-- Support configuration files for specifying the score for each check =>
-
-- Accept a student's project path as an argument
-
-- Accept a student's ID as an argument
 
 - Run certain checks inside a virtual environment
 
@@ -20,6 +15,8 @@
 import os
 import shutil
 import unittest
+
+from typing import Optional
 
 import grader.utils.constants as const
 from grader.utils.process import run
@@ -153,6 +150,66 @@ class TestFunctionalGoodWeather(unittest.TestCase):
             expected_output, run_result.stdout, f"Expected output '{expected_output}' not found in the tool's output"
         )
 
+    @clone_repo("https://github.com/fmipython/PythonProjectGrader", "/tmp/PythonProjectGrader")
+    def test_10_default_log_file_name(self):
+        # Arrange
+        log_file = "grader.log"
+        if os.path.exists(log_file):
+            os.remove(log_file)
+        command = build_command(project_path="/tmp/PythonProjectGrader")
+
+        # Act
+        run_result = run(command)
+
+        # Assert
+        self.assertEqual(run_result.returncode, 0, run_result.stdout)
+        self.assertTrue(os.path.exists(log_file), "Default log file 'grader.log' was not created")
+        os.remove(log_file)
+
+    @clone_repo("https://github.com/fmipython/PythonProjectGrader", "/tmp/PythonProjectGrader")
+    def test_14_all_checks_score_one(self):
+        # Arrange
+        config_file = "full_single_point.json"
+        command = build_command(project_path="/tmp/PythonProjectGrader", config_file=config_file)
+
+        # Act
+        run_result = run(command)
+
+        run_returncode = run_result.returncode
+        run_stdout = run_result.stdout
+
+        # Assert
+        self.assertEqual(run_returncode, 0, run_stdout)
+        for check in ["requirements", "pylint", "type-hints", "coverage"]:
+            self.assertTrue(
+                is_score_correct(expected_score=1, target_check=check, grader_output=run_stdout),
+                f"Check '{check}' did not have the expected score of 1"
+            )
+
+    @clone_repo("https://github.com/fmipython/PythonProjectGrader", "/tmp/PythonProjectGrader")
+    def test_15_only_pylint_check(self):
+        # Arrange
+        config_file = "only_pylint.json"
+        command = build_command(project_path="/tmp/PythonProjectGrader", config_file=config_file)
+
+        # Act
+        run_result = run(command)
+
+        run_returncode = run_result.returncode
+        run_stdout = run_result.stdout
+
+        # Assert
+        self.assertEqual(run_returncode, 0, run_stdout)
+        self.assertTrue(
+            is_score_correct(expected_score=10, target_check="pylint", grader_output=run_stdout),
+            "Pylint check did not have the expected score of 10"
+        )
+        for check in ["requirements", "type-hints", "coverage"]:
+            self.assertNotIn(
+                f"Check: {check}", run_stdout,
+                f"Unexpected check '{check}' was executed"
+            )
+
 
 class TestFunctionalBadWeather(unittest.TestCase):
     @clone_repo("https://github.com/fmipython/PythonProjectGrader", "/tmp/PythonProjectGrader")
@@ -185,8 +242,48 @@ class TestFunctionalBadWeather(unittest.TestCase):
         self.assertNotEqual(run_result.returncode, 0, "Expected non-zero return code when no config is provided")
         self.assertIn("Error: No configuration file provided", run_result.stdout)
 
+    @clone_repo("https://github.com/fmipython/PythonProjectGrader", "/tmp/PythonProjectGrader")
+    def test_11_no_student_id_in_output(self):
+        # Arrange
+        unexpected_output = "Running checks for student"
+        command = build_command(project_path="/tmp/PythonProjectGrader")
 
-def build_command(project_path: str, config_file: str = "full.json", student_id: str = None) -> list[str]:
+        # Act
+        run_result = run(command)
+
+        # Assert
+        self.assertEqual(run_result.returncode, 0, run_result.stdout)
+        self.assertNotIn(
+            unexpected_output, run_result.stdout, f"Unexpected output '{unexpected_output}' found in the tool's output"
+        )
+
+    @clone_repo("https://github.com/fmipython/PythonProjectGrader", "/tmp/PythonProjectGrader")
+    def test_12_no_project_path_provided(self):
+        # Arrange
+        command = build_command(project_path="")
+
+        # Act
+        run_result = run(command)
+
+        # Assert
+        self.assertNotEqual(run_result.returncode, 0, "Expected non-zero return code when no project path is provided")
+        self.assertIn("Error: No project path provided", run_result.stdout)
+
+    @clone_repo("https://github.com/fmipython/PythonProjectGrader", "/tmp/PythonProjectGrader")
+    def test_13_invalid_project_path(self):
+        # Arrange
+        invalid_path = "/tmp/invalid_project_path"
+        command = build_command(project_path=invalid_path)
+
+        # Act
+        run_result = run(command)
+
+        # Assert
+        self.assertNotEqual(run_result.returncode, 0, "Expected non-zero return code for invalid project path")
+        self.assertIn(f"Error: Invalid project path '{invalid_path}'", run_result.stdout)
+
+
+def build_command(project_path: str, config_file: str = "full.json", student_id: Optional[str] = None) -> list[str]:
     python_binary = "python3" if os.name == "posix" else "python"
     grader_entrypoint = "main.py"
 

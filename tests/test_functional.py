@@ -36,7 +36,7 @@ class TestFunctionalGoodWeather(unittest.TestCase):
         self.assertEqual(run_returncode, 0, run_stdout)
         self.assertTrue(is_score_correct(expected_score=10, target_check="requirements", grader_output=run_stdout))
 
-    def test_03_pylint_check(self):
+    def test_02_pylint_check(self):
         # Arrange
         command = build_command(project_path="/tmp/PythonProjectGrader")
 
@@ -50,7 +50,7 @@ class TestFunctionalGoodWeather(unittest.TestCase):
         self.assertEqual(run_returncode, 0, run_stdout)
         self.assertTrue(is_score_correct(expected_score=10, target_check="pylint", grader_output=run_stdout))
 
-    def test_04_type_hints_check(self):
+    def test_03_type_hints_check(self):
         # Arrange
         command = build_command(project_path="/tmp/PythonProjectGrader")
 
@@ -64,7 +64,7 @@ class TestFunctionalGoodWeather(unittest.TestCase):
         self.assertEqual(run_returncode, 0, run_stdout)
         self.assertTrue(is_score_correct(expected_score=8, target_check="type-hints", grader_output=run_stdout))
 
-    def test_05_coverage_check(self):
+    def test_04_coverage_check(self):
         # Arrange
         command = build_command(project_path="/tmp/PythonProjectGrader")
 
@@ -78,7 +78,7 @@ class TestFunctionalGoodWeather(unittest.TestCase):
         self.assertEqual(run_returncode, 0, run_stdout)
         self.assertTrue(is_score_correct(expected_score=8, target_check="coverage", grader_output=run_stdout))
 
-    def test_06_log_file_created(self):
+    def test_05_log_file_created(self):
         # Arrange
         log_file = "grader.log"
         if os.path.exists(log_file):
@@ -93,7 +93,7 @@ class TestFunctionalGoodWeather(unittest.TestCase):
         self.assertTrue(os.path.exists(log_file), "Log file was not created")
         os.remove(log_file)
 
-    def test_07_log_file_with_student_id(self):
+    def test_06_log_file_with_student_id(self):
         # Arrange
         student_id = "student123"
         log_file = f"{student_id}.log"
@@ -109,7 +109,7 @@ class TestFunctionalGoodWeather(unittest.TestCase):
         self.assertTrue(os.path.exists(log_file), f"Log file with student ID '{student_id}' was not created")
         os.remove(log_file)
 
-    def test_09_student_id_in_output(self):
+    def test_07_student_id_in_output(self):
         # Arrange
         student_id = "student123"
         expected_output = f"Running checks for student {student_id}"
@@ -124,7 +124,7 @@ class TestFunctionalGoodWeather(unittest.TestCase):
             expected_output, run_result.stdout, f"Expected output '{expected_output}' not found in the tool's output"
         )
 
-    def test_10_default_log_file_name(self):
+    def test_08_default_log_file_name(self):
         # Arrange
         log_file = "grader.log"
         if os.path.exists(log_file):
@@ -139,7 +139,7 @@ class TestFunctionalGoodWeather(unittest.TestCase):
         self.assertTrue(os.path.exists(log_file), "Default log file 'grader.log' was not created")
         os.remove(log_file)
 
-    def test_14_all_checks_score_one(self):
+    def test_09_all_checks_score_one(self):
         # Arrange
         config_file = "full_single_point.json"
         command = build_command(project_path="/tmp/PythonProjectGrader", config_file=config_file)
@@ -158,7 +158,7 @@ class TestFunctionalGoodWeather(unittest.TestCase):
                 f"Check '{check}' did not have the expected score of 1",
             )
 
-    def test_15_only_pylint_check(self):
+    def test_10_only_pylint_check(self):
         # Arrange
         config_file = "only_pylint.json"
         command = build_command(project_path="/tmp/PythonProjectGrader", config_file=config_file)
@@ -193,7 +193,7 @@ class TestFunctionalBadWeather(unittest.TestCase):
         if os.path.exists(self.clone_path):
             shutil.rmtree(self.clone_path)
 
-    def test_02_requirements_txt_does_not_exist(self):
+    def test_11_requirements_txt_does_not_exist(self):
         # Arrange
         command = build_command(project_path="/tmp/PythonProjectGrader")
 
@@ -209,7 +209,7 @@ class TestFunctionalBadWeather(unittest.TestCase):
         self.assertEqual(run_returncode, 0, run_stdout)
         self.assertTrue(is_score_correct(expected_score=0, target_check="requirements", grader_output=run_stdout))
 
-    def test_08_no_config_provided(self):
+    def test_12_no_config_provided(self):
         # Arrange
         random_config_path = "/tmp/nonexistent_config.json"
         command = build_command(project_path="/tmp/PythonProjectGrader", config_file=random_config_path)
@@ -221,7 +221,7 @@ class TestFunctionalBadWeather(unittest.TestCase):
         self.assertNotEqual(run_result.returncode, 0, "Expected non-zero return code when no config is provided")
         self.assertIn("Configuration file not found", run_result.stdout)
 
-    def test_11_no_student_id_in_output(self):
+    def test_13_no_student_id_in_output(self):
         # Arrange
         unexpected_output = "Running checks for student"
         command = build_command(project_path="/tmp/PythonProjectGrader")
@@ -235,7 +235,7 @@ class TestFunctionalBadWeather(unittest.TestCase):
             unexpected_output, run_result.stdout, f"Unexpected output '{unexpected_output}' found in the tool's output"
         )
 
-    def test_12_no_project_path_provided(self):
+    def test_14_no_project_path_provided(self):
         # Arrange
         command = build_command(project_path=None)
 
@@ -246,7 +246,7 @@ class TestFunctionalBadWeather(unittest.TestCase):
         self.assertNotEqual(run_result.returncode, 0, "Expected non-zero return code when no project path is provided")
         self.assertIn("error: the following arguments are required: project_root", run_result.stderr)
 
-    def test_13_invalid_project_path(self):
+    def test_15_invalid_project_path(self):
         # Arrange
         invalid_path = "/tmp/invalid_project_path"
         if os.path.exists(invalid_path):

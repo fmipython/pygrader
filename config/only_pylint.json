@@ -1,0 +1,9 @@
+{
+  "checks": [
+    {
+      "name": "pylint",
+      "max_points": 1,
+      "requires_venv": true
+    }
+  ]
+}

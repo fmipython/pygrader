@@ -1,0 +1,24 @@
+{
+  "checks": [
+    {
+      "name": "requirements",
+      "max_points": 10,
+      "requires_venv": false
+    },
+    {
+      "name": "pylint",
+      "max_points": 10,
+      "requires_venv": true
+    },
+    {
+      "name": "type-hints",
+      "max_points": 10,
+      "requires_venv": false
+    },
+    {
+      "name": "coverage",
+      "max_points": 10,
+      "requires_venv": true
+    }
+  ]
+}

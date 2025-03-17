@@ -27,6 +27,9 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Test with unittest
+      - name: Run the unit tests
         run: |
-          python3 -m unittest discover -s tests
+          find tests -type f -name "test_*.py" -not -name "test_functional.py" | xargs python3 -m unittest
+      - name: Run the functional tests
+        run: |
+          python3 -m unittest discover -s tests -p "test_functional.py"

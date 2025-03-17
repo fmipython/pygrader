@@ -46,6 +46,7 @@ Where ``PROJECT_PATH`` is the path to the project you want to grade.
    :caption: Contents:
 
    usage
+   functionality
    install
    config
    checks

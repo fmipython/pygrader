@@ -3,6 +3,7 @@ Main entry point of the program.
 Calls all the checks, and stores their results
 """
 
+import os
 import sys
 import grader.utils.constants as const
 
@@ -28,10 +29,15 @@ if __name__ == "__main__":
         logger.debug("Exception: %s", exc)
         sys.exit(1)
 
-    logger.info("Running checks for student %s", student_id)
+    if student_id is not None:
+        logger.info("Running checks for student %s", student_id)
     logger.debug("Arguments: %s", args)
 
     project_root = args["project_root"]
+
+    if not os.path.exists(project_root):
+        logger.error("Project root directory does not exist")
+        sys.exit(1)
 
     tests_directory = get_tests_directory_name(project_root)
     if tests_directory is None:

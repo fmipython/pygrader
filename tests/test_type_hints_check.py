@@ -22,7 +22,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         """
         Set up the test environment.
         """
-        self.type_hints_check = TypeHintsCheck("type_hints", 2, "sample_dir")
+        self.type_hints_check = TypeHintsCheck("type_hints", "sample_dir", 2, is_venv_required=False)
         # This way, we have 3 ranges: 0-33, 34-66, 67-100
         return super().setUp()
 

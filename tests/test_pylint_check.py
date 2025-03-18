@@ -19,7 +19,7 @@ class TestPylintCheck(unittest.TestCase):
         """
         Set up the test environment.
         """
-        self.pylint_check = PylintCheck("pylint", 2, "sample_dir")
+        self.pylint_check = PylintCheck("pylint", "sample_dir", 2, is_venv_required=False)
         # This way, we have 3 ranges: 0-33, 34-66, 67-100
         return super().setUp()
 

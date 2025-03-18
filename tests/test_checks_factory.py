@@ -68,12 +68,12 @@ class TestChecksFactory(unittest.TestCase):
         with self.assertRaises(InvalidCheckError):
             create_checks(config, project_root)
 
-    def test_06_is_venv_present(self):
+    def test_06_venv_required(self):
         """
         Test that checks requiring a virtual environment are separated correctly.
         """
         # Arrange
-        config = {"checks": [{"name": "coverage", "max_points": 10, "requires_venv": True}]}
+        config = {"checks": [{"name": "coverage", "max_points": 10, "is_venv_required": True}]}
         project_root = "test_project"
 
         # Act
@@ -83,12 +83,12 @@ class TestChecksFactory(unittest.TestCase):
         self.assertEqual(len(non_venv_checks), 0)
         self.assertEqual(len(venv_checks), 1)
 
-    def test_07_is_venv_not_present(self):
+    def test_07_venv_not_required(self):
         """
         Test that checks not requiring a virtual environment are separated correctly.
         """
         # Arrange
-        config = {"checks": [{"name": "coverage", "max_points": 10}]}
+        config = {"checks": [{"name": "coverage", "max_points": 10, "is_venv_required": False}]}
         project_root = "test_project"
 
         # Act
@@ -97,3 +97,15 @@ class TestChecksFactory(unittest.TestCase):
         # Assert
         self.assertEqual(len(non_venv_checks), 1)
         self.assertEqual(len(venv_checks), 0)
+
+    def test_08_is_venv_required_not_present(self):
+        """
+        Test that when is_venv_required is not present, an InvalidConfigError is raised.
+        """
+        # Arrange
+        config = {"checks": [{"name": "coverage", "max_points": 10}]}
+        project_root = "test_project"
+
+        # Act
+        with self.assertRaises(InvalidConfigError):
+            _ = create_checks(config, project_root)

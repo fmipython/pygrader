@@ -15,7 +15,13 @@ class TestGetArgs(unittest.TestCase):
         """
         Test that the required argument is parsed correctly.
         """
-        expected = {"project_root": "path/to/project", "config": None, "student_id": None, "verbosity": 0}
+        expected = {
+            "project_root": "path/to/project",
+            "config": None,
+            "student_id": None,
+            "verbosity": 0,
+            "skip_venv_creation": False,
+        }
         self.assertEqual(get_args(), expected)
 
     @patch("sys.argv", ["cli.py", "path/to/project", "-c", "path/to/config"])
@@ -23,7 +29,13 @@ class TestGetArgs(unittest.TestCase):
         """
         Test that the optional config argument is parsed correctly.
         """
-        expected = {"project_root": "path/to/project", "config": "path/to/config", "student_id": None, "verbosity": 0}
+        expected = {
+            "project_root": "path/to/project",
+            "config": "path/to/config",
+            "student_id": None,
+            "verbosity": 0,
+            "skip_venv_creation": False,
+        }
         self.assertEqual(get_args(), expected)
 
     @patch("sys.argv", ["cli.py", "path/to/project", "--student-id", "12345"])
@@ -31,7 +43,13 @@ class TestGetArgs(unittest.TestCase):
         """
         Test that the optional student ID argument is parsed correctly.
         """
-        expected = {"project_root": "path/to/project", "config": None, "student_id": "12345", "verbosity": 0}
+        expected = {
+            "project_root": "path/to/project",
+            "config": None,
+            "student_id": "12345",
+            "verbosity": 0,
+            "skip_venv_creation": False,
+        }
         self.assertEqual(get_args(), expected)
 
     @patch("sys.argv", ["cli.py", "path/to/project", "-v"])
@@ -39,7 +57,13 @@ class TestGetArgs(unittest.TestCase):
         """
         Test that the verbosity argument is parsed correctly.
         """
-        expected = {"project_root": "path/to/project", "config": None, "student_id": None, "verbosity": 1}
+        expected = {
+            "project_root": "path/to/project",
+            "config": None,
+            "student_id": None,
+            "verbosity": 1,
+            "skip_venv_creation": False,
+        }
         self.assertEqual(get_args(), expected)
 
     @patch("sys.argv", ["cli.py", "path/to/project", "-vv"])
@@ -47,7 +71,13 @@ class TestGetArgs(unittest.TestCase):
         """
         Test that multiple verbosity arguments are parsed correctly.
         """
-        expected = {"project_root": "path/to/project", "config": None, "student_id": None, "verbosity": 2}
+        expected = {
+            "project_root": "path/to/project",
+            "config": None,
+            "student_id": None,
+            "verbosity": 2,
+            "skip_venv_creation": False,
+        }
         self.assertEqual(get_args(), expected)
 
 

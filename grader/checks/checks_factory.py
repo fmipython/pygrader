@@ -41,8 +41,9 @@ def create_checks(config: dict, project_root: str) -> tuple[list[AbstractCheck],
 
     non_venv_checks = []
     venv_checks = []
+
     for check in checks:
-        if "name" not in check or "max_points" not in check:
+        if "name" not in check or "max_points" not in check or "is_venv_required" not in check:
             raise InvalidConfigError("Invalid check configuration")
 
         name = check["name"]

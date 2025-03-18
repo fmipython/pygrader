@@ -61,7 +61,7 @@ class TestChecksFactory(unittest.TestCase):
         Test that an unknown check name raises an InvalidCheckError.
         """
         # Arrange
-        config = {"checks": [{"name": "unknown", "max_points": 10}]}
+        config = {"checks": [{"name": "unknown", "max_points": 10, "is_venv_required": False}]}
         project_root = "test_project"
 
         # Act

@@ -50,7 +50,7 @@ def create_checks(config: dict, project_root: str) -> tuple[list[AbstractCheck],
         if name not in NAME_TO_CHECK:
             raise InvalidCheckError(f"Unknown check name: {name}")
 
-        is_venv = check.get("requires_venv", False)
+        is_venv = check.get("is_venv_required", False)
 
         other_args = {**check}
         del other_args["name"]

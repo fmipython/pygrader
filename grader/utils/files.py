@@ -6,39 +6,38 @@ import os
 from typing import Optional
 
 import grader.utils.constants as const
+from grader.utils.structure_validator import StructureValidator
 
 
 def find_all_python_files(project_root_dir: str) -> list[str]:
     """
-    Find all python files in the project directory
+    Find all python files in the project directory.
 
     :param project_root_dir: The path to the project directory
     :return: A list of all python files in the project directory
     """
-    python_files = find_all_files_under_directory(project_root_dir, ".py")
+    python_structure = StructureValidator(name="Python Files", required=False, patterns=["**/*.py"])
+    python_files = python_structure.get_matching_files(project_root_dir)
     return [file for file in python_files if all(venv_path not in file for venv_path in const.POSSIBLE_VENV_DIRS)]
 
 
 def find_all_source_files(project_root_dir: str) -> list[str]:
     """
-    Find all source files in the project directory
+    Find all source files in the project directory.
 
     :param project_root_dir: The path to the project directory
     :return: A list of all source files in the project directory
     """
-
     all_files = find_all_python_files(project_root_dir)
     tests_directory = get_tests_directory_name(project_root_dir)
     test_files = find_all_test_files(tests_directory)
 
-    source_files = [file for file in all_files if file not in test_files]
-
-    return source_files
+    return [file for file in all_files if file not in test_files]
 
 
 def find_all_test_files(tests_directory: Optional[str] = None) -> list[str]:
     """
-    Find all test files in the project directory
+    Find all test files in the project directory.
 
     :param tests_directory: The tests directory, defaults to None
     :return: A list of all test files in the project directory. If no tests directory is found, return an empty list
@@ -46,8 +45,8 @@ def find_all_test_files(tests_directory: Optional[str] = None) -> list[str]:
     if tests_directory is None:
         return []
 
-    test_files = find_all_files_under_directory(tests_directory, ".py")
-    return test_files
+    test_structure = StructureValidator(name="Test Files", required=False, patterns=["**/*.py"])
+    return test_structure.get_matching_files(tests_directory)
 
 
 def get_tests_directory_name(project_root_dir: str) -> Optional[str]:
@@ -56,7 +55,6 @@ def get_tests_directory_name(project_root_dir: str) -> Optional[str]:
 
     :param project_root_dir: The path to the project directory
     :returns: The path to the tests directory if found, otherwise None
-    :rtype: Optional[str]
     """
     for possible_directory in const.POSSIBLE_TEST_DIRS:
         possible_tests_path = os.path.join(project_root_dir, possible_directory)

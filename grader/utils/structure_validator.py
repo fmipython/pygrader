@@ -40,7 +40,7 @@ class StructureValidator:
         :rtype: list[str]
         """
         path = Path(project_root)
-        return [str(file) for pattern in self.patterns for file in path.glob(pattern)]
+        return [str(file.resolve()) for pattern in self.patterns for file in path.glob(pattern)]
 
     @staticmethod
     def from_dict(raw_object: dict) -> "StructureValidator":

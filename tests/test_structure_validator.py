@@ -2,9 +2,11 @@
 Unit tests for the StructureValidator class in the structure_validator module.
 """
 
+import os
 import unittest
 from unittest.mock import patch, MagicMock
 from grader.utils.structure_validator import StructureValidator
+from pathlib import Path
 
 
 class TestStructureValidator(unittest.TestCase):
@@ -58,16 +60,23 @@ class TestStructureValidator(unittest.TestCase):
         Test that get_matching_files returns the correct list of matching files.
         """
         # Arrange
-        mocked_glob.side_effect = [
-            [MagicMock(name="file1.py"), MagicMock(name="file2.py")],
-            [MagicMock(name="tests/test_file.py")],
+        project_root_abs = os.path.abspath(self.project_root)
+        matching_files = [
+            os.path.join(project_root_abs, "file1.py"),
+            os.path.join(project_root_abs, "file2.py"),
+            os.path.join(project_root_abs, "tests/test_file.py"),
         ]
+        mocked_glob.side_effect = [
+            [Path(file) for file in matching_files[:2]],
+            [Path(file) for file in matching_files[2:]],
+        ]
+        expected_result = matching_files
 
         # Act
-        result = self.validator.get_matching_files(self.project_root)
+        actual_result = self.validator.get_matching_files(self.project_root)
 
         # Assert
-        self.assertEqual(result, ["file1.py", "file2.py", "tests/test_file.py"])
+        self.assertEqual(actual_result, expected_result)
         mocked_glob.assert_any_call("*.py")
         mocked_glob.assert_any_call("tests/*.py")
 

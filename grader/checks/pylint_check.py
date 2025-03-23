@@ -13,7 +13,8 @@ from pylint.reporters.text import TextReporter
 import grader.utils.constants as const
 from grader.utils import process
 from grader.checks.abstract_check import ScoredCheck, CheckError
-from grader.utils.files import find_all_python_files
+
+import grader.utils.files as files
 
 logger = logging.getLogger("grader")
 
@@ -39,7 +40,7 @@ class PylintCheck(ScoredCheck):
         super().run()
 
         try:
-            pylint_args = find_all_python_files(self._project_root)
+            pylint_args = files.find_all_python_files(self._project_root)
         except OSError as error:
             logger.error("Error while finding python files: %s", error)
             raise CheckError("Error while finding python files") from error

@@ -24,7 +24,7 @@ class TestPylintCheck(unittest.TestCase):
         return super().setUp()
 
     @patch("grader.utils.process.run")
-    @patch("grader.utils.files.find_all_files_under_directory")
+    @patch("grader.utils.files.find_all_python_files")
     def test_01_pylint_called(self, mocked_find_python_files: MagicMock, mocked_pylint: MagicMock):
         """
         Test if pylint is called with the correct arguments.

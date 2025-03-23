@@ -18,6 +18,11 @@ class TestFunctionalGoodWeather(unittest.TestCase):
             if clone_result.returncode != 0:
                 raise RuntimeError(f"Failed to clone the repository: {clone_result.stderr}")
 
+            # Remove the functional tests from the repo, as they cause issues and time loss.
+            functional_tests_path = os.path.join(self.clone_path, "tests", "test_functional.py")
+            if os.path.exists(functional_tests_path):
+                os.remove(functional_tests_path)
+
     def tearDown(self):
         if os.path.exists(self.clone_path):
             shutil.rmtree(self.clone_path)
@@ -188,6 +193,11 @@ class TestFunctionalBadWeather(unittest.TestCase):
             clone_result = run(["git", "clone", self.repo_url, self.clone_path])
             if clone_result.returncode != 0:
                 raise RuntimeError(f"Failed to clone the repository: {clone_result.stderr}")
+
+            # Remove the functional tests from the repo, as they cause issues and time loss.
+            functional_tests_path = os.path.join(self.clone_path, "tests", "test_functional.py")
+            if os.path.exists(functional_tests_path):
+                os.remove(functional_tests_path)
 
     def tearDown(self):
         if os.path.exists(self.clone_path):

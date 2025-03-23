@@ -8,25 +8,31 @@ import grader.utils.constants as const
 from grader.utils.process import run
 
 
-class TestFunctionalGoodWeather(unittest.TestCase):
+class BaseFunctionalTest(unittest.TestCase):
     repo_url = "https://github.com/fmipython/PythonProjectGrader"
     clone_path = "/tmp/PythonProjectGrader"
 
     def setUp(self):
-        if not os.path.exists(self.clone_path):
-            clone_result = run(["git", "clone", self.repo_url, self.clone_path])
-            if clone_result.returncode != 0:
-                raise RuntimeError(f"Failed to clone the repository: {clone_result.stderr}")
+        if os.path.exists(self.clone_path):
+            return
 
-            # Remove the functional tests from the repo, as they cause issues and time loss.
-            functional_tests_path = os.path.join(self.clone_path, "tests", "test_functional.py")
-            if os.path.exists(functional_tests_path):
-                os.remove(functional_tests_path)
+        clone_result = run(["git", "clone", self.repo_url, self.clone_path])
+        if clone_result.returncode != 0:
+            raise RuntimeError(f"Failed to clone the repository: {clone_result.stderr}")
+
+        # Remove the functional tests from the repo, as they cause issues and time loss.
+        functional_tests_path = os.path.join(self.clone_path, "tests", "test_functional.py")
+        if os.path.exists(functional_tests_path):
+            os.remove(functional_tests_path)
 
     def tearDown(self):
-        if os.path.exists(self.clone_path):
-            shutil.rmtree(self.clone_path)
+        if not os.path.exists(self.clone_path):
+            return
 
+        shutil.rmtree(self.clone_path)
+
+
+class TestFunctionalGoodWeather(BaseFunctionalTest):
     def test_01_requirements_txt_exists(self):
         # Arrange
         command = build_command(project_path="/tmp/PythonProjectGrader")
@@ -184,25 +190,7 @@ class TestFunctionalGoodWeather(unittest.TestCase):
             self.assertNotIn(f"Check: {check}", run_stdout, f"Unexpected check '{check}' was executed")
 
 
-class TestFunctionalBadWeather(unittest.TestCase):
-    repo_url = "https://github.com/fmipython/PythonProjectGrader"
-    clone_path = "/tmp/PythonProjectGrader"
-
-    def setUp(self):
-        if not os.path.exists(self.clone_path):
-            clone_result = run(["git", "clone", self.repo_url, self.clone_path])
-            if clone_result.returncode != 0:
-                raise RuntimeError(f"Failed to clone the repository: {clone_result.stderr}")
-
-            # Remove the functional tests from the repo, as they cause issues and time loss.
-            functional_tests_path = os.path.join(self.clone_path, "tests", "test_functional.py")
-            if os.path.exists(functional_tests_path):
-                os.remove(functional_tests_path)
-
-    def tearDown(self):
-        if os.path.exists(self.clone_path):
-            shutil.rmtree(self.clone_path)
-
+class TestFunctionalBadWeather(BaseFunctionalTest):
     def test_11_requirements_txt_does_not_exist(self):
         # Arrange
         command = build_command(project_path="/tmp/PythonProjectGrader")

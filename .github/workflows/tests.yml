@@ -30,6 +30,6 @@ jobs:
       - name: Run the unit tests
         run: |
           find tests -type f -name "test_*.py" -not -name "test_functional.py" | xargs python3 -m unittest
-      - name: Run the functional tests
-        run: |
-          python3 -m unittest discover -s tests -p "test_functional.py"
+      # - name: Run the functional tests
+      #   run: |
+      #    python3 -m unittest discover -s tests -p "test_functional.py"

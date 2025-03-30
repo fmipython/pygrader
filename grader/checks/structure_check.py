@@ -59,8 +59,13 @@ class StructureCheck(NonScoredCheck):
         :return: The structure information
         :rtype: list[StructureInformation]
         """
-        with open(filepath, "r", encoding="utf-8") as file_pointer:
-            raw_structure = yaml.safe_load(file_pointer)
+        try:
+            with open(filepath, "r", encoding="utf-8") as file_pointer:
+                raw_structure = yaml.safe_load(file_pointer)
+        except yaml.YAMLError as error:
+            raise CheckError(f"Invalid structure file: {error}") from error
+        except OSError as error:
+            raise CheckError(f"Cannot read structure file: {error}") from error
 
         try:
             elements = [StructureValidator.from_dict(value) for value in raw_structure.values()]

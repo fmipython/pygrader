@@ -42,7 +42,7 @@ def create_checks(config: dict, project_root: str) -> tuple[list[AbstractCheck],
     non_venv_checks = []
     venv_checks = []
 
-    expected_keys = {"name", "max_points", "is_venv_required"}
+    expected_keys = {"name", "is_venv_required"}
     for check in checks:
         if any(key not in check for key in expected_keys):
             raise InvalidConfigError("Invalid check configuration")

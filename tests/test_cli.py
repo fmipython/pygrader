@@ -21,6 +21,7 @@ class TestGetArgs(unittest.TestCase):
             "student_id": None,
             "verbosity": 0,
             "skip_venv_creation": False,
+            "output": None,
         }
         self.assertEqual(get_args(), expected)
 
@@ -35,6 +36,7 @@ class TestGetArgs(unittest.TestCase):
             "student_id": None,
             "verbosity": 0,
             "skip_venv_creation": False,
+            "output": None,
         }
         self.assertEqual(get_args(), expected)
 
@@ -49,6 +51,7 @@ class TestGetArgs(unittest.TestCase):
             "student_id": "12345",
             "verbosity": 0,
             "skip_venv_creation": False,
+            "output": None,
         }
         self.assertEqual(get_args(), expected)
 
@@ -63,6 +66,7 @@ class TestGetArgs(unittest.TestCase):
             "student_id": None,
             "verbosity": 1,
             "skip_venv_creation": False,
+            "output": None,
         }
         self.assertEqual(get_args(), expected)
 
@@ -77,6 +81,7 @@ class TestGetArgs(unittest.TestCase):
             "student_id": None,
             "verbosity": 2,
             "skip_venv_creation": False,
+            "output": None,
         }
         self.assertEqual(get_args(), expected)
 

@@ -7,6 +7,7 @@ from logging import Logger
 import os
 import sys
 import grader.utils.constants as const
+import json
 
 from grader.checks.abstract_check import AbstractCheck, CheckError, ScoredCheck, NonScoredCheck
 from grader.checks.checks_factory import create_checks
@@ -53,7 +54,7 @@ class Grader:
         non_venv_checks, venv_checks = create_checks(self.__config, self.__project_root)
 
         for check in non_venv_checks:
-            check_result = self.__run_check(scores, non_scored_checks_results, check)
+            check_result = self.__run_check(check)
             match check:
                 case ScoredCheck():
                     scores.append((check.name, check_result, check.max_points))
@@ -61,11 +62,11 @@ class Grader:
                     non_scored_checks_results.append((check.name, check_result))
 
         if args["skip_venv_creation"]:
-            return scores, []
+            return scores, non_scored_checks_results
 
         with VirtualEnvironment(self.__project_root) as venv:
             for check in venv_checks:
-                check_result = self.__run_check(scores, non_scored_checks_results, check)
+                check_result = self.__run_check(check)
                 match check:
                     case ScoredCheck():
                         scores.append((check.name, check_result, check.max_points))
@@ -86,14 +87,31 @@ class Grader:
 
 if __name__ == "__main__":
     args = get_args()
-    logger = setup_logger(args["student_id"], verbosity=args["verbosity"])
+    is_suppressing_info = args["output"] == "json" or args["output"] == "csv"
+    logger = setup_logger(args["student_id"], verbosity=args["verbosity"], suppress_info=is_suppressing_info)
 
     grader = Grader(args["student_id"], args["project_root"], args["config"], logger)
 
     scored_checks_result, non_scored_checks_result = grader.grade()
 
-    for name, score, max_score in scored_checks_result:
-        logger.info("Check: %s, Score: %s/%s", name, score, max_score)
+    if args["output"] == "json":
+        output = {
+            "scored_checks": [
+                {"name": name, "score": score, "max_score": max_score}
+                for name, score, max_score in scored_checks_result
+            ],
+            "non_scored_checks": [{"name": name, "result": result} for name, result in non_scored_checks_result],
+        }
+        print(json.dumps(output, indent=4))
+    elif args["output"] == "csv":
+        print("Check,Score,Max Score")
+        for name, score, max_score in scored_checks_result:
+            print(f"{name},{score},{max_score}")
+        for name, result in non_scored_checks_result:
+            print(f"{name},{result},{'NaN'}")
+    else:
+        for name, score, max_score in scored_checks_result:
+            logger.info("Check: %s, Score: %s/%s", name, score, max_score)
 
-    for name, result in non_scored_checks_result:
-        logger.info("Check: %s, Result: %s", name, result)
+        for name, result in non_scored_checks_result:
+            logger.info("Check: %s, Result: %s", name, result)

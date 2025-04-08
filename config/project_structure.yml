@@ -1,36 +1,36 @@
 source:
   name: "Source files"
   required: true
-  patterns: 
+  patterns:
     - "src/**/*.py"
 
 init:
   name: "Init files"
   required: true
-  patterns: 
+  patterns:
     - "src/**/__init__.py"
 
 tests:
   name: "Test files"
   required: false
-  patterns: 
+  patterns:
     - "tests/**/*.py"
     - "tst/**/*.py"
 
 requirements:
   name: "Requirements file"
   required: false
-  patterns: 
+  patterns:
     - "requirements.txt"
 
 main:
   name: "Main file"
   required: true
-  patterns: 
+  patterns:
     - "main.py"
 
 readme:
   name: "Readme file"
   required: false
-  patterns: 
+  patterns:
     - "README.md"

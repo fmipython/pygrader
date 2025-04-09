@@ -13,7 +13,7 @@ class TestRequirementsCheck(unittest.TestCase):
         """
         Set up the test case environment.
         """
-        self.coverage_check = RequirementsCheck("requirements", 1, "sample_dir")
+        self.coverage_check = RequirementsCheck("requirements", "sample_dir", 1, is_venv_required=False)
         return super().setUp()
 
     @patch("os.path.exists")

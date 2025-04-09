@@ -32,7 +32,7 @@ class TestFindAllPythonFiles(unittest.TestCase):
         self.__sample_dir = "sample_dir"
         super().__init__(methodName)
 
-    @patch("grader.utils.files.find_all_files_under_directory")
+    @patch("grader.utils.structure_validator.StructureValidator.get_matching_files")
     def test_01_find_all_python_files(self, mocked_function: MagicMock):
         """
         Verify that find_all_python_files returns the proper files.
@@ -48,8 +48,9 @@ class TestFindAllPythonFiles(unittest.TestCase):
         actual_files = find_all_python_files(self.__sample_dir)
 
         # Assert
+        # TODO - Add check that python files are indeed searched for
         self.assertEqual(expected_files, actual_files)
-        mocked_function.assert_called_once_with(self.__sample_dir, ".py")
+        mocked_function.assert_called_once_with(self.__sample_dir)
 
     def __build_sample_files(self) -> tuple[list[str], list[str]]:
         """
@@ -181,7 +182,7 @@ class TestFindAllTestFiles(unittest.TestCase):
         self.assertEqual(expected_value, actual_value)
         mocked_find_all_files_under_directory.assert_not_called()
 
-    @patch("grader.utils.files.find_all_files_under_directory")
+    @patch("grader.utils.structure_validator.StructureValidator.get_matching_files")
     def test_02_directory_provided(self, mocked_find_all_files_under_directory: MagicMock):
         """
         Verify that find_all_test_files returns the proper files when a directory is provided.
@@ -201,8 +202,9 @@ class TestFindAllTestFiles(unittest.TestCase):
         actual_value = find_all_test_files(self.__sample_dir)
 
         # Assert
+        # TODO - Add check that python files are indeed searched for
         self.assertEqual(expected_value, actual_value)
-        mocked_find_all_files_under_directory.assert_called_once_with(self.__sample_dir, ".py")
+        mocked_find_all_files_under_directory.assert_called_once_with(self.__sample_dir)
 
 
 class TestGetTestsDirectoryName(unittest.TestCase):

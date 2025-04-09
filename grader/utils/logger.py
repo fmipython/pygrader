@@ -12,13 +12,14 @@ MAX_LOG_FILES = 20
 logging.addLevelName(VERBOSE, "VERBOSE")
 
 
-def setup_logger(student_id: Optional[str] = None, verbosity: int = 0) -> logging.Logger:
+def setup_logger(student_id: Optional[str] = None, verbosity: int = 0, suppress_info: bool = False) -> logging.Logger:
     """
     Setup the logger with the given verbosity level and student id
 
     Args:
         student_id: The id of the student. Defaults to None.
         verbosity: . Defaults to 0.
+        suppress_info: Suppress info and warning messages. Defaults to False.
 
     Returns:
         logging.Logger: The configured logger object.
@@ -27,18 +28,22 @@ def setup_logger(student_id: Optional[str] = None, verbosity: int = 0) -> loggin
     logger = logging.getLogger("grader")
     logger.setLevel(logging.DEBUG)  # Set the logger to the lowest level to capture all messages
 
-    # Clear existing handlers to avoid duplicates
     logger.handlers.clear()
 
-    match verbosity:
-        case 0:
-            console_level = logging.INFO
-        case 1:
-            console_level = VERBOSE
-        case 2:
-            console_level = logging.DEBUG
-        case _:
-            console_level = logging.DEBUG
+    console_level = None
+    if suppress_info:
+        console_level = logging.ERROR  # Suppress info and warning messages
+    else:
+        match verbosity:
+            case 0:
+                console_level = logging.INFO
+            case 1:
+                console_level = VERBOSE
+            case 2:
+                console_level = logging.DEBUG
+            case _:
+                console_level = logging.DEBUG
+    # Clear existing handlers to avoid duplicates
 
     if verbosity > 0:
         console_format = "%(asctime)s - %(levelname)s - %(message)s"

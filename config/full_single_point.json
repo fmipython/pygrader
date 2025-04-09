@@ -3,22 +3,22 @@
     {
       "name": "requirements",
       "max_points": 1,
-      "requires_venv": false
+      "is_venv_required": false
     },
     {
       "name": "pylint",
       "max_points": 1,
-      "requires_venv": true
+      "is_venv_required": true
     },
     {
       "name": "type-hints",
       "max_points": 1,
-      "requires_venv": false
+      "is_venv_required": false
     },
     {
       "name": "coverage",
       "max_points": 1,
-      "requires_venv": true
+      "is_venv_required": true
     }
   ]
 }

@@ -12,19 +12,20 @@ from pylint.reporters.text import TextReporter
 
 import grader.utils.constants as const
 from grader.utils import process
-from grader.checks.abstract_check import AbstractCheck, CheckError
-from grader.utils.files import find_all_python_files
+from grader.checks.abstract_check import ScoredCheck, CheckError
+
+import grader.utils.files as files
 
 logger = logging.getLogger("grader")
 
 
-class PylintCheck(AbstractCheck):
+class PylintCheck(ScoredCheck):
     """
     The Pylint check class.
     """
 
-    def __init__(self, name: str, max_points: int, project_root: str):
-        AbstractCheck.__init__(self, name, max_points, project_root)
+    def __init__(self, name: str, project_root: str, max_points: int, is_venv_required: bool):
+        super().__init__(name, max_points, project_root, is_venv_required)
         self.__pylint_max_score = 10
 
     def run(self) -> float:
@@ -39,7 +40,7 @@ class PylintCheck(AbstractCheck):
         super().run()
 
         try:
-            pylint_args = find_all_python_files(self._project_root)
+            pylint_args = files.find_all_python_files(self._project_root)
         except OSError as error:
             logger.error("Error while finding python files: %s", error)
             raise CheckError("Error while finding python files") from error

@@ -26,7 +26,7 @@ class TestAbstractCheck(unittest.TestCase):
                 super().run()
                 return 0
 
-        check = DummyCheck("dummy", 1, "dummy", is_venv_requred=True)
+        check = DummyCheck("dummy", "dummy", is_venv_requred=True)
 
         # Act & Assert
         with self.assertRaises(CheckError):

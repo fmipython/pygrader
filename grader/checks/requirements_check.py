@@ -6,19 +6,19 @@ It checks if requirements.txt exists in the project root.
 import logging
 import os
 
-from grader.checks.abstract_check import AbstractCheck
+from grader.checks.abstract_check import ScoredCheck
 from grader.utils.constants import REQUIREMENTS_FILENAME
 
 logger = logging.getLogger("grader")
 
 
-class RequirementsCheck(AbstractCheck):
+class RequirementsCheck(ScoredCheck):
     """
     The requirements.txt check class.
     """
 
-    def __init__(self, name: str, max_points: int, project_root: str):
-        super().__init__(name, max_points, project_root)
+    def __init__(self, name: str, project_root: str, max_points: int, is_venv_required: bool):
+        super().__init__(name, max_points, project_root, is_venv_required)
 
         self.__requirements_path = os.path.join(self._project_root, REQUIREMENTS_FILENAME)
 

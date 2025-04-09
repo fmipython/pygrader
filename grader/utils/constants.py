@@ -39,6 +39,17 @@ PYLINT_BIN = PYLINT_BIN_WINDOWS if os.name == "nt" else PYLINT_BIN_UNIX
 PYLINT_PATH = os.path.join(VENV_NAME, PYLINT_BIN)
 PYLINTRC = os.path.join(CONFIG_DIR, "2024.pylintrc")
 
+# Pytest constants
+PYTEST_BIN_WINDOWS = "pytest.exe"
+PYTEST_BIN_UNIX = "pytest"
+PYTEST_BIN = PYTEST_BIN_WINDOWS if os.name == "nt" else PYTEST_BIN_UNIX
+
+PYTEST_PATH_WINDOWS = os.path.join(VENV_NAME, "Scripts", PYTEST_BIN)
+PYTEST_PATH_UNIX = os.path.join(VENV_NAME, "bin", PYTEST_BIN)
+PYTEST_PATH = PYTEST_PATH_WINDOWS if os.name == "nt" else PYTEST_PATH_UNIX
+PYTEST_ARGS = ["--no-header", "-r A"]
+PYTEST_ROOT_DIR_ARG = "--rootdir={}"
+
 # Coverage constants
 COVERAGE_BIN_WINDOWS = "coverage.exe"
 COVERAGE_BIN_UNIX = "coverage"

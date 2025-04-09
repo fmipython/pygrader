@@ -9,6 +9,7 @@ from grader.checks.pylint_check import PylintCheck
 from grader.checks.requirements_check import RequirementsCheck
 from grader.checks.structure_check import StructureCheck
 from grader.checks.type_hints_check import TypeHintsCheck
+from grader.checks.tests_check import TestsCheck
 from grader.utils.config import InvalidConfigError
 
 
@@ -18,6 +19,7 @@ NAME_TO_CHECK: dict[str, type[AbstractCheck]] = {
     "requirements": RequirementsCheck,
     "type-hints": TypeHintsCheck,
     "structure": StructureCheck,
+    "tests": TestsCheck,
 }
 
 

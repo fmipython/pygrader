@@ -1,5 +1,7 @@
 # PythonProjectGrader
 
+<img src="https://raw.githubusercontent.com/fmipython/PythonProjectGrader/refs/heads/main/logo.png" alt="Logo" width="200" height="200">
+
 [![Tests](https://github.com/fmipython/PythonProjectGrader/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/fmipython/PythonProjectGrader/actions/workflows/tests.yml)[![GPL-3.0](https://img.shields.io/badge/license-GPL_3.0-blue.svg)](https://github.com/lyubolp/slightly-better-cut/blob/main/LICENSE)
 
 A grader for Python projects, used in the ["Programming with Python"](https://github.com/fmipython) course at Sofia University "St. Kliment Ohridski", Faculty of Mathematics and Informatics.

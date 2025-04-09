@@ -3,11 +3,12 @@ Module containing the logger setup function and the custom VERBOSE level.
 """
 
 import logging
+from logging.handlers import RotatingFileHandler
 import sys
-
 from typing import Optional
 
 VERBOSE = 15
+MAX_LOG_FILES = 20
 logging.addLevelName(VERBOSE, "VERBOSE")
 
 
@@ -26,6 +27,9 @@ def setup_logger(student_id: Optional[str] = None, verbosity: int = 0) -> loggin
     logger = logging.getLogger("grader")
     logger.setLevel(logging.DEBUG)  # Set the logger to the lowest level to capture all messages
 
+    # Clear existing handlers to avoid duplicates
+    logger.handlers.clear()
+
     match verbosity:
         case 0:
             console_level = logging.INFO
@@ -43,13 +47,21 @@ def setup_logger(student_id: Optional[str] = None, verbosity: int = 0) -> loggin
 
     file_format = "%(asctime)s - %(levelname)s - %(message)s"
 
-    console_handler = logging.StreamHandler(stream=sys.stdout)  # Change to stdout
+    # Console handler setup
+    console_handler = logging.StreamHandler(stream=sys.stdout)
     console_handler.setLevel(console_level)
     console_handler.setFormatter(logging.Formatter(console_format))
 
-    file_handler = logging.FileHandler(student_id + ".log")
+    # Rotating file handler setup
+    file_handler = RotatingFileHandler(
+        filename=f"{student_id}.log",
+        maxBytes=0,  # No size limit
+        backupCount=MAX_LOG_FILES - 1,  # -1 because the main file counts as one
+    )
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(logging.Formatter(file_format))
+    # Force a rollover on startup to create a new log file each time
+    file_handler.doRollover()
 
     logger.addHandler(console_handler)
     logger.addHandler(file_handler)

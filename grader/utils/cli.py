@@ -31,5 +31,8 @@ def get_args() -> dict[str, Any]:
         choices=["json", "csv"],
         help="Set the output format (currently only 'json' is supported)",
     )
+    parser.add_argument(
+        "--keep-venv", action="store_true", help="Keep the virtual environment after grading", default=False
+    )
 
     return parser.parse_args().__dict__

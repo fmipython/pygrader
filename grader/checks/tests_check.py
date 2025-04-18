@@ -17,6 +17,7 @@ logger = logging.getLogger("grader")
 class TestsCheck(ScoredCheck):
     """
     The tests check class.
+    This class is responsible for running tests on the submitted code and scoring the results.
     """
 
     def __init__(
@@ -29,6 +30,17 @@ class TestsCheck(ScoredCheck):
         default_test_score: float = 0.0,
         test_score_mapping: Optional[dict[str, float]] = None,
     ):
+        """
+        Initialize the TestsCheck class.
+
+        :param name: The name of the check.
+        :param project_root: The root directory of the project.
+        :param max_points: The maximum points for the check.
+        :param is_venv_required: Whether a virtual environment is required.
+        :param tests_path: A list of paths to the test files.
+        :param default_test_score: The default score for tests not explicitly mapped.
+        :param test_score_mapping: A mapping of test names to their respective scores.
+        """
         super().__init__(name, max_points, project_root, is_venv_required)
         self.__pytest_full_path = os.path.join(project_root, PYTEST_PATH)
         self.__test_score_mapping = defaultdict(lambda: default_test_score)
@@ -41,14 +53,15 @@ class TestsCheck(ScoredCheck):
 
     def run(self) -> float:
         """
-        Run the coverage check on the project.
+        Run the tests check on the project.
 
-        :returns: The score from the coverage check.
+        This method executes the tests using pytest, parses the results, and calculates the score.
+
+        :returns: The score from the tests check.
         :rtype: float
+        :raises CheckError: If the total score exceeds the maximum points.
         """
         super().run()
-
-        # return self.__translate_score(coverage_report_result)
 
         pytest_stdout = self.__pytest_run()
 
@@ -68,6 +81,13 @@ class TestsCheck(ScoredCheck):
         return passed_tests_score
 
     def __pytest_run(self):
+        """
+        Run pytest on the specified test files.
+
+        :returns: The stdout output from the pytest run.
+        :rtype: str
+        :raises CheckError: If pytest fails to execute or encounters an error.
+        """
         command = (
             [self.__pytest_full_path]
             + PYTEST_ARGS
@@ -92,6 +112,13 @@ class TestsCheck(ScoredCheck):
         return output.stdout
 
     def __parse_pytest_output(self, output: str) -> tuple[list[str], list[str]]:
+        """
+        Parse the output from pytest to determine passed and failed tests.
+
+        :param output: The output from the pytest run.
+        :returns: A tuple containing two lists - passed tests and failed tests.
+        :rtype: tuple[list[str], list[str]]
+        """
         passed_tests = []
         failed_tests = []
 

@@ -1,0 +1,122 @@
+"""
+Unit tests for the TestsCheck class.
+"""
+
+import unittest
+from unittest.mock import patch
+
+from grader.checks.tests_check import TestsCheck
+from grader.checks.abstract_check import CheckError
+
+
+class TestTestsCheck(unittest.TestCase):
+    """
+    Test cases for the TestsCheck class.
+    """
+
+    def setUp(self):
+        """
+        Set up the test environment.
+        """
+        self.name = "Test Check"
+        self.project_root = "/path/to/project"
+        self.max_points = 100
+        self.is_venv_required = False
+        self.tests_path = ["test_file.py"]
+        self.default_test_score = 10.0
+        self.test_score_mapping = {"test_1": 20.0, "test_2": 30.0}
+
+        self.tests_check = TestsCheck(
+            self.name,
+            self.project_root,
+            self.max_points,
+            self.is_venv_required,
+            self.tests_path,
+            self.default_test_score,
+            self.test_score_mapping,
+        )
+
+    @patch("grader.checks.tests_check.TestsCheck._TestsCheck__pytest_run")
+    def test_01_all_tests_pass(self, mock_pytest_run):
+        """
+        Verify run calculates the correct score when all tests pass.
+        """
+        # Arrange
+        mock_pytest_run.return_value = "PASSED test_1::test_1\nPASSED test_2::test_2"
+
+        # Act
+        score = self.tests_check.run()
+
+        # Assert
+        self.assertEqual(score, 50.0)
+
+    @patch("grader.checks.tests_check.TestsCheck._TestsCheck__pytest_run")
+    def test_02_some_tests_fail(self, mock_pytest_run):
+        """
+        Verify run calculates the correct score when some tests fail.
+        """
+        # Arrange
+        mock_pytest_run.return_value = "PASSED test_1::test_1\nFAILED test_2::test_2"
+
+        # Act
+        score = self.tests_check.run()
+
+        # Assert
+        self.assertEqual(score, 20.0)
+
+    @patch("grader.checks.tests_check.TestsCheck._TestsCheck__pytest_run")
+    def test_03_score_exceeds_max_points(self, mock_pytest_run):
+        """
+        Verify run raises CheckError when total score exceeds max_points.
+        """
+        # Arrange
+        mock_pytest_run.return_value = "PASSED test_1::test_1\nPASSED test_2::test_2\nPASSED test_3::test_3"
+        self.tests_check._TestsCheck__test_score_mapping["test_3"] = 60.0
+
+        # Act & Assert
+        with self.assertRaises(CheckError):
+            self.tests_check.run()
+
+    @patch("grader.checks.tests_check.TestsCheck._TestsCheck__pytest_run")
+    @patch("grader.checks.tests_check.logger")
+    def test_04_logs_correct_passed_and_failed_counts(self, mock_logger, mock_pytest_run):
+        """
+        Verify run logs the correct number of passed and failed tests.
+        """
+        # Arrange
+        mock_pytest_run.return_value = "PASSED test_1::test_1\nFAILED test_2::test_2"
+
+        # Act
+        self.tests_check.run()
+
+        # Assert
+        mock_logger.info.assert_any_call("Passed tests: %d/%d", 1, 2)
+        mock_logger.info.assert_any_call("Failed tests: %d/%d", 1, 2)
+
+    @patch("grader.checks.tests_check.TestsCheck._TestsCheck__pytest_run")
+    def test_05_empty_test_results(self, mock_pytest_run):
+        """
+        Verify run handles empty test results gracefully.
+        """
+        # Arrange
+        mock_pytest_run.return_value = ""
+
+        # Act
+        score = self.tests_check.run()
+
+        # Assert
+        self.assertEqual(score, 0.0)
+
+    @patch("grader.checks.tests_check.TestsCheck._TestsCheck__pytest_run")
+    def test_06_invalid_pytest_output(self, mock_pytest_run):
+        """
+        Verify run handles invalid pytest output gracefully.
+        """
+        # Arrange
+        mock_pytest_run.return_value = "INVALID OUTPUT"
+
+        # Act
+        score = self.tests_check.run()
+
+        # Assert
+        self.assertEqual(score, 0.0)

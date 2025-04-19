@@ -9,7 +9,9 @@ from typing import Optional
 
 from grader.checks.abstract_check import CheckError, ScoredCheck
 from grader.utils.constants import PYTEST_ARGS, PYTEST_PATH, PYTEST_ROOT_DIR_ARG
-from grader.utils.process import run, extend_env_variable
+
+# from grader.utils.process import run, extend_env_variable
+from grader.utils import process
 
 logger = logging.getLogger("grader")
 
@@ -96,10 +98,10 @@ class RunTestsCheck(ScoredCheck):
         )
 
         try:
-            output = run(
+            output = process.run(
                 command,
                 current_directory=self._project_root,
-                env_vars=extend_env_variable("PYTHONPATH", self._project_root),
+                env_vars=process.extend_env_variable("PYTHONPATH", self._project_root),
             )
         except (OSError, ValueError) as e:
             logger.error("Tests run failed: %s", e)

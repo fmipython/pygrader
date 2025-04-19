@@ -18,9 +18,28 @@ Current supported set of checks are:
 
 The tool supports configuration files, where you can specify the score for each check.
 
-==========
-Quickstart
-==========
+=======================
+Quickstart (via Docker)
+=======================
+
+1. If you don't have Docker (or Docker Desktop) already, install it from [here](https://docs.docker.com/get-docker).
+
+2. Download or clone this repository, if you haven't already.
+
+3. Navigate to the project repository in a terminal and execute the following command:
+
+.. code:: bash
+
+   ./run <path_to_Python_project>
+
+
+Replace ``<path_to_Python_project>`` with the path to your project directory. This command should work on all operating systems.
+
+⚠️ *If you are on Windows,* ``<path_to_Python_project>`` *should be a full path, not a relative one. For example, write* ``C:\Users\YourName\Documents\Project`` *instead of just* ``..\Project``.
+
+=======================
+Quickstart (via source)
+=======================
 
 1. Clone the repository and create a virtual environment:
 

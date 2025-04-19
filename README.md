@@ -1,5 +1,7 @@
 # PythonProjectGrader
 
+<img src="https://raw.githubusercontent.com/fmipython/PythonProjectGrader/refs/heads/main/logo.png" alt="Logo" width="200" height="200">
+
 [![Tests](https://github.com/fmipython/PythonProjectGrader/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/fmipython/PythonProjectGrader/actions/workflows/tests.yml)[![GPL-3.0](https://img.shields.io/badge/license-GPL_3.0-blue.svg)](https://github.com/lyubolp/slightly-better-cut/blob/main/LICENSE)
 
 A grader for Python projects, used in the ["Programming with Python"](https://github.com/fmipython) course at Sofia University "St. Kliment Ohridski", Faculty of Mathematics and Informatics.
@@ -13,7 +15,6 @@ Current supported set of checks are:
 - Code coverage (via pytest & coverage)
 
 The tool supports configuration files, where you can specify the score for each check.
-
 
 ## How to use (easier way)
 
@@ -29,8 +30,7 @@ The tool supports configuration files, where you can specify the score for each 
 
 Replace `<path_to_Python_project>` with the path to your project directory. This command should work on all operating systems.
 
-⚠️ *If you are on Windows, `<path_to_Python_project>` should be a full path, not a relative one. For example, write `C:\Users\YourName\Documents\Project` instead of just `..\Project`.*
-
+⚠️ _If you are on Windows, `<path_to_Python_project>` should be a full path, not a relative one. For example, write `C:\Users\YourName\Documents\Project` instead of just `..\Project`._
 
 ## How to use 2.0 (raw way)
 
@@ -43,13 +43,14 @@ python3 -m venv .venv
 ```
 
 2. Activate the virtual environment:
-      * On Linux/MacOS:
+
+   - On Linux/MacOS:
 
    ```bash
    source .venv/bin/activate
    ```
 
-   * On Windows:
+   - On Windows:
 
    ```bash
    .venv\Scripts\activate
@@ -70,6 +71,10 @@ python3 main.py -c ./config/2024.json PROJECT_PATH
 Where `PROJECT_PATH` is the path to the project you want to grade.
 
 ## Configuration
+
+The grader supports configuration files in JSON format.
+The configuration specifies which checks to run, their maximum score, as well as other requirements.
+Refer to the [documentation](https://fmipython.github.io/PythonProjectGrader/config.html) for more information.
 
 ## Documentation
 

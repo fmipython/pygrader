@@ -14,7 +14,7 @@ from grader.utils.process import run, extend_env_variable
 logger = logging.getLogger("grader")
 
 
-class TestsCheck(ScoredCheck):
+class RunTestsCheck(ScoredCheck):
     """
     The tests check class.
     This class is responsible for running tests on the submitted code and scoring the results.

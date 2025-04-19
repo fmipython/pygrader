@@ -5,7 +5,7 @@ Unit tests for the TestsCheck class.
 import unittest
 from unittest.mock import patch
 
-from grader.checks.tests_check import TestsCheck
+from grader.checks.run_tests_check import RunTestsCheck
 from grader.checks.abstract_check import CheckError
 
 
@@ -26,7 +26,7 @@ class TestTestsCheck(unittest.TestCase):
         self.default_test_score = 10.0
         self.test_score_mapping = {"test_1": 20.0, "test_2": 30.0}
 
-        self.tests_check = TestsCheck(
+        self.tests_check = RunTestsCheck(
             self.name,
             self.project_root,
             self.max_points,

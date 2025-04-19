@@ -1,0 +1,15 @@
+{
+    "checks": [
+        {
+            "name": "tests",
+            "max_points": 10,
+            "is_venv_required": true,
+            "tests_path": ["/home/lyubolp/PythonProjectGrader/tests/sample_code_tests.py"],
+            "default_test_score": 2,
+            "test_score_mapping": {
+                "test_add": 3,
+                "test_divide": 3
+            }
+        }
+    ]
+}

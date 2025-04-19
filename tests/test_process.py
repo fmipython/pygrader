@@ -38,7 +38,7 @@ class TestRunProcess(unittest.TestCase):
 
             is_command_name_logged = f"DEBUG:grader:Running command: {[expected_command]}" in log.output
             is_additional_information_logged = (
-                f"DEBUG:grader:Command failed: {expected_returncode} {expected_stdout} {expected_stderr}"
+                f"DEBUG:grader:Command failed: {expected_returncode} {expected_stdout} {expected_stderr}" in log.output
             )
 
         # Assert
@@ -46,7 +46,7 @@ class TestRunProcess(unittest.TestCase):
         self.assertTrue(is_command_name_logged)
         self.assertTrue(is_additional_information_logged)
         mocked_subprocess.assert_called_once_with(
-            [expected_command], check=False, capture_output=True, text=True, cwd=None
+            [expected_command], check=False, capture_output=True, text=True, cwd=None, env=None
         )
 
     @patch("subprocess.run")
@@ -71,12 +71,12 @@ class TestRunProcess(unittest.TestCase):
             actual_subprocess_result = run([expected_command])
 
             is_command_name_logged = f"DEBUG:grader:Running command: {[expected_command]}" in log.output
-            is_additional_information_logged = f"DEBUG:grader:Command succeeded: {expected_stdout}"
+            is_additional_information_logged = f"DEBUG:grader:Command succeeded: {expected_stdout}" in log.output
 
         # Assert
         self.assertEqual(expected_subprocess_result, actual_subprocess_result)
         self.assertTrue(is_command_name_logged)
         self.assertTrue(is_additional_information_logged)
         mocked_subprocess.assert_called_once_with(
-            [expected_command], check=False, capture_output=True, text=True, cwd=None
+            [expected_command], check=False, capture_output=True, text=True, cwd=None, env=None
         )

@@ -22,9 +22,10 @@ class VirtualEnvironment:
 
     is_initialized = False
 
-    def __init__(self, project_path: str):
+    def __init__(self, project_path: str, keep_venv: bool = False):
         self._project_path = project_path
         self._venv_path = os.path.join(project_path, const.VENV_NAME)
+        self.__keep_venv = keep_venv
 
     def __enter__(self):
         self.setup()
@@ -81,7 +82,8 @@ class VirtualEnvironment:
         """
         Delete the virtual environment.
         """
-        shutil.rmtree(self._venv_path)
+        if not self.__keep_venv:
+            shutil.rmtree(self._venv_path)
 
     @staticmethod
     def __install_requirements(venv_path: str, requirements_path: str):

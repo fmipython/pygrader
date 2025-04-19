@@ -19,12 +19,14 @@ from grader.utils.virtual_environment import VirtualEnvironment
 
 
 class Grader:
-    def __init__(self, student_id: str, project_root: str, config_path: str, logger: Logger):
+    def __init__(
+        self, student_id: str, project_root: str, config_path: str, logger: Logger, is_keeping_venv: bool = False
+    ):
         self.__student_id = student_id
         self.__logger = logger
 
         self.__logger.info("Python project grader, %s", const.VERSION)
-
+        self.__is_keeping_venv = is_keeping_venv
         try:
             self.__config = load_config(config_path)
         except FileNotFoundError as exc:
@@ -64,7 +66,7 @@ class Grader:
         if args["skip_venv_creation"]:
             return scores, non_scored_checks_results
 
-        with VirtualEnvironment(self.__project_root) as venv:
+        with VirtualEnvironment(self.__project_root, self.__is_keeping_venv) as venv:
             for check in venv_checks:
                 check_result = self.__run_check(check)
                 match check:
@@ -90,7 +92,7 @@ if __name__ == "__main__":
     is_suppressing_info = args["output"] == "json" or args["output"] == "csv"
     logger = setup_logger(args["student_id"], verbosity=args["verbosity"], suppress_info=is_suppressing_info)
 
-    grader = Grader(args["student_id"], args["project_root"], args["config"], logger)
+    grader = Grader(args["student_id"], args["project_root"], args["config"], logger, args["keep_venv"])
 
     scored_checks_result, non_scored_checks_result = grader.grade()
 

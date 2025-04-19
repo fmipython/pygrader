@@ -12,7 +12,7 @@ REPORTS_TEMP_DIR = os.path.join(ROOT_DIR, "reports")
 CONFIG_DIR = os.path.join(ROOT_DIR, "config")
 
 # Python
-PYTHON_BIN_WINDOWS = "python"
+PYTHON_BIN_WINDOWS = "python.exe"
 PYTHON_BIN_UNIX = "python3"
 
 PYTHON_BIN = PYTHON_BIN_WINDOWS if os.name == "nt" else PYTHON_BIN_UNIX

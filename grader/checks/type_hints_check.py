@@ -5,7 +5,7 @@ It calls mypy as a subprocess to generate a report and then read from the report
 
 import logging
 
-from grader.checks.abstract_check import ScoredCheck, CheckError
+from grader.checks.abstract_check import ScoredCheck, CheckError, ScoredCheckResult
 from grader.utils.constants import MYPY_TYPE_HINT_CONFIG, REPORTS_TEMP_DIR, MYPY_LINE_COUNT_REPORT
 from grader.utils import files
 from grader.utils import process
@@ -25,7 +25,7 @@ class TypeHintsCheck(ScoredCheck):
         self.__mypy_arguments = ["--config-file", MYPY_TYPE_HINT_CONFIG, "--linecount-report", REPORTS_TEMP_DIR]
         self.__mypy_max_score = 1
 
-    def run(self) -> float:
+    def run(self) -> ScoredCheckResult:
         """
         Run the mypy check on the project.
 
@@ -68,10 +68,12 @@ class TypeHintsCheck(ScoredCheck):
 
         if int(lines_total) == 0:
             logger.error("Mypy linecount report is empty")
-            return 0.0
+            return ScoredCheckResult(self.name, 0, self.max_points)
 
         # Calculate score
-        return self.__translate_score(int(lines_with_type_annotations) / int(lines_total))
+        score = self.__translate_score(int(lines_with_type_annotations) / int(lines_total))
+
+        return ScoredCheckResult(self.name, score, self.max_points)
 
     def __translate_score(self, mypy_score: float) -> float:
         """

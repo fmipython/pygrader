@@ -12,7 +12,7 @@ from pylint.reporters.text import TextReporter
 
 import grader.utils.constants as const
 from grader.utils import process
-from grader.checks.abstract_check import ScoredCheck, CheckError
+from grader.checks.abstract_check import ScoredCheck, CheckError, ScoredCheckResult
 
 import grader.utils.files as files
 
@@ -28,7 +28,7 @@ class PylintCheck(ScoredCheck):
         super().__init__(name, max_points, project_root, is_venv_required)
         self.__pylint_max_score = 10
 
-    def run(self) -> float:
+    def run(self) -> ScoredCheckResult:
         """
         Run the pylint check on the project.
         First, find all python files in the project, then create a custom reporter (to suppress all output).
@@ -65,7 +65,9 @@ class PylintCheck(ScoredCheck):
         pylint_score = self.__get_pylint_score(results.stdout)
 
         logger.debug("Pylint score: %s", pylint_score)
-        return self.__translate_score(pylint_score)
+        score = self.__translate_score(pylint_score)
+
+        return ScoredCheckResult(self.name, score, self.max_points)
 
     def __translate_score(self, pylint_score: float) -> float:
         """

@@ -7,7 +7,7 @@ import logging
 
 import yaml
 
-from grader.checks.abstract_check import NonScoredCheck, CheckError
+from grader.checks.abstract_check import NonScoredCheck, CheckError, NonScoredCheckResult
 from grader.utils.logger import VERBOSE
 from grader.utils.structure_validator import StructureValidator
 
@@ -26,7 +26,7 @@ class StructureCheck(NonScoredCheck):
         super().__init__(name, project_root, is_venv_required)
         self.__structure_file = structure_file
 
-    def run(self) -> bool:
+    def run(self) -> NonScoredCheckResult:
         """
         Run the structure check on the project.
 
@@ -44,9 +44,9 @@ class StructureCheck(NonScoredCheck):
             logger.log(VERBOSE, "Is %s structure valid ? %s", element.name, is_element_valid)
 
             if element.required and not is_element_valid:
-                return False
+                return NonScoredCheckResult(self.name, False)
 
-        return True
+        return NonScoredCheckResult(self.name, True)
 
     @staticmethod
     def __load_structure_file(filepath: str) -> list[StructureValidator]:

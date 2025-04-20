@@ -3,6 +3,7 @@ Module containing a class representing an abstract check.
 Each check should inherit from this class.
 """
 
+from dataclasses import dataclass
 import logging
 from abc import ABC, abstractmethod
 from typing import TypeVar, Generic, Optional
@@ -16,6 +17,16 @@ logger = logging.getLogger("grader")
 T = TypeVar("T")
 
 
+@dataclass
+class CheckResult(Generic[T]):
+    """
+    Class representing the result of a check.
+    """
+
+    name: str
+    result: T
+
+
 class AbstractCheck(ABC, Generic[T]):
     """
     Each check has a name and a project root path.
@@ -27,7 +38,7 @@ class AbstractCheck(ABC, Generic[T]):
         self._is_venv_required = is_venv_requred
 
     @abstractmethod
-    def run(self) -> Optional[T]:
+    def run(self) -> Optional[CheckResult[T]]:  # TODO - Check if we need the Optional
         """
         Main method that executes the check.
 
@@ -61,6 +72,22 @@ class AbstractCheck(ABC, Generic[T]):
         return VirtualEnvironment.is_initialized
 
 
+@dataclass
+class ScoredCheckResult(CheckResult[T]):
+    """
+    Class representing the result of a scored check.
+    """
+
+    max_score: int
+
+
+@dataclass
+class NonScoredCheckResult(CheckResult[bool]):
+    """
+    Class representing the result of a non-scored check.
+    """
+
+
 class ScoredCheck(AbstractCheck[float]):
     """
     Each scored check has a maximum amount of points.
@@ -78,7 +105,7 @@ class ScoredCheck(AbstractCheck[float]):
         """
         return self._max_points
 
-    def run(self) -> float:
+    def run(self) -> Optional[ScoredCheckResult[float]]:
         """
         Main method that executes the check.
 
@@ -87,7 +114,7 @@ class ScoredCheck(AbstractCheck[float]):
         """
         super().run()
         # Implement the logic for the scored check here
-        return 0.0  # Replace with actual score
+        return ScoredCheckResult(self.name, 0.0, self.max_points)  # Replace with actual score
 
 
 class NonScoredCheck(AbstractCheck[bool]):
@@ -107,7 +134,7 @@ class NonScoredCheck(AbstractCheck[bool]):
         """
         return self._is_fatal
 
-    def run(self) -> bool:
+    def run(self) -> NonScoredCheckResult:
         """
         Main method that executes the check.
 
@@ -116,7 +143,7 @@ class NonScoredCheck(AbstractCheck[bool]):
         """
         super().run()
         # Implement the logic for the non-scored check here
-        return True  # or False based on the check logic
+        return NonScoredCheckResult(self.name, True)  # or False based on the check logic
 
 
 class CheckError(Exception):

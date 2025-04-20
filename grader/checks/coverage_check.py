@@ -94,7 +94,7 @@ class CoverageCheck(ScoredCheck):
 
         try:
             command = [self.__coverage_full_path] + COVERAGE_REPORT_ARGS_NO_FORMAT + source_files
-            output = run(command, current_directory=self._project_root)
+            _ = run(command, current_directory=self._project_root)
         except (OSError, ValueError) as e:
             logger.error("Coverage report (no format) failed: %s", e)
             raise CheckError("Coverage report (no format) failed") from e

@@ -43,14 +43,11 @@ def setup_logger(student_id: Optional[str] = None, verbosity: int = 0, suppress_
                 console_level = logging.DEBUG
             case _:
                 console_level = logging.DEBUG
-    # Clear existing handlers to avoid duplicates
 
     if verbosity > 0:
         console_format = "%(asctime)s - %(levelname)s - %(message)s"
     else:
         console_format = "%(message)s"
-
-    file_format = "%(asctime)s - %(levelname)s - %(message)s"
 
     # Console handler setup
     console_handler = logging.StreamHandler(stream=sys.stdout)
@@ -58,6 +55,7 @@ def setup_logger(student_id: Optional[str] = None, verbosity: int = 0, suppress_
     console_handler.setFormatter(logging.Formatter(console_format))
 
     # Rotating file handler setup
+    file_format = "%(asctime)s - %(levelname)s - %(message)s"
     file_handler = RotatingFileHandler(
         filename=f"{student_id}.log",
         maxBytes=0,  # No size limit

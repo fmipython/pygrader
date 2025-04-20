@@ -38,7 +38,7 @@ class TypeHintsCheck(ScoredCheck):
         :returns: The score from the mypy check.
         :rtype: float
         """
-        super().run()
+        self._pre_run()
 
         # Gather all files
         try:

@@ -29,7 +29,7 @@ class RequirementsCheck(ScoredCheck):
         :return: The score from the requirements.txt check
         :rtype: float
         """
-        super().run()
+        self._pre_run()
 
         score = int(os.path.exists(self.__requirements_path)) * self.max_points
 

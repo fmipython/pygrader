@@ -37,7 +37,7 @@ class PylintCheck(ScoredCheck):
         :returns: The score from the pylint check.
         :rtype: float
         """
-        super().run()
+        self._pre_run()
 
         try:
             pylint_args = files.find_all_python_files(self._project_root)

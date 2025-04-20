@@ -6,7 +6,7 @@ Each check should inherit from this class.
 from dataclasses import dataclass
 import logging
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic, Optional
+from typing import TypeVar, Generic
 
 from grader.utils.logger import VERBOSE
 from grader.utils.virtual_environment import VirtualEnvironment
@@ -38,18 +38,14 @@ class AbstractCheck(ABC, Generic[T]):
         self._is_venv_required = is_venv_requred
 
     @abstractmethod
-    def run(self) -> Optional[CheckResult[T]]:  # TODO - Check if we need the Optional
+    def run(self) -> CheckResult[T]:  # TODO - Check if we need the Optional
         """
         Main method that executes the check.
 
         :returns: The result of the check.
         :rtype: Optional[T]
         """
-        if self._is_venv_required and not self.is_running_within_venv():
-            raise CheckError("Virtual environment is required for this check")
-
-        logger.log(VERBOSE, "Running %s", self.name)
-        return None
+        pass
 
     @property
     def name(self) -> str:
@@ -70,6 +66,17 @@ class AbstractCheck(ABC, Generic[T]):
         :rtype: bool
         """
         return VirtualEnvironment.is_initialized
+
+    def _pre_run(self):
+        """
+        Pre-run checks to ensure the environment is set up correctly.
+
+        :raises CheckError: If the check requires a virtual environment and is not running within one.
+        """
+        if self._is_venv_required and not self.is_running_within_venv():
+            raise CheckError("Virtual environment is required for this check")
+
+        logger.log(VERBOSE, "Running %s", self.name)
 
 
 @dataclass
@@ -105,17 +112,6 @@ class ScoredCheck(AbstractCheck[float]):
         """
         return self._max_points
 
-    def run(self) -> Optional[ScoredCheckResult[float]]:
-        """
-        Main method that executes the check.
-
-        :returns: The score of the check.
-        :rtype: float
-        """
-        super().run()
-        # Implement the logic for the scored check here
-        return ScoredCheckResult(self.name, 0.0, self.max_points)  # Replace with actual score
-
 
 class NonScoredCheck(AbstractCheck[bool]):
     """
@@ -133,17 +129,6 @@ class NonScoredCheck(AbstractCheck[bool]):
         :rtype: bool
         """
         return self._is_fatal
-
-    def run(self) -> NonScoredCheckResult:
-        """
-        Main method that executes the check.
-
-        :returns: True if the check passes, False otherwise.
-        :rtype: bool
-        """
-        super().run()
-        # Implement the logic for the non-scored check here
-        return NonScoredCheckResult(self.name, True)  # or False based on the check logic
 
 
 class CheckError(Exception):

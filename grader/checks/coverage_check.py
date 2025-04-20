@@ -36,7 +36,7 @@ class CoverageCheck(ScoredCheck):
         :returns: The score from the coverage check.
         :rtype: float
         """
-        super().run()
+        self._pre_run()
 
         self.__coverage_run()
 

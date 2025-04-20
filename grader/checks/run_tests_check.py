@@ -63,7 +63,7 @@ class RunTestsCheck(ScoredCheck):
         :rtype: float
         :raises CheckError: If the total score exceeds the maximum points.
         """
-        super().run()
+        self._pre_run()
 
         pytest_stdout = self.__pytest_run()
 

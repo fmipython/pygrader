@@ -36,6 +36,7 @@ class StructureCheck(NonScoredCheck):
         :return: The score from the structure check
         :rtype: float
         """
+        self._pre_run()
         structure_elements = StructureCheck.__load_structure_file(self.__structure_file)
 
         for element in structure_elements:

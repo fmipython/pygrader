@@ -7,14 +7,20 @@ from logging import Logger
 import os
 import sys
 import grader.utils.constants as const
-import json
 
-from grader.checks.abstract_check import AbstractCheck, CheckError, ScoredCheck, NonScoredCheck
+from grader.checks.abstract_check import (
+    AbstractCheck,
+    CheckError,
+    NonScoredCheckResult,
+    CheckResult,
+    ScoredCheckResult,
+)
 from grader.checks.checks_factory import create_checks
 from grader.utils.cli import get_args
 from grader.utils.config import load_config
 from grader.utils.files import get_tests_directory_name
 from grader.utils.logger import setup_logger
+from grader.utils.results_reporter import JSONResultsReporter, CSVResultsReporter, PlainTextResultsReporter
 from grader.utils.virtual_environment import VirtualEnvironment
 
 
@@ -43,77 +49,53 @@ class Grader:
             self.__logger.error("Project root directory does not exist")
             sys.exit(1)
 
-    def grade(self):
+    def grade(self) -> list[CheckResult]:
         tests_directory = get_tests_directory_name(self.__project_root)
         if tests_directory is None:
             self.__logger.warning(
                 "No tests directory found in the project directory. Either it is missing or named differently."
             )
 
-        scores = []
-        non_scored_checks_results = []
-
         non_venv_checks, venv_checks = create_checks(self.__config, self.__project_root)
 
-        for check in non_venv_checks:
-            check_result = self.__run_check(check)
-            match check:
-                case ScoredCheck():
-                    scores.append((check.name, check_result, check.max_points))
-                case NonScoredCheck():
-                    non_scored_checks_results.append((check.name, check_result))
+        scores = [self.__run_check(check) for check in non_venv_checks]
 
         if args["skip_venv_creation"]:
-            return scores, non_scored_checks_results
+            return scores
 
-        with VirtualEnvironment(self.__project_root, self.__is_keeping_venv) as venv:
-            for check in venv_checks:
-                check_result = self.__run_check(check)
-                match check:
-                    case ScoredCheck():
-                        scores.append((check.name, check_result, check.max_points))
-                    case NonScoredCheck():
-                        non_scored_checks_results.append((check.name, check_result))
+        with VirtualEnvironment(self.__project_root, self.__is_keeping_venv):
+            scores += [self.__run_check(check) for check in venv_checks]
 
-        return scores, non_scored_checks_results
+        return scores
 
-    def __run_check(self, check: AbstractCheck):
+    def __run_check(self, check: AbstractCheck) -> CheckResult:
         try:
             check_result = check.run()
         except CheckError as error:
             self.__logger.error("Check failed: %s", error)
-            check_result = 0.0
+            check_result = CheckResult(check.name, 0)  # TODO - Need to add default check result
 
         return check_result
 
 
 if __name__ == "__main__":
     args = get_args()
-    is_suppressing_info = args["output"] == "json" or args["output"] == "csv"
+    is_suppressing_info = args["report_format"] == "json" or args["report_format"] == "csv" or args["suppress_info"]
     logger = setup_logger(args["student_id"], verbosity=args["verbosity"], suppress_info=is_suppressing_info)
 
     grader = Grader(args["student_id"], args["project_root"], args["config"], logger, args["keep_venv"])
 
-    scored_checks_result, non_scored_checks_result = grader.grade()
+    checks_results = grader.grade()
 
-    if args["output"] == "json":
-        output = {
-            "scored_checks": [
-                {"name": name, "score": score, "max_score": max_score}
-                for name, score, max_score in scored_checks_result
-            ],
-            "non_scored_checks": [{"name": name, "result": result} for name, result in non_scored_checks_result],
-        }
-        print(json.dumps(output, indent=4))
-    elif args["output"] == "csv":
-        print("Check,Score,Max Score")
-        for name, score, max_score in scored_checks_result:
-            print(f"{name},{score},{max_score}")
-        for name, result in non_scored_checks_result:
-            print(f"{name},{result},{'NaN'}")
-    else:
-        for name, score, max_score in scored_checks_result:
-            logger.info("Check: %s, Score: %s/%s", name, score, max_score)
+    match args["report_format"]:
+        case "json":
+            reporter = JSONResultsReporter()
+        case "csv":
+            reporter = CSVResultsReporter()
+        case "text":
+            reporter = PlainTextResultsReporter()
+        case _:
+            reporter = PlainTextResultsReporter()
 
-        for name, result in non_scored_checks_result:
-            logger.info("Check: %s, Result: %s", name, result)
+    # TODO - Add output to a file
+    reporter.display(checks_results)

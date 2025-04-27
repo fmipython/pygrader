@@ -32,6 +32,7 @@ class BaseFunctionalTest(unittest.TestCase):
         shutil.rmtree(self.clone_path)
 
 
+@unittest.skipIf(os.name == "nt", "Test skipped on Windows")
 class TestFunctionalGoodWeather(BaseFunctionalTest):
     def test_01_requirements_txt_exists(self):
         # Arrange
@@ -190,6 +191,7 @@ class TestFunctionalGoodWeather(BaseFunctionalTest):
             self.assertNotIn(f"Check: {check}", run_stdout, f"Unexpected check '{check}' was executed")
 
 
+@unittest.skipIf(os.name == "nt", "Test skipped on Windows")
 class TestFunctionalBadWeather(BaseFunctionalTest):
     def test_11_requirements_txt_does_not_exist(self):
         # Arrange

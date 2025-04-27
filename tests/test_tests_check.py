@@ -133,7 +133,7 @@ class TestTestsCheck(unittest.TestCase):
         self.assertEqual(score, 0.0)
 
     @patch("grader.utils.process.run")
-    def test_07_pytest_raises_OSError(self, mock_run):
+    def test_07_pytest_raises_os_error(self, mock_run):
         """
         Verify run raises CheckError when pytest raises OSError.
         """
@@ -145,7 +145,7 @@ class TestTestsCheck(unittest.TestCase):
             self.tests_check.run()
 
     @patch("grader.utils.process.run")
-    def test_08_pytest_raises_ValueError(self, mock_run):
+    def test_08_pytest_raises_value_error(self, mock_run):
         """
         Verify run raises CheckError when pytest raises ValueError.
         """

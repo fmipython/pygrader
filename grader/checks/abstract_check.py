@@ -45,7 +45,6 @@ class AbstractCheck(ABC, Generic[T]):
         :returns: The result of the check.
         :rtype: Optional[T]
         """
-        pass
 
     @property
     def name(self) -> str:

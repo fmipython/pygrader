@@ -1,3 +1,7 @@
+"""
+Unit tests for the checks_factory module in the grader package.
+"""
+
 import unittest
 from grader.checks.checks_factory import create_checks, InvalidCheckError
 from grader.utils.config import InvalidConfigError

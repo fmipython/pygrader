@@ -4,9 +4,9 @@ Unit tests for the StructureValidator class in the structure_validator module.
 
 import os
 import unittest
+from pathlib import Path
 from unittest.mock import patch, MagicMock
 from grader.utils.structure_validator import StructureValidator
-from pathlib import Path
 
 
 class TestStructureValidator(unittest.TestCase):

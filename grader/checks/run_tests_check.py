@@ -10,7 +10,6 @@ from typing import Optional
 from grader.checks.abstract_check import CheckError, ScoredCheck, ScoredCheckResult
 from grader.utils.constants import PYTEST_ARGS, PYTEST_PATH, PYTEST_ROOT_DIR_ARG
 
-# from grader.utils.process import run, extend_env_variable
 from grader.utils import process
 
 logger = logging.getLogger("grader")

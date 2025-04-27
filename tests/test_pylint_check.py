@@ -146,7 +146,8 @@ class TestPylintCheck(unittest.TestCase):
         :type mocked_pylint: MagicMock
         """
         # Arrange
-        mocked_pylint.return_value = CompletedProcess("pylint", 0, self.__create_sample_pylint_output(10 / 3))
+        mocked_pylint_stdout = self.__create_sample_pylint_output(10 / 3)
+        mocked_pylint.return_value = CompletedProcess("pylint", 0, mocked_pylint_stdout)
         expected_score = 1
 
         # Act

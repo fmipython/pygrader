@@ -14,9 +14,6 @@ from grader.utils.structure_validator import StructureValidator
 logger = logging.getLogger("grader")
 
 
-# TODO - It also needs to work with multiple structures, depending on the project type.
-
-
 class StructureCheck(NonScoredCheck):
     """
     The Structure check class.

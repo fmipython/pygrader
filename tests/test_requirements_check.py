@@ -1,3 +1,7 @@
+"""
+Unit tests for the RequirementsCheck class in the requirements_check module.
+"""
+
 import unittest
 from unittest.mock import patch, MagicMock
 

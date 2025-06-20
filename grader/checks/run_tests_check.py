@@ -7,10 +7,9 @@ import logging
 import os
 from typing import Optional
 
-from grader.checks.abstract_check import CheckError, ScoredCheck
+from grader.checks.abstract_check import CheckError, ScoredCheck, ScoredCheckResult
 from grader.utils.constants import PYTEST_ARGS, PYTEST_PATH, PYTEST_ROOT_DIR_ARG
 
-# from grader.utils.process import run, extend_env_variable
 from grader.utils import process
 
 logger = logging.getLogger("grader")
@@ -53,7 +52,7 @@ class RunTestsCheck(ScoredCheck):
 
         self.__tests_path = tests_path
 
-    def run(self) -> float:
+    def run(self) -> ScoredCheckResult:
         """
         Run the tests check on the project.
 
@@ -63,7 +62,7 @@ class RunTestsCheck(ScoredCheck):
         :rtype: float
         :raises CheckError: If the total score exceeds the maximum points.
         """
-        super().run()
+        self._pre_run()
 
         pytest_stdout = self.__pytest_run()
 
@@ -80,7 +79,7 @@ class RunTestsCheck(ScoredCheck):
         logger.info("Passed tests: %d/%d", len(passed), total_amount)
         logger.info("Failed tests: %d/%d", len(failed), total_amount)
 
-        return passed_tests_score
+        return ScoredCheckResult(self.name, passed_tests_score, self.max_points)
 
     def __pytest_run(self):
         """

@@ -39,35 +39,40 @@ def create_checks(config: dict, project_root: str) -> tuple[list[AbstractCheck],
     if "checks" not in config:
         raise InvalidConfigError("No checks found in the configuration file")
 
-    checks = config["checks"]
+    checks: list[dict] = config["checks"]
 
     non_venv_checks = []
     venv_checks = []
 
     expected_keys = {"name", "is_venv_required"}
     for check in checks:
-        if any(key not in check for key in expected_keys):
-            raise InvalidConfigError("Invalid check configuration")
-
-        name = check["name"]
-
-        if name not in NAME_TO_CHECK:
-            raise InvalidCheckError(f"Unknown check name: {name}")
+        created_check = __create_check(project_root, expected_keys, check)
 
         is_venv = check.get("is_venv_required", False)
-
-        other_args = {**check}
-        del other_args["name"]
-
-        check_class = NAME_TO_CHECK[name]
-        created_check = check_class(name, project_root, **other_args)
-
         if is_venv:
             venv_checks.append(created_check)
         else:
             non_venv_checks.append(created_check)
 
     return non_venv_checks, venv_checks
+
+
+def __create_check(project_root: str, expected_keys: set[str], check: dict) -> AbstractCheck:
+    if any(key not in check for key in expected_keys):
+        raise InvalidConfigError("Invalid check configuration")
+
+    name = check["name"]
+
+    if name not in NAME_TO_CHECK:
+        raise InvalidCheckError(f"Unknown check name: {name}")
+
+    other_args = {**check}
+    del other_args["name"]
+
+    check_class = NAME_TO_CHECK[name]
+    created_check = check_class(name, project_root, **other_args)
+
+    return created_check
 
 
 class InvalidCheckError(Exception):

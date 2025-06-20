@@ -151,8 +151,7 @@ class TestsVirtualEnvironment(unittest.TestCase):
         def custom_run_behavior(command: list[str], *args, **kwargs):
             if "install" in command:
                 return subprocess.CompletedProcess("", 1)
-            else:
-                return subprocess.CompletedProcess("", 0)
+            return subprocess.CompletedProcess("", 0)
 
         patched_run.side_effect = custom_run_behavior
 
@@ -192,8 +191,7 @@ class TestsVirtualEnvironment(unittest.TestCase):
         def custom_run_behavior(command: list[str], *args, **kwargs):
             if "install" in command:
                 return subprocess.CompletedProcess("", 1)
-            else:
-                return subprocess.CompletedProcess("", 0)
+            return subprocess.CompletedProcess("", 0)
 
         patched_run.side_effect = custom_run_behavior
 

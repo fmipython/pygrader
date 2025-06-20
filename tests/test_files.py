@@ -48,7 +48,6 @@ class TestFindAllPythonFiles(unittest.TestCase):
         actual_files = find_all_python_files(self.__sample_dir)
 
         # Assert
-        # TODO - Add check that python files are indeed searched for
         self.assertEqual(expected_files, actual_files)
         mocked_function.assert_called_once_with(self.__sample_dir)
 
@@ -202,7 +201,6 @@ class TestFindAllTestFiles(unittest.TestCase):
         actual_value = find_all_test_files(self.__sample_dir)
 
         # Assert
-        # TODO - Add check that python files are indeed searched for
         self.assertEqual(expected_value, actual_value)
         mocked_find_all_files_under_directory.assert_called_once_with(self.__sample_dir)
 
@@ -438,4 +436,4 @@ class TestFindAllFilesUnderDirectory(unittest.TestCase):
         ]
         subdirs = [["folder1", "folder2"], ["subfolder1"], []]
 
-        return [result for result in zip(root_dirs, subdirs, files)]
+        return list(zip(root_dirs, subdirs, files))

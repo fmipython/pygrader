@@ -1,3 +1,7 @@
+"""
+Unit tests for the CLI module in the cli.py module.
+"""
+
 import unittest
 from unittest.mock import patch
 from grader.utils.cli import get_args

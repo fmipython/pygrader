@@ -19,6 +19,10 @@ class TestAbstractCheck(unittest.TestCase):
 
         # Arrange
         class DummyCheck(AbstractCheck):
+            """
+            Dummy check class for testing
+            """
+
             def run(self) -> float:
                 """
                 Run the dummy check.

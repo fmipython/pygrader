@@ -5,7 +5,7 @@ Module containing the unit test code coverage check.
 import logging
 import os
 
-from grader.checks.abstract_check import ScoredCheck, CheckError
+from grader.checks.abstract_check import ScoredCheck, CheckError, ScoredCheckResult
 from grader.utils.constants import (
     COVERAGE_PATH,
     COVERAGE_RUN_ARGS,
@@ -29,14 +29,14 @@ class CoverageCheck(ScoredCheck):
 
         self.__coverage_full_path = os.path.join(project_root, COVERAGE_PATH)
 
-    def run(self) -> float:
+    def run(self) -> ScoredCheckResult:
         """
         Run the coverage check on the project.
 
         :returns: The score from the coverage check.
         :rtype: float
         """
-        super().run()
+        self._pre_run()
 
         self.__coverage_run()
 
@@ -45,7 +45,8 @@ class CoverageCheck(ScoredCheck):
         if coverage_report_result is None:
             raise CheckError("Coverage report generation failed")
 
-        return self.__translate_score(coverage_report_result)
+        score = self.__translate_score(coverage_report_result)
+        return ScoredCheckResult(self.name, score, self.max_points)
 
     def __translate_score(self, coverage_score: float) -> float:
         """
@@ -94,7 +95,7 @@ class CoverageCheck(ScoredCheck):
 
         try:
             command = [self.__coverage_full_path] + COVERAGE_REPORT_ARGS_NO_FORMAT + source_files
-            output = run(command, current_directory=self._project_root)
+            _ = run(command, current_directory=self._project_root)
         except (OSError, ValueError) as e:
             logger.error("Coverage report (no format) failed: %s", e)
             raise CheckError("Coverage report (no format) failed") from e

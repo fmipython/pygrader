@@ -266,7 +266,7 @@ def build_command(
     project_path: Optional[str], config_file: str = "full.json", student_id: Optional[str] = None
 ) -> list[str]:
     python_binary = "python3" if os.name == "posix" else "python"
-    grader_entrypoint = "main.py"
+    grader_entrypoint = "pygrader.py"
 
     full_config_path = os.path.join(const.CONFIG_DIR, config_file)
     base_command = [python_binary, os.path.join(const.ROOT_DIR, grader_entrypoint)]

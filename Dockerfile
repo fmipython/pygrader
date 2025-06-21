@@ -11,4 +11,4 @@ COPY . .
 
 VOLUME ["/project"]
 
-ENTRYPOINT ["python", "main.py", "/project"]
+ENTRYPOINT ["python", "pygrader.py", "/project"]

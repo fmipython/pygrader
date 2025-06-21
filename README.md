@@ -65,7 +65,7 @@ pip install -r requirements.txt
 ## Usage
 
 ```bash
-python3 main.py -c ./config/2024.json PROJECT_PATH
+python3 pygrader.py -c ./config/2024.json PROJECT_PATH
 ```
 
 Where `PROJECT_PATH` is the path to the project you want to grade.

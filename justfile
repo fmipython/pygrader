@@ -17,7 +17,7 @@ lint_file file: venv
 
 test:
     unit_tests
-    functional_tests: venv-
+    functional_tests
 
 unit_tests: venv
     find tests -type f -name "test_*.py" -not -name "test_functional.py" | xargs python3 -m unittest

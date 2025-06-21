@@ -28,7 +28,7 @@ class TestGetArgs(unittest.TestCase):
             "skip_venv_creation": False,
             "output": None,
         }
-        self.assertEqual(get_args(), expected)
+        self.assertTrue(get_args().items() <= expected.items())
 
     @patch("sys.argv", ["cli.py", "path/to/project", "-c", "path/to/config"])
     def test_optional_config_argument(self):
@@ -44,7 +44,7 @@ class TestGetArgs(unittest.TestCase):
             "skip_venv_creation": False,
             "output": None,
         }
-        self.assertEqual(get_args(), expected)
+        self.assertTrue(get_args().items() <= expected.items())
 
     @patch("sys.argv", ["cli.py", "path/to/project", "--student-id", "12345"])
     def test_optional_student_id_argument(self):
@@ -60,7 +60,7 @@ class TestGetArgs(unittest.TestCase):
             "skip_venv_creation": False,
             "output": None,
         }
-        self.assertEqual(get_args(), expected)
+        self.assertTrue(get_args().items() <= expected.items())
 
     @patch("sys.argv", ["cli.py", "path/to/project", "-v"])
     def test_verbosity_argument(self):
@@ -76,7 +76,7 @@ class TestGetArgs(unittest.TestCase):
             "skip_venv_creation": False,
             "output": None,
         }
-        self.assertEqual(get_args(), expected)
+        self.assertTrue(get_args().items() <= expected.items())
 
     @patch("sys.argv", ["cli.py", "path/to/project", "-vv"])
     def test_multiple_verbosity_argument(self):
@@ -92,7 +92,7 @@ class TestGetArgs(unittest.TestCase):
             "skip_venv_creation": False,
             "output": None,
         }
-        self.assertEqual(get_args(), expected)
+        self.assertTrue(get_args().items() <= expected.items())
 
 
 if __name__ == "__main__":

@@ -6,7 +6,7 @@ import unittest
 from unittest.mock import patch
 
 from grader.checks.run_tests_check import RunTestsCheck
-from grader.checks.abstract_check import CheckError
+from grader.checks.abstract_check import CheckError, ScoredCheckResult
 
 
 class TestTestsCheck(unittest.TestCase):
@@ -43,12 +43,13 @@ class TestTestsCheck(unittest.TestCase):
         """
         # Arrange
         mock_pytest_run.return_value = "PASSED test_1::test_1\nPASSED test_2::test_2"
+        expected_score = ScoredCheckResult(self.name, 50.0, self.max_points)
 
         # Act
         score = self.tests_check.run()
 
         # Assert
-        self.assertEqual(score, 50.0)
+        self.assertEqual(score, expected_score)
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
     def test_02_some_tests_fail(self, mock_pytest_run):
@@ -57,12 +58,13 @@ class TestTestsCheck(unittest.TestCase):
         """
         # Arrange
         mock_pytest_run.return_value = "PASSED test_1::test_1\nFAILED test_2::test_2"
+        expected_score = ScoredCheckResult(self.name, 20.0, self.max_points)
 
         # Act
         score = self.tests_check.run()
 
         # Assert
-        self.assertEqual(score, 20.0)
+        self.assertEqual(score, expected_score)
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
     def test_03_score_exceeds_max_points(self, mock_pytest_run):
@@ -111,12 +113,13 @@ class TestTestsCheck(unittest.TestCase):
         """
         # Arrange
         mock_pytest_run.return_value = ""
+        expected_score = ScoredCheckResult(self.name, 0.0, self.max_points)
 
         # Act
         score = self.tests_check.run()
 
         # Assert
-        self.assertEqual(score, 0.0)
+        self.assertEqual(score, expected_score)
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
     def test_06_invalid_pytest_output(self, mock_pytest_run):
@@ -125,12 +128,13 @@ class TestTestsCheck(unittest.TestCase):
         """
         # Arrange
         mock_pytest_run.return_value = "INVALID OUTPUT"
+        expected_score = ScoredCheckResult(self.name, 0.0, self.max_points)
 
         # Act
         score = self.tests_check.run()
 
         # Assert
-        self.assertEqual(score, 0.0)
+        self.assertEqual(score, expected_score)
 
     @patch("grader.utils.process.run")
     def test_07_pytest_raises_os_error(self, mock_run):

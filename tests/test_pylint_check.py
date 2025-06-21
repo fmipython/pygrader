@@ -8,6 +8,7 @@ from unittest.mock import patch, MagicMock
 
 import grader.utils.constants as const
 from grader.checks.pylint_check import PylintCheck
+from grader.checks.abstract_check import ScoredCheckResult
 
 
 class TestPylintCheck(unittest.TestCase):
@@ -111,7 +112,7 @@ class TestPylintCheck(unittest.TestCase):
         """
         # Arrange
         mocked_pylint.return_value = CompletedProcess("pylint", 0, self.__create_sample_pylint_output(0))
-        expected_score = 0
+        expected_score = ScoredCheckResult(self.pylint_check.name, 0, self.pylint_check.max_points)
 
         # Act
         actual_score = self.pylint_check.run()
@@ -129,7 +130,7 @@ class TestPylintCheck(unittest.TestCase):
         """
         # Arrange
         mocked_pylint.return_value = CompletedProcess("pylint", 0, self.__create_sample_pylint_output(2.2))
-        expected_score = 0
+        expected_score = ScoredCheckResult(self.pylint_check.name, 0, self.pylint_check.max_points)
 
         # Act
         actual_score = self.pylint_check.run()
@@ -148,7 +149,7 @@ class TestPylintCheck(unittest.TestCase):
         # Arrange
         mocked_pylint_stdout = self.__create_sample_pylint_output(10 / 3)
         mocked_pylint.return_value = CompletedProcess("pylint", 0, mocked_pylint_stdout)
-        expected_score = 1
+        expected_score = ScoredCheckResult(self.pylint_check.name, 1, self.pylint_check.max_points)
 
         # Act
         actual_score = self.pylint_check.run()
@@ -166,7 +167,7 @@ class TestPylintCheck(unittest.TestCase):
         """
         # Arrange
         mocked_pylint.return_value = CompletedProcess("pylint", 0, self.__create_sample_pylint_output(10 / 3 + 0.1))
-        expected_score = 1
+        expected_score = ScoredCheckResult(self.pylint_check.name, 1, self.pylint_check.max_points)
 
         # Act
         actual_score = self.pylint_check.run()
@@ -184,7 +185,7 @@ class TestPylintCheck(unittest.TestCase):
         """
         # Arrange
         mocked_pylint.return_value = CompletedProcess("pylint", 0, self.__create_sample_pylint_output(5))
-        expected_score = 1
+        expected_score = ScoredCheckResult(self.pylint_check.name, 1, self.pylint_check.max_points)
 
         # Act
         actual_score = self.pylint_check.run()
@@ -202,7 +203,7 @@ class TestPylintCheck(unittest.TestCase):
         """
         # Arrange
         mocked_pylint.return_value = CompletedProcess("pylint", 0, self.__create_sample_pylint_output(10 / 3 * 2))
-        expected_score = 2
+        expected_score = ScoredCheckResult(self.pylint_check.name, 2, self.pylint_check.max_points)
 
         # Act
         actual_score = self.pylint_check.run()
@@ -220,7 +221,7 @@ class TestPylintCheck(unittest.TestCase):
         """
         # Arrange
         mocked_pylint.return_value = CompletedProcess("pylint", 0, self.__create_sample_pylint_output(7.5))
-        expected_score = 2
+        expected_score = ScoredCheckResult(self.pylint_check.name, 2, self.pylint_check.max_points)
 
         # Act
         actual_score = self.pylint_check.run()
@@ -238,7 +239,7 @@ class TestPylintCheck(unittest.TestCase):
         """
         # Arrange
         mocked_pylint.return_value = CompletedProcess("pylint", 0, self.__create_sample_pylint_output(10))
-        expected_score = 2
+        expected_score = ScoredCheckResult(self.pylint_check.name, 2, self.pylint_check.max_points)
 
         # Act
         actual_score = self.pylint_check.run()

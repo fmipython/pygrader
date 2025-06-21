@@ -7,7 +7,7 @@ from unittest.mock import patch, MagicMock
 
 from yaml import YAMLError
 
-from grader.checks.abstract_check import CheckError
+from grader.checks.abstract_check import CheckError, NonScoredCheckResult
 from grader.checks.structure_check import StructureCheck
 
 
@@ -33,12 +33,13 @@ class TestStructureCheck(unittest.TestCase):
         mock_element.is_structure_valid.return_value = True
         mock_element.required = True
         mock_load_structure_file.return_value = [mock_element]
+        expected = NonScoredCheckResult(self.structure_check.name, True)
 
         # Act
         result = self.structure_check.run()
 
         # Assert
-        self.assertTrue(result)
+        self.assertEqual(result, expected)
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
     def test_02_invalid_required_structure(self, mock_load_structure_file):
@@ -50,12 +51,13 @@ class TestStructureCheck(unittest.TestCase):
         mock_element.is_structure_valid.return_value = False
         mock_element.required = True
         mock_load_structure_file.return_value = [mock_element]
+        expected = NonScoredCheckResult(self.structure_check.name, False)
 
         # Act
         result = self.structure_check.run()
 
         # Assert
-        self.assertFalse(result)
+        self.assertEqual(result, expected)
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
     def test_03_invalid_non_required_structure(self, mock_load_structure_file):
@@ -67,12 +69,13 @@ class TestStructureCheck(unittest.TestCase):
         mock_element.is_structure_valid.return_value = False
         mock_element.required = False
         mock_load_structure_file.return_value = [mock_element]
+        expected = NonScoredCheckResult(self.structure_check.name, True)
 
         # Act
         result = self.structure_check.run()
 
         # Assert
-        self.assertTrue(result)
+        self.assertEqual(result, expected)
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
     def test_04_empty_structure_file(self, mock_load_structure_file):
@@ -81,12 +84,13 @@ class TestStructureCheck(unittest.TestCase):
         """
         # Arrange
         mock_load_structure_file.return_value = []
+        expected = NonScoredCheckResult(self.structure_check.name, True)
 
         # Act
         result = self.structure_check.run()
 
         # Assert
-        self.assertTrue(result)
+        self.assertEqual(result, expected)
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
     def test_05_logs_structure_validity(self, mock_load_structure_file):
@@ -99,13 +103,14 @@ class TestStructureCheck(unittest.TestCase):
         mock_element.required = True
         mock_element.name = "test_element"
         mock_load_structure_file.return_value = [mock_element]
+        expected_log_output = "Is test_element structure valid ?"
 
         with self.assertLogs("grader", level="DEBUG") as log:
             # Act
             self.structure_check.run()
 
         # Assert
-        self.assertIn("Is test_element structure valid ?", log.output[0])
+        self.assertTrue(any(expected_log_output in message for message in log.output))
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
     def test_06_raises_check_error_on_invalid_structure_file(self, mock_load_structure_file):
@@ -134,12 +139,13 @@ class TestStructureCheck(unittest.TestCase):
         mock_element2.required = False
 
         mock_load_structure_file.return_value = [mock_element1, mock_element2]
+        expected = NonScoredCheckResult(self.structure_check.name, True)
 
         # Act
         result = self.structure_check.run()
 
         # Assert
-        self.assertTrue(result)
+        self.assertEqual(result, expected)
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
     def test_08_multiple_elements_with_invalid_required(self, mock_load_structure_file):
@@ -156,12 +162,13 @@ class TestStructureCheck(unittest.TestCase):
         mock_element2.required = True
 
         mock_load_structure_file.return_value = [mock_element1, mock_element2]
+        expected = NonScoredCheckResult(self.structure_check.name, False)
 
         # Act
         result = self.structure_check.run()
 
         # Assert
-        self.assertFalse(result)
+        self.assertEqual(result, expected)
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
     def test_09_multiple_elements_with_invalid_non_required(self, mock_load_structure_file):
@@ -178,12 +185,13 @@ class TestStructureCheck(unittest.TestCase):
         mock_element2.required = False
 
         mock_load_structure_file.return_value = [mock_element1, mock_element2]
+        expected = NonScoredCheckResult(self.structure_check.name, True)
 
         # Act
         result = self.structure_check.run()
 
         # Assert
-        self.assertTrue(result)
+        self.assertEqual(result, expected)
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
     def test_10_all_invalid_elements(self, mock_load_structure_file):
@@ -200,12 +208,13 @@ class TestStructureCheck(unittest.TestCase):
         mock_element2.required = False
 
         mock_load_structure_file.return_value = [mock_element1, mock_element2]
+        expected = NonScoredCheckResult(self.structure_check.name, False)
 
         # Act
         result = self.structure_check.run()
 
         # Assert
-        self.assertFalse(result)
+        self.assertEqual(result, expected)
 
     @patch("grader.utils.structure_validator.StructureValidator.is_structure_valid")
     @patch("grader.checks.structure_check.open", create=True)

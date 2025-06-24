@@ -52,7 +52,7 @@ class PylintCheck(ScoredCheck):
         if os.path.exists(pylintrc_path):
             pylint_args.extend(["--rcfile", pylintrc_path])
 
-        command = [os.path.join(self._project_root, const.PYLINT_PATH)] + pylint_args
+        command = [const.PYLINT_PATH] + pylint_args  # Current working directory is set in the process.run method
         try:
             results = process.run(command, current_directory=self._project_root)
         except (OSError, ValueError) as error:

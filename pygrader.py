@@ -14,6 +14,8 @@ from grader.checks.abstract_check import (
     NonScoredCheckResult,
     CheckResult,
     ScoredCheckResult,
+    ScoredCheck,
+    NonScoredCheck,
 )
 from grader.checks.checks_factory import create_checks
 from grader.utils.cli import get_args
@@ -73,7 +75,14 @@ class Grader:
             check_result = check.run()
         except CheckError as error:
             self.__logger.error("Check failed: %s", error)
-            check_result = CheckResult(check.name, 0)  # TODO - Need to add default check result
+
+            match check:
+                case ScoredCheck():
+                    check_result = ScoredCheckResult(check.name, 0, check.max_points)
+                case NonScoredCheck():
+                    check_result = NonScoredCheckResult(check.name, False)
+                case _:
+                    raise TypeError(f"Unknown check type: {type(check)}") from error
 
         return check_result
 

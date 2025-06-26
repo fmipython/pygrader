@@ -8,7 +8,7 @@ import grader.utils.constants as const
 from grader.utils.process import run
 
 
-class BaseFunctionalTest(unittest.TestCase):
+class BaseFunctionalTestWithGrader(unittest.TestCase):
     repo_url = "https://github.com/fmipython/PythonProjectGrader"
     clone_path = "/tmp/PythonProjectGrader"
 
@@ -33,7 +33,7 @@ class BaseFunctionalTest(unittest.TestCase):
 
 
 @unittest.skipIf(os.name == "nt", "Test skipped on Windows")
-class TestFunctionalGoodWeather(BaseFunctionalTest):
+class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
     def test_01_requirements_txt_exists(self):
         # Arrange
         command = build_command(project_path="/tmp/PythonProjectGrader")
@@ -192,7 +192,7 @@ class TestFunctionalGoodWeather(BaseFunctionalTest):
 
 
 @unittest.skipIf(os.name == "nt", "Test skipped on Windows")
-class TestFunctionalBadWeather(BaseFunctionalTest):
+class TestFunctionalBadWeatherWithGrader(BaseFunctionalTestWithGrader):
     def test_11_requirements_txt_does_not_exist(self):
         # Arrange
         command = build_command(project_path="/tmp/PythonProjectGrader")
@@ -260,6 +260,101 @@ class TestFunctionalBadWeather(BaseFunctionalTest):
         # Assert
         self.assertNotEqual(run_result.returncode, 0, "Expected non-zero return code for invalid project path")
         self.assertIn("Project root directory does not exist", run_result.stdout)
+
+
+class TestVariousConfigsOnSampleProject(unittest.TestCase):
+    def test_01_only_pylint(self):
+        # Arrange
+        project_path = os.path.join(const.ROOT_DIR, "tests", "sample_project")
+        command = build_command(project_path=project_path, config_file="only_pylint.json")
+
+        # Act
+        run_result = run(command)
+
+        # Assert
+        self.assertEqual(run_result.returncode, 0, run_result.stdout)
+        self.assertTrue(
+            is_score_correct(expected_score=1, target_check="pylint", grader_output=run_result.stdout),
+            "Pylint check did not have the expected score of 1",
+        )
+
+    def test_02_full(self):
+        # Arrange
+        project_path = os.path.join(const.ROOT_DIR, "tests", "sample_project")
+        command = build_command(project_path=project_path, config_file="full.json")
+
+        # Act
+        run_result = run(command)
+
+        # Assert
+        self.assertEqual(run_result.returncode, 0, run_result.stdout)
+        self.assertTrue(
+            is_score_correct(expected_score=10, target_check="requirements", grader_output=run_result.stdout)
+        )
+        self.assertTrue(is_score_correct(expected_score=10, target_check="pylint", grader_output=run_result.stdout))
+        self.assertTrue(
+            is_score_correct(expected_score=10, target_check="type-hints", grader_output=run_result.stdout)
+        )
+        self.assertTrue(is_score_correct(expected_score=10, target_check="coverage", grader_output=run_result.stdout))
+
+    def test_03_full_single_point(self):
+        # Arrange
+        project_path = os.path.join(const.ROOT_DIR, "tests", "sample_project")
+        command = build_command(project_path=project_path, config_file="full_single_point.json")
+
+        # Act
+        run_result = run(command)
+
+        # Assert
+        self.assertEqual(run_result.returncode, 0, run_result.stdout)
+        self.assertTrue(
+            is_score_correct(expected_score=1, target_check="requirements", grader_output=run_result.stdout)
+        )
+        self.assertTrue(is_score_correct(expected_score=1, target_check="pylint", grader_output=run_result.stdout))
+        self.assertTrue(is_score_correct(expected_score=1, target_check="type-hints", grader_output=run_result.stdout))
+        self.assertTrue(is_score_correct(expected_score=1, target_check="coverage", grader_output=run_result.stdout))
+
+    def test_04_structure(self):
+        # Arrange
+        project_path = os.path.join(const.ROOT_DIR, "tests", "sample_project")
+        command = build_command(project_path=project_path, config_file="structure.json")
+
+        # Act
+        run_result = run(command)
+
+        # Assert
+        self.assertEqual(run_result.returncode, 0, run_result.stdout)
+        self.assertTrue(is_score_correct(expected_score=10, target_check="structure", grader_output=run_result.stdout))
+
+    def test_05_tests(self):
+        # Arrange
+        project_path = os.path.join(const.ROOT_DIR, "tests", "sample_project")
+        command = build_command(project_path=project_path, config_file="tests.json")
+
+        # Act
+        run_result = run(command)
+
+        # Assert
+        self.assertEqual(run_result.returncode, 0, run_result.stdout)
+        self.assertTrue(is_score_correct(expected_score=10, target_check="tests", grader_output=run_result.stdout))
+
+    def test_06_2024(self):
+        # Arrange
+        project_path = os.path.join(const.ROOT_DIR, "tests", "sample_project")
+        command = build_command(project_path=project_path, config_file="2024.json")
+
+        # Act
+        run_result = run(command)
+
+        # Assert
+        self.assertEqual(run_result.returncode, 0, run_result.stdout)
+
+        self.assertTrue(is_score_correct(expected_score=3, target_check="pylint", grader_output=run_result.stdout))
+        self.assertTrue(is_score_correct(expected_score=3, target_check="type-hints", grader_output=run_result.stdout))
+        self.assertTrue(is_score_correct(expected_score=5, target_check="coverage", grader_output=run_result.stdout))
+        self.assertTrue(
+            is_score_correct(expected_score=1, target_check="requirements", grader_output=run_result.stdout)
+        )
 
 
 def build_command(

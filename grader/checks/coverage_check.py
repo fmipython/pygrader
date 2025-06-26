@@ -27,7 +27,7 @@ class CoverageCheck(ScoredCheck):
     def __init__(self, name: str, project_root: str, max_points: int, is_venv_required: bool):
         super().__init__(name, max_points, project_root, is_venv_required)
 
-        self.__coverage_full_path = os.path.join(project_root, COVERAGE_PATH)
+        self.__coverage_full_path = COVERAGE_PATH
 
     def run(self) -> ScoredCheckResult:
         """

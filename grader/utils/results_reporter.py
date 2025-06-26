@@ -132,4 +132,4 @@ def result_to_plain_text(check_result: CheckResult) -> str:
         case NonScoredCheckResult(name, result):
             return f"Check: {name}, Result: {result}"
         case _:
-            raise ValueError("Unknown CheckResult type")
+            raise ValueError(f"Unknown CheckResult type ({type(check_result)}) for check {check_result.name}")

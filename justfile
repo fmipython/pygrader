@@ -46,10 +46,10 @@ clean:
     rm -rf .mypy_cache
     rm -rf docs/build
     rm -f lcov.info
-    rm -rf *.log
+    rm -rf *.log.*
 
 clean_logs:
-    rm -rf *.log
+    rm -rf *.log.*
 
 clean_venv:
     rm -rf .venv

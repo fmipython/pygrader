@@ -75,7 +75,7 @@ class CoverageCheck(ScoredCheck):
         """
         Run the coverage tool on the project.
         """
-        command = [self.__coverage_full_path] + COVERAGE_RUN_ARGS + COVERAGE_RUN_PYTEST_ARGS + [self._project_root]
+        command = [self.__coverage_full_path] + COVERAGE_RUN_ARGS + COVERAGE_RUN_PYTEST_ARGS
 
         try:
             output = run(command, current_directory=self._project_root)

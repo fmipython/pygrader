@@ -62,7 +62,7 @@ class Grader:
 
         scores = [self.__run_check(check) for check in non_venv_checks]
 
-        if args["skip_venv_creation"]:
+        if args["skip_venv_creation"] or len(venv_checks) == 0:
             return scores
 
         with VirtualEnvironment(self.__project_root, self.__is_keeping_venv):

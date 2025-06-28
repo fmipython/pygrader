@@ -27,7 +27,7 @@ def run(
     :param env_vars: A dictionary of environment variables to set for the subprocess
     :return: The output of the command (returncode, stdout, stderr)
     """
-    logger.debug("Running command: %s", command)
+    logger.debug("Running command: %s, from directory: %s", command, current_directory)
 
     # Prepare the environment variables
     if env_vars is not None:

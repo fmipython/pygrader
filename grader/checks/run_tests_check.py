@@ -43,7 +43,6 @@ class RunTestsCheck(ScoredCheck):
         :param test_score_mapping: A mapping of test names to their respective scores.
         """
         super().__init__(name, max_points, project_root, is_venv_required)
-        self.__pytest_full_path = os.path.join(project_root, PYTEST_PATH)
         self.__test_score_mapping = defaultdict(lambda: default_test_score)
 
         if test_score_mapping is not None:
@@ -89,12 +88,11 @@ class RunTestsCheck(ScoredCheck):
         :rtype: str
         :raises CheckError: If pytest fails to execute or encounters an error.
         """
-        command = (
-            [self.__pytest_full_path]
-            + PYTEST_ARGS
-            + [PYTEST_ROOT_DIR_ARG.format(self._project_root)]
-            + self.__tests_path
-        )
+        if os.path.isabs(self._project_root):
+            pytest_root_dir = PYTEST_ROOT_DIR_ARG.format(self._project_root)
+        else:
+            pytest_root_dir = PYTEST_ROOT_DIR_ARG.format(os.path.join(os.getcwd(), self._project_root))
+        command = [PYTEST_PATH] + PYTEST_ARGS + [pytest_root_dir] + self.__tests_path
 
         try:
             output = process.run(

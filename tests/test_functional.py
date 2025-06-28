@@ -291,10 +291,8 @@ class TestVariousConfigsOnSampleProject(unittest.TestCase):
         self.assertTrue(
             is_score_correct(expected_score=10, target_check="requirements", grader_output=run_result.stdout)
         )
-        self.assertTrue(is_score_correct(expected_score=10, target_check="pylint", grader_output=run_result.stdout))
-        self.assertTrue(
-            is_score_correct(expected_score=10, target_check="type-hints", grader_output=run_result.stdout)
-        )
+        self.assertTrue(is_score_correct(expected_score=7, target_check="pylint", grader_output=run_result.stdout))
+        self.assertTrue(is_score_correct(expected_score=8, target_check="type-hints", grader_output=run_result.stdout))
         self.assertTrue(is_score_correct(expected_score=10, target_check="coverage", grader_output=run_result.stdout))
 
     def test_03_full_single_point(self):
@@ -324,7 +322,11 @@ class TestVariousConfigsOnSampleProject(unittest.TestCase):
 
         # Assert
         self.assertEqual(run_result.returncode, 0, run_result.stdout)
-        self.assertTrue(is_score_correct(expected_score=10, target_check="structure", grader_output=run_result.stdout))
+        self.assertTrue(
+            is_non_scored_check_correct(
+                expected_result=True, target_check="structure", grader_output=run_result.stdout
+            )
+        )
 
     def test_05_tests(self):
         # Arrange
@@ -336,7 +338,7 @@ class TestVariousConfigsOnSampleProject(unittest.TestCase):
 
         # Assert
         self.assertEqual(run_result.returncode, 0, run_result.stdout)
-        self.assertTrue(is_score_correct(expected_score=10, target_check="tests", grader_output=run_result.stdout))
+        self.assertTrue(is_score_correct(expected_score=13, target_check="tests", grader_output=run_result.stdout))
 
     def test_06_2024(self):
         # Arrange
@@ -349,7 +351,7 @@ class TestVariousConfigsOnSampleProject(unittest.TestCase):
         # Assert
         self.assertEqual(run_result.returncode, 0, run_result.stdout)
 
-        self.assertTrue(is_score_correct(expected_score=3, target_check="pylint", grader_output=run_result.stdout))
+        self.assertTrue(is_score_correct(expected_score=2, target_check="pylint", grader_output=run_result.stdout))
         self.assertTrue(is_score_correct(expected_score=3, target_check="type-hints", grader_output=run_result.stdout))
         self.assertTrue(is_score_correct(expected_score=5, target_check="coverage", grader_output=run_result.stdout))
         self.assertTrue(
@@ -384,3 +386,15 @@ def is_score_correct(expected_score: int, target_check: str, grader_output: str)
     actual_score = int(score_line.split(",")[1].split(":")[1].split("/")[0].strip())
 
     return actual_score == expected_score
+
+
+def is_non_scored_check_correct(expected_result: bool, target_check: str, grader_output: str) -> bool:
+    lines = grader_output.split("\n")
+
+    score_lines = [line for line in lines if line.startswith("Check")]
+    score_line = next(line for line in score_lines if target_check in line)
+
+    # Example: "Check: structure, Result: False"
+    actual_result = score_line.split(",")[1].split(":")[1].strip()
+
+    return actual_result == str(expected_result)

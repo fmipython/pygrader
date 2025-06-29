@@ -9,7 +9,7 @@ from subprocess import CompletedProcess
 from unittest.mock import patch, MagicMock
 
 import grader.utils.constants as const
-from grader.checks.abstract_check import CheckError
+from grader.checks.abstract_check import CheckError, ScoredCheckResult
 from grader.checks.type_hints_check import TypeHintsCheck
 
 
@@ -22,7 +22,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         """
         Set up the test environment.
         """
-        self.type_hints_check = TypeHintsCheck("type_hints", 2, "sample_dir")
+        self.type_hints_check = TypeHintsCheck("type_hints", "sample_dir", 2, is_venv_required=False)
         # This way, we have 3 ranges: 0-33, 34-66, 67-100
         return super().setUp()
 
@@ -92,7 +92,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         with open(const.MYPY_LINE_COUNT_REPORT, "w", encoding="utf-8") as report_file:
             report_file.write("0 0 0 100 0")
 
-        expected_score = 0
+        expected_score = ScoredCheckResult("type_hints", 0, 2)
 
         # Act
         actual_score = self.type_hints_check.run()
@@ -113,7 +113,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         with open(const.MYPY_LINE_COUNT_REPORT, "w", encoding="utf-8") as report_file:
             report_file.write("0 0 20 100 0")
 
-        expected_score = 0
+        expected_score = ScoredCheckResult("type_hints", 0, 2)
 
         # Act
         actual_score = self.type_hints_check.run()
@@ -134,7 +134,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         with open(const.MYPY_LINE_COUNT_REPORT, "w", encoding="utf-8") as report_file:
             report_file.write("0 0 1 3 0")
 
-        expected_score = 1
+        expected_score = ScoredCheckResult("type_hints", 1, 2)
 
         # Act
         actual_score = self.type_hints_check.run()
@@ -155,7 +155,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         with open(const.MYPY_LINE_COUNT_REPORT, "w", encoding="utf-8") as report_file:
             report_file.write("0 0 11 30 0")
 
-        expected_score = 1
+        expected_score = ScoredCheckResult("type_hints", 1, 2)
 
         # Act
         actual_score = self.type_hints_check.run()
@@ -176,7 +176,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         with open(const.MYPY_LINE_COUNT_REPORT, "w", encoding="utf-8") as report_file:
             report_file.write("0 0 15 30 0")
 
-        expected_score = 1
+        expected_score = ScoredCheckResult("type_hints", 1, 2)
 
         # Act
         actual_score = self.type_hints_check.run()
@@ -197,7 +197,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         with open(const.MYPY_LINE_COUNT_REPORT, "w", encoding="utf-8") as report_file:
             report_file.write("0 0 22 33 0")
 
-        expected_score = 2
+        expected_score = ScoredCheckResult("type_hints", 2, 2)
 
         # Act
         actual_score = self.type_hints_check.run()
@@ -218,7 +218,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         with open(const.MYPY_LINE_COUNT_REPORT, "w", encoding="utf-8") as report_file:
             report_file.write("0 0 35 40 0")
 
-        expected_score = 2
+        expected_score = ScoredCheckResult("type_hints", 2, 2)
 
         # Act
         actual_score = self.type_hints_check.run()
@@ -239,7 +239,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         with open(const.MYPY_LINE_COUNT_REPORT, "w", encoding="utf-8") as report_file:
             report_file.write("1290 1805 107 107 total")
 
-        expected_score = 2
+        expected_score = ScoredCheckResult("type_hints", 2, 2)
 
         # Act
         actual_score = self.type_hints_check.run()
@@ -260,7 +260,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         with open(const.MYPY_LINE_COUNT_REPORT, "w", encoding="utf-8") as report_file:
             report_file.write("0 0 0 0 0")
 
-        expected_score = 0
+        expected_score = ScoredCheckResult("type_hints", 0, 2)
 
         # Act
         actual_score = self.type_hints_check.run()

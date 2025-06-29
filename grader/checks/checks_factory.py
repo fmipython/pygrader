@@ -7,7 +7,9 @@ from grader.checks.abstract_check import AbstractCheck
 from grader.checks.coverage_check import CoverageCheck
 from grader.checks.pylint_check import PylintCheck
 from grader.checks.requirements_check import RequirementsCheck
+from grader.checks.structure_check import StructureCheck
 from grader.checks.type_hints_check import TypeHintsCheck
+from grader.checks.run_tests_check import RunTestsCheck
 from grader.utils.config import InvalidConfigError
 
 
@@ -16,6 +18,8 @@ NAME_TO_CHECK: dict[str, type[AbstractCheck]] = {
     "pylint": PylintCheck,
     "requirements": RequirementsCheck,
     "type-hints": TypeHintsCheck,
+    "structure": StructureCheck,
+    "tests": RunTestsCheck,
 }
 
 
@@ -35,31 +39,40 @@ def create_checks(config: dict, project_root: str) -> tuple[list[AbstractCheck],
     if "checks" not in config:
         raise InvalidConfigError("No checks found in the configuration file")
 
-    checks = config["checks"]
+    checks: list[dict] = config["checks"]
 
     non_venv_checks = []
     venv_checks = []
+
+    expected_keys = {"name", "is_venv_required"}
     for check in checks:
-        if "name" not in check or "max_points" not in check:
-            raise InvalidConfigError("Invalid check configuration")
+        created_check = __create_check(project_root, expected_keys, check)
 
-        name = check["name"]
-        max_points = check["max_points"]
-
-        if name not in NAME_TO_CHECK:
-            raise InvalidCheckError(f"Unknown check name: {name}")
-
-        is_venv = check.get("requires_venv", False)
-
-        check_class = NAME_TO_CHECK[name]
-        created_check = check_class(name, max_points, project_root)
-
+        is_venv = check.get("is_venv_required", False)
         if is_venv:
             venv_checks.append(created_check)
         else:
             non_venv_checks.append(created_check)
 
     return non_venv_checks, venv_checks
+
+
+def __create_check(project_root: str, expected_keys: set[str], check: dict) -> AbstractCheck:
+    if any(key not in check for key in expected_keys):
+        raise InvalidConfigError("Invalid check configuration")
+
+    name = check["name"]
+
+    if name not in NAME_TO_CHECK:
+        raise InvalidCheckError(f"Unknown check name: {name}")
+
+    other_args = {**check}
+    del other_args["name"]
+
+    check_class = NAME_TO_CHECK[name]
+    created_check = check_class(name, project_root, **other_args)
+
+    return created_check
 
 
 class InvalidCheckError(Exception):

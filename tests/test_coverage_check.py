@@ -6,7 +6,7 @@ import unittest
 from subprocess import CompletedProcess
 from unittest.mock import patch, MagicMock
 
-from grader.checks.abstract_check import CheckError
+from grader.checks.abstract_check import CheckError, ScoredCheckResult
 from grader.checks.coverage_check import CoverageCheck
 
 
@@ -19,7 +19,7 @@ class TestCoverageCheck(unittest.TestCase):
         """
         Set up the CoverageCheck instance for testing.
         """
-        self.coverage_check = CoverageCheck("Coverage", 2, "sample_dir")
+        self.coverage_check = CoverageCheck("Coverage", "sample_dir", 2, is_venv_required=False)
         # This way, we have 3 ranges: 0-33, 34-66, 67-100
         return super().setUp()
 
@@ -72,7 +72,7 @@ class TestCoverageCheck(unittest.TestCase):
         # Arrange
         mocked_run.return_value = True
         mocked_report.return_value = 0
-        expected_score = 0
+        expected_score = ScoredCheckResult("Coverage", 0, 2)
 
         # Act
         actual_score = self.coverage_check.run()
@@ -89,7 +89,7 @@ class TestCoverageCheck(unittest.TestCase):
         # Arrange
         mocked_run.return_value = True
         mocked_report.return_value = 22
-        expected_score = 0
+        expected_score = ScoredCheckResult("Coverage", 0, 2)
 
         # Act
         actual_score = self.coverage_check.run()
@@ -106,7 +106,7 @@ class TestCoverageCheck(unittest.TestCase):
         # Arrange
         mocked_run.return_value = True
         mocked_report.return_value = 100 / 3
-        expected_score = 1
+        expected_score = ScoredCheckResult("Coverage", 1, 2)
 
         # Act
         actual_score = self.coverage_check.run()
@@ -123,7 +123,7 @@ class TestCoverageCheck(unittest.TestCase):
         # Arrange
         mocked_run.return_value = True
         mocked_report.return_value = 100 / 3 + 1
-        expected_score = 1
+        expected_score = ScoredCheckResult("Coverage", 1, 2)
 
         # Act
         actual_score = self.coverage_check.run()
@@ -140,7 +140,7 @@ class TestCoverageCheck(unittest.TestCase):
         # Arrange
         mocked_run.return_value = True
         mocked_report.return_value = 50
-        expected_score = 1
+        expected_score = ScoredCheckResult("Coverage", 1, 2)
 
         # Act
         actual_score = self.coverage_check.run()
@@ -157,7 +157,7 @@ class TestCoverageCheck(unittest.TestCase):
         # Arrange
         mocked_run.return_value = True
         mocked_report.return_value = 100 / 3 * 2
-        expected_score = 2
+        expected_score = ScoredCheckResult("Coverage", 2, 2)
 
         # Act
         actual_score = self.coverage_check.run()
@@ -174,7 +174,7 @@ class TestCoverageCheck(unittest.TestCase):
         # Arrange
         mocked_run.return_value = True
         mocked_report.return_value = 75
-        expected_score = 2
+        expected_score = ScoredCheckResult("Coverage", 2, 2)
 
         # Act
         actual_score = self.coverage_check.run()
@@ -191,7 +191,7 @@ class TestCoverageCheck(unittest.TestCase):
         # Arrange
         mocked_run.return_value = True
         mocked_report.return_value = 100
-        expected_score = 2
+        expected_score = ScoredCheckResult("Coverage", 2, 2)
 
         # Act
         actual_score = self.coverage_check.run()
@@ -217,4 +217,4 @@ class TestCoverageCheck(unittest.TestCase):
         result = self.coverage_check.run()
 
         # Assert
-        self.assertEqual(2, result)
+        self.assertEqual(ScoredCheckResult("Coverage", 2, 2), result)

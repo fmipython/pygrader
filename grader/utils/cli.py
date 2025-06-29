@@ -1,6 +1,7 @@
 """
 Module containing the CLI arguments parser.
 """
+
 import argparse
 
 from typing import Any
@@ -20,6 +21,19 @@ def get_args() -> dict[str, Any]:
     parser.add_argument("--student-id", type=str, help="The student's id")
     parser.add_argument(
         "-v", "--verbosity", action="count", default=0, help="Set verbosity (0: DEBUG, 1: VERBOSE, 2: INFO)"
+    )
+    parser.add_argument("-s", "--suppress-info", action="store_true", help="Suppress info messages", default=False)
+    parser.add_argument(
+        "--skip-venv-creation", action="store_true", help="Skip the virtual environment creation", default=False
+    )
+    parser.add_argument(
+        "--report-format",
+        type=str,
+        choices=["json", "csv", "text"],
+        help="Set the report format. Implies --suppress-info if passed explicitly",
+    )
+    parser.add_argument(
+        "--keep-venv", action="store_true", help="Keep the virtual environment after grading", default=False
     )
 
     return parser.parse_args().__dict__

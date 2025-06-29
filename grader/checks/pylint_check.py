@@ -12,22 +12,23 @@ from pylint.reporters.text import TextReporter
 
 import grader.utils.constants as const
 from grader.utils import process
-from grader.checks.abstract_check import AbstractCheck, CheckError
-from grader.utils.files import find_all_python_files
+from grader.checks.abstract_check import ScoredCheck, CheckError, ScoredCheckResult
+
+import grader.utils.files as files
 
 logger = logging.getLogger("grader")
 
 
-class PylintCheck(AbstractCheck):
+class PylintCheck(ScoredCheck):
     """
     The Pylint check class.
     """
 
-    def __init__(self, name: str, max_points: int, project_root: str):
-        AbstractCheck.__init__(self, name, max_points, project_root)
+    def __init__(self, name: str, project_root: str, max_points: int, is_venv_required: bool):
+        super().__init__(name, max_points, project_root, is_venv_required)
         self.__pylint_max_score = 10
 
-    def run(self) -> float:
+    def run(self) -> ScoredCheckResult:
         """
         Run the pylint check on the project.
         First, find all python files in the project, then create a custom reporter (to suppress all output).
@@ -36,21 +37,22 @@ class PylintCheck(AbstractCheck):
         :returns: The score from the pylint check.
         :rtype: float
         """
-        super().run()
+        self._pre_run()
 
         try:
-            pylint_args = find_all_python_files(self._project_root)
+            pylint_args = files.find_all_python_files(self._project_root)
         except OSError as error:
             logger.error("Error while finding python files: %s", error)
             raise CheckError("Error while finding python files") from error
 
         logger.debug("Running pylint check on files: %s", pylint_args)
-        pylintrc_path = const.PYLINTRC
         pylint_args.append("--fail-under=0")
+
+        pylintrc_path = const.PYLINTRC
         if os.path.exists(pylintrc_path):
             pylint_args.extend(["--rcfile", pylintrc_path])
 
-        command = [os.path.join(self._project_root, const.PYLINT_PATH)] + pylint_args
+        command = [const.PYLINT_PATH] + pylint_args  # Current working directory is set in the process.run method
         try:
             results = process.run(command, current_directory=self._project_root)
         except (OSError, ValueError) as error:
@@ -63,7 +65,9 @@ class PylintCheck(AbstractCheck):
         pylint_score = self.__get_pylint_score(results.stdout)
 
         logger.debug("Pylint score: %s", pylint_score)
-        return self.__translate_score(pylint_score)
+        score = self.__translate_score(pylint_score)
+
+        return ScoredCheckResult(self.name, score, self.max_points)
 
     def __translate_score(self, pylint_score: float) -> float:
         """

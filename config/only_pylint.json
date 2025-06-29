@@ -3,7 +3,7 @@
     {
       "name": "pylint",
       "max_points": 1,
-      "requires_venv": true
+      "is_venv_required": true
     }
   ]
 }

@@ -8,20 +8,32 @@ import grader.utils.constants as const
 from grader.utils.process import run
 
 
-class TestFunctionalGoodWeather(unittest.TestCase):
+class BaseFunctionalTestWithGrader(unittest.TestCase):
     repo_url = "https://github.com/fmipython/PythonProjectGrader"
     clone_path = "/tmp/PythonProjectGrader"
 
     def setUp(self):
-        if not os.path.exists(self.clone_path):
-            clone_result = run(["git", "clone", self.repo_url, self.clone_path])
-            if clone_result.returncode != 0:
-                raise RuntimeError(f"Failed to clone the repository: {clone_result.stderr}")
+        if os.path.exists(self.clone_path):
+            return
+
+        clone_result = run(["git", "clone", self.repo_url, self.clone_path])
+        if clone_result.returncode != 0:
+            raise RuntimeError(f"Failed to clone the repository: {clone_result.stderr}")
+
+        # Remove the functional tests from the repo, as they cause issues and time loss.
+        functional_tests_path = os.path.join(self.clone_path, "tests", "test_functional.py")
+        if os.path.exists(functional_tests_path):
+            os.remove(functional_tests_path)
 
     def tearDown(self):
-        if os.path.exists(self.clone_path):
-            shutil.rmtree(self.clone_path)
+        if not os.path.exists(self.clone_path):
+            return
 
+        shutil.rmtree(self.clone_path)
+
+
+@unittest.skipIf(os.name == "nt", "Test skipped on Windows")
+class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
     def test_01_requirements_txt_exists(self):
         # Arrange
         command = build_command(project_path="/tmp/PythonProjectGrader")
@@ -179,20 +191,8 @@ class TestFunctionalGoodWeather(unittest.TestCase):
             self.assertNotIn(f"Check: {check}", run_stdout, f"Unexpected check '{check}' was executed")
 
 
-class TestFunctionalBadWeather(unittest.TestCase):
-    repo_url = "https://github.com/fmipython/PythonProjectGrader"
-    clone_path = "/tmp/PythonProjectGrader"
-
-    def setUp(self):
-        if not os.path.exists(self.clone_path):
-            clone_result = run(["git", "clone", self.repo_url, self.clone_path])
-            if clone_result.returncode != 0:
-                raise RuntimeError(f"Failed to clone the repository: {clone_result.stderr}")
-
-    def tearDown(self):
-        if os.path.exists(self.clone_path):
-            shutil.rmtree(self.clone_path)
-
+@unittest.skipIf(os.name == "nt", "Test skipped on Windows")
+class TestFunctionalBadWeatherWithGrader(BaseFunctionalTestWithGrader):
     def test_11_requirements_txt_does_not_exist(self):
         # Arrange
         command = build_command(project_path="/tmp/PythonProjectGrader")
@@ -262,11 +262,108 @@ class TestFunctionalBadWeather(unittest.TestCase):
         self.assertIn("Project root directory does not exist", run_result.stdout)
 
 
+class TestVariousConfigsOnSampleProject(unittest.TestCase):
+    def test_01_only_pylint(self):
+        # Arrange
+        project_path = os.path.join(const.ROOT_DIR, "tests", "sample_project")
+        command = build_command(project_path=project_path, config_file="only_pylint.json")
+
+        # Act
+        run_result = run(command)
+
+        # Assert
+        self.assertEqual(run_result.returncode, 0, run_result.stdout)
+        self.assertTrue(
+            is_score_correct(expected_score=1, target_check="pylint", grader_output=run_result.stdout),
+            "Pylint check did not have the expected score of 1",
+        )
+
+    def test_02_full(self):
+        # Arrange
+        project_path = os.path.join(const.ROOT_DIR, "tests", "sample_project")
+        command = build_command(project_path=project_path, config_file="full.json")
+
+        # Act
+        run_result = run(command)
+
+        # Assert
+        self.assertEqual(run_result.returncode, 0, run_result.stdout)
+        self.assertTrue(
+            is_score_correct(expected_score=10, target_check="requirements", grader_output=run_result.stdout)
+        )
+        self.assertTrue(is_score_correct(expected_score=7, target_check="pylint", grader_output=run_result.stdout))
+        self.assertTrue(is_score_correct(expected_score=8, target_check="type-hints", grader_output=run_result.stdout))
+        self.assertTrue(is_score_correct(expected_score=10, target_check="coverage", grader_output=run_result.stdout))
+
+    def test_03_full_single_point(self):
+        # Arrange
+        project_path = os.path.join(const.ROOT_DIR, "tests", "sample_project")
+        command = build_command(project_path=project_path, config_file="full_single_point.json")
+
+        # Act
+        run_result = run(command)
+
+        # Assert
+        self.assertEqual(run_result.returncode, 0, run_result.stdout)
+        self.assertTrue(
+            is_score_correct(expected_score=1, target_check="requirements", grader_output=run_result.stdout)
+        )
+        self.assertTrue(is_score_correct(expected_score=1, target_check="pylint", grader_output=run_result.stdout))
+        self.assertTrue(is_score_correct(expected_score=1, target_check="type-hints", grader_output=run_result.stdout))
+        self.assertTrue(is_score_correct(expected_score=1, target_check="coverage", grader_output=run_result.stdout))
+
+    def test_04_structure(self):
+        # Arrange
+        project_path = os.path.join(const.ROOT_DIR, "tests", "sample_project")
+        command = build_command(project_path=project_path, config_file="structure.json")
+
+        # Act
+        run_result = run(command)
+
+        # Assert
+        self.assertEqual(run_result.returncode, 0, run_result.stdout)
+        self.assertTrue(
+            is_non_scored_check_correct(
+                expected_result=True, target_check="structure", grader_output=run_result.stdout
+            )
+        )
+
+    def test_05_tests(self):
+        # Arrange
+        project_path = os.path.join(const.ROOT_DIR, "tests", "sample_project")
+        command = build_command(project_path=project_path, config_file="tests.json")
+
+        # Act
+        run_result = run(command)
+
+        # Assert
+        self.assertEqual(run_result.returncode, 0, run_result.stdout)
+        self.assertTrue(is_score_correct(expected_score=13, target_check="tests", grader_output=run_result.stdout))
+
+    def test_06_2024(self):
+        # Arrange
+        project_path = os.path.join(const.ROOT_DIR, "tests", "sample_project")
+        command = build_command(project_path=project_path, config_file="2024.json")
+
+        # Act
+        run_result = run(command)
+
+        # Assert
+        self.assertEqual(run_result.returncode, 0, run_result.stdout)
+
+        self.assertTrue(is_score_correct(expected_score=2, target_check="pylint", grader_output=run_result.stdout))
+        self.assertTrue(is_score_correct(expected_score=3, target_check="type-hints", grader_output=run_result.stdout))
+        self.assertTrue(is_score_correct(expected_score=5, target_check="coverage", grader_output=run_result.stdout))
+        self.assertTrue(
+            is_score_correct(expected_score=1, target_check="requirements", grader_output=run_result.stdout)
+        )
+
+
 def build_command(
     project_path: Optional[str], config_file: str = "full.json", student_id: Optional[str] = None
 ) -> list[str]:
     python_binary = "python3" if os.name == "posix" else "python"
-    grader_entrypoint = "main.py"
+    grader_entrypoint = "pygrader.py"
 
     full_config_path = os.path.join(const.CONFIG_DIR, config_file)
     base_command = [python_binary, os.path.join(const.ROOT_DIR, grader_entrypoint)]
@@ -289,3 +386,15 @@ def is_score_correct(expected_score: int, target_check: str, grader_output: str)
     actual_score = int(score_line.split(",")[1].split(":")[1].split("/")[0].strip())
 
     return actual_score == expected_score
+
+
+def is_non_scored_check_correct(expected_result: bool, target_check: str, grader_output: str) -> bool:
+    lines = grader_output.split("\n")
+
+    score_lines = [line for line in lines if line.startswith("Check")]
+    score_line = next(line for line in score_lines if target_check in line)
+
+    # Example: "Check: structure, Result: False"
+    actual_result = score_line.split(",")[1].split(":")[1].strip()
+
+    return actual_result == str(expected_result)

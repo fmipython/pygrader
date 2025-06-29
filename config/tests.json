@@ -1,0 +1,15 @@
+{
+  "checks": [
+    {
+      "name": "tests",
+      "max_points": 13,
+      "is_venv_required": true,
+      "tests_path": ["/home/lyubolp/pygrader/tests/sample_project/tests/test_sample_code.py"],
+      "default_test_score": 1,
+      "test_score_mapping": {
+        "test_add": 2,
+        "test_divide": 2
+      }
+    }
+  ]
+}

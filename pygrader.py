@@ -22,19 +22,31 @@ from grader.utils.cli import get_args
 from grader.utils.config import load_config
 from grader.utils.files import get_tests_directory_name
 from grader.utils.logger import setup_logger
-from grader.utils.results_reporter import JSONResultsReporter, CSVResultsReporter, PlainTextResultsReporter
+from grader.utils.results_reporter import (
+    JSONResultsReporter,
+    CSVResultsReporter,
+    PlainTextResultsReporter,
+    ResultsReporter,
+)
 from grader.utils.virtual_environment import VirtualEnvironment
 
 
 class Grader:
     def __init__(
-        self, student_id: str, project_root: str, config_path: str, logger: Logger, is_keeping_venv: bool = False
+        self,
+        student_id: str,
+        project_root: str,
+        config_path: str,
+        logger: Logger,
+        is_keeping_venv: bool = False,
+        is_skipping_venv_creation: bool = False,
     ):
         self.__student_id = student_id
         self.__logger = logger
 
         self.__logger.info("Python project grader, %s", const.VERSION)
         self.__is_keeping_venv = is_keeping_venv
+        self.__is_skipping_venv_creation = is_skipping_venv_creation
         try:
             self.__config = load_config(config_path)
         except FileNotFoundError as exc:
@@ -44,7 +56,11 @@ class Grader:
 
         if student_id is not None:
             self.__logger.info("Running checks for student %s", student_id)
-        self.__logger.debug("Arguments: %s", args)
+
+        self.__logger.debug("Project root: %s", project_root)
+        self.__logger.debug("Configuration file: %s", config_path)
+        self.__logger.debug("Keeping virtual environment: %s", is_keeping_venv)
+        self.__logger.debug("Skipping virtual environment creation: %s", is_skipping_venv_creation)
 
         self.__project_root = project_root
         if not os.path.exists(self.__project_root):
@@ -62,7 +78,7 @@ class Grader:
 
         scores = [self.__run_check(check) for check in non_venv_checks]
 
-        if args["skip_venv_creation"] or len(venv_checks) == 0:
+        if self.__is_skipping_venv_creation or len(venv_checks) == 0:
             return scores
 
         with VirtualEnvironment(self.__project_root, self.__is_keeping_venv):
@@ -87,24 +103,36 @@ class Grader:
         return check_result
 
 
+def build_reporter(report_format) -> ResultsReporter:
+    """
+    Build a results reporter based on the specified report format.
+
+    :param report_format: The format of the report (e.g., "json", "csv", "text").
+    :return: An instance of a ResultsReporter subclass.
+    """
+    match report_format:
+        case "json":
+            return JSONResultsReporter()
+        case "csv":
+            return CSVResultsReporter()
+        case "text":
+            return PlainTextResultsReporter()
+        case _:
+            return PlainTextResultsReporter()
+
+
 if __name__ == "__main__":
     args = get_args()
     is_suppressing_info = args["report_format"] == "json" or args["report_format"] == "csv" or args["suppress_info"]
     logger = setup_logger(args["student_id"], verbosity=args["verbosity"], suppress_info=is_suppressing_info)
 
-    grader = Grader(args["student_id"], args["project_root"], args["config"], logger, args["keep_venv"])
+    grader = Grader(
+        args["student_id"], args["project_root"], args["config"], logger, args["keep_venv"], args["skip_venv_creation"]
+    )
 
     checks_results = grader.grade()
 
-    match args["report_format"]:
-        case "json":
-            reporter = JSONResultsReporter()
-        case "csv":
-            reporter = CSVResultsReporter()
-        case "text":
-            reporter = PlainTextResultsReporter()
-        case _:
-            reporter = PlainTextResultsReporter()
+    reporter = build_reporter(args["report_format"])
 
     # TODO - Add output to a file
     reporter.display(checks_results)

@@ -3,7 +3,6 @@ Module containing the unit test code coverage check.
 """
 
 import logging
-import os
 
 from grader.checks.abstract_check import ScoredCheck, CheckError, ScoredCheckResult
 from grader.utils.constants import (

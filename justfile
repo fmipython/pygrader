@@ -15,15 +15,15 @@ lint_file file: venv
     python3 -m pylint {{file}} --fail-under 9
     mypy {{file}} --ignore-missing-imports
 
-test:
-    unit_tests
-    functional_tests
-
 unit_tests: venv
     find tests -type f -name "test_*.py" -not -name "test_functional.py" | xargs python3 -m unittest
 
 functional_tests: venv
     python3 -m unittest discover -s tests -p "test_functional.py"
+
+test:
+    unit_tests
+    functional_tests
 
 push: venv lint test
     git push

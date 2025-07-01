@@ -36,7 +36,9 @@ class TestRunProcess(unittest.TestCase):
         with self.assertLogs("grader", level="DEBUG") as log:
             actual_subprocess_result = run([expected_command])
 
-            is_command_name_logged = f"DEBUG:grader:Running command: {[expected_command]}" in log.output
+            is_command_name_logged = (
+                f"DEBUG:grader:Running command: {[expected_command]}, from directory: {None}" in log.output
+            )
             is_additional_information_logged = (
                 f"DEBUG:grader:Command failed: {expected_returncode} {expected_stdout} {expected_stderr}" in log.output
             )
@@ -70,7 +72,9 @@ class TestRunProcess(unittest.TestCase):
         with self.assertLogs("grader", level="DEBUG") as log:
             actual_subprocess_result = run([expected_command])
 
-            is_command_name_logged = f"DEBUG:grader:Running command: {[expected_command]}" in log.output
+            is_command_name_logged = (
+                f"DEBUG:grader:Running command: {[expected_command]}, from directory: {None}" in log.output
+            )
             is_additional_information_logged = f"DEBUG:grader:Command succeeded: {expected_stdout}" in log.output
 
         # Assert

@@ -16,7 +16,7 @@ lint_file file: venv
     mypy {{file}} --ignore-missing-imports
 
 unit_tests: venv
-    find tests -type f -name "test_*.py" -not -name "test_functional.py" | xargs python3 -m unittest
+    find tests -type f -name "test_*.py" -not -name "test_functional.py" -not -path "*sample_project*" | xargs python3 -m unittest
 
 functional_tests: venv
     python3 -m unittest discover -s tests -p "test_functional.py"

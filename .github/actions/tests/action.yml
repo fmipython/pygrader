@@ -23,6 +23,7 @@ runs:
     - name: Run the unit tests
       run: |
         find tests -type f -name "test_*.py" -not -name "test_functional.py" -not -path "*sample_project*" | xargs python3 -m unittest
+      shell: bash
     - name: Run the functional tests
       run: |
         python3 -m unittest discover -s tests -p "test_functional.py"

@@ -1,0 +1,25 @@
+name: Deploy Sphinx to GitHub Pages
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.10"
+
+    - name: Install dependencies
+      run: |
+        pip install sphinx sphinx_rtd_theme sphinx_rtd_theme_ext_color_contrast
+
+    - name: Build Sphinx documentation
+      run: |
+        sphinx-build docs/source _build  # Adjust 'docs' if your Sphinx files are located elsewhere
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: _build/
+        force_orphan: true

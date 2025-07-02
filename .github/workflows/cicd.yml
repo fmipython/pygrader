@@ -1,0 +1,30 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: pygrader CI&CD
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+  # This is used to complete the identity challenge
+  # with sigstore/fulcio when running outside of PRs.
+  id-token: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./github/actions/tests
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./github/actions/docker
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./github/actions/docs

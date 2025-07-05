@@ -103,7 +103,7 @@ class Grader:
         return check_result
 
 
-def build_reporter(report_format) -> ResultsReporter:
+def build_reporter(report_format: str) -> ResultsReporter:
     """
     Build a results reporter based on the specified report format.
 

@@ -70,7 +70,7 @@ class CoverageCheck(ScoredCheck):
 
         return self._max_points
 
-    def __coverage_run(self):
+    def __coverage_run(self) -> None:
         """
         Run the coverage tool on the project.
         """
@@ -86,7 +86,7 @@ class CoverageCheck(ScoredCheck):
             logger.error("Coverage run failed")
             raise CheckError("Coverage run failed")
 
-    def __coverage_report(self):
+    def __coverage_report(self) -> int:
         """
         Generate a report from the coverage tool.
         """

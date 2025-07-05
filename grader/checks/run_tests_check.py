@@ -80,7 +80,7 @@ class RunTestsCheck(ScoredCheck):
 
         return ScoredCheckResult(self.name, passed_tests_score, self.max_points)
 
-    def __pytest_run(self):
+    def __pytest_run(self) -> str:
         """
         Run pytest on the specified test files.
 

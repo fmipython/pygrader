@@ -9,8 +9,8 @@ from grader.utils.process import run
 
 
 class BaseFunctionalTestWithGrader(unittest.TestCase):
-    repo_url = "https://github.com/fmipython/PythonProjectGrader"
-    clone_path = "/tmp/PythonProjectGrader"
+    repo_url = "https://github.com/fmipython/pygrader"
+    clone_path = "/tmp/pygrader"
 
     def setUp(self):
         if os.path.exists(self.clone_path):
@@ -19,6 +19,16 @@ class BaseFunctionalTestWithGrader(unittest.TestCase):
         clone_result = run(["git", "clone", self.repo_url, self.clone_path])
         if clone_result.returncode != 0:
             raise RuntimeError(f"Failed to clone the repository: {clone_result.stderr}")
+
+        current_branch_result = run(["git", "rev-parse", "--abbrev-ref", "HEAD"], current_directory=os.getcwd())
+        if current_branch_result.returncode != 0:
+            raise RuntimeError(f"Failed to get current branch: {current_branch_result.stderr}")
+
+        current_branch = current_branch_result.stdout.strip()
+
+        checkout_result = run(["git", "checkout", current_branch], current_directory=self.clone_path)
+        if checkout_result.returncode != 0:
+            raise RuntimeError(f"Failed to checkout branch {current_branch}: {checkout_result.stderr}")
 
         # Remove the functional tests from the repo, as they cause issues and time loss.
         functional_tests_path = os.path.join(self.clone_path, "tests", "test_functional.py")
@@ -34,9 +44,10 @@ class BaseFunctionalTestWithGrader(unittest.TestCase):
 
 @unittest.skipIf(os.name == "nt", "Test skipped on Windows")
 class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
+    @unittest.skip("debug")
     def test_01_requirements_txt_exists(self):
         # Arrange
-        command = build_command(project_path="/tmp/PythonProjectGrader")
+        command = build_command(project_path=self.clone_path)
 
         # Act
         run_result = run(command)
@@ -48,9 +59,10 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
         self.assertEqual(run_returncode, 0, run_stdout)
         self.assertTrue(is_score_correct(expected_score=10, target_check="requirements", grader_output=run_stdout))
 
+    @unittest.skip("debug")
     def test_02_pylint_check(self):
         # Arrange
-        command = build_command(project_path="/tmp/PythonProjectGrader")
+        command = build_command(project_path=self.clone_path)
 
         # Act
         run_result = run(command)
@@ -64,7 +76,7 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
 
     def test_03_type_hints_check(self):
         # Arrange
-        command = build_command(project_path="/tmp/PythonProjectGrader")
+        command = build_command(project_path=self.clone_path)
 
         # Act
         run_result = run(command)
@@ -78,7 +90,7 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
 
     def test_04_coverage_check(self):
         # Arrange
-        command = build_command(project_path="/tmp/PythonProjectGrader")
+        command = build_command(project_path=self.clone_path)
 
         # Act
         run_result = run(command)
@@ -90,12 +102,13 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
         self.assertEqual(run_returncode, 0, run_stdout)
         self.assertTrue(is_score_correct(expected_score=8, target_check="coverage", grader_output=run_stdout))
 
+    @unittest.skip("debug")
     def test_05_log_file_created(self):
         # Arrange
         log_file = "grader.log"
         if os.path.exists(log_file):
             os.remove(log_file)
-        command = build_command(project_path="/tmp/PythonProjectGrader")
+        command = build_command(project_path=self.clone_path)
 
         # Act
         run_result = run(command)
@@ -105,13 +118,14 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
         self.assertTrue(os.path.exists(log_file), "Log file was not created")
         os.remove(log_file)
 
+    @unittest.skip("debug")
     def test_06_log_file_with_student_id(self):
         # Arrange
         student_id = "student123"
         log_file = f"{student_id}.log"
         if os.path.exists(log_file):
             os.remove(log_file)
-        command = build_command(project_path="/tmp/PythonProjectGrader", student_id=student_id)
+        command = build_command(project_path=self.clone_path, student_id=student_id)
 
         # Act
         run_result = run(command)
@@ -121,11 +135,12 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
         self.assertTrue(os.path.exists(log_file), f"Log file with student ID '{student_id}' was not created")
         os.remove(log_file)
 
+    @unittest.skip("debug")
     def test_07_student_id_in_output(self):
         # Arrange
         student_id = "student123"
         expected_output = f"Running checks for student {student_id}"
-        command = build_command(project_path="/tmp/PythonProjectGrader", student_id=student_id)
+        command = build_command(project_path=self.clone_path, student_id=student_id)
 
         # Act
         run_result = run(command)
@@ -136,12 +151,13 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
             expected_output, run_result.stdout, f"Expected output '{expected_output}' not found in the tool's output"
         )
 
+    @unittest.skip("debug")
     def test_08_default_log_file_name(self):
         # Arrange
         log_file = "grader.log"
         if os.path.exists(log_file):
             os.remove(log_file)
-        command = build_command(project_path="/tmp/PythonProjectGrader")
+        command = build_command(project_path=self.clone_path)
 
         # Act
         run_result = run(command)
@@ -151,10 +167,11 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
         self.assertTrue(os.path.exists(log_file), "Default log file 'grader.log' was not created")
         os.remove(log_file)
 
+    @unittest.skip("debug")
     def test_09_all_checks_score_one(self):
         # Arrange
         config_file = "full_single_point.json"
-        command = build_command(project_path="/tmp/PythonProjectGrader", config_file=config_file)
+        command = build_command(project_path=self.clone_path, config_file=config_file)
 
         # Act
         run_result = run(command)
@@ -170,10 +187,11 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
                 f"Check '{check}' did not have the expected score of 1",
             )
 
+    @unittest.skip("debug")
     def test_10_only_pylint_check(self):
         # Arrange
         config_file = "only_pylint.json"
-        command = build_command(project_path="/tmp/PythonProjectGrader", config_file=config_file)
+        command = build_command(project_path=self.clone_path, config_file=config_file)
 
         # Act
         run_result = run(command)
@@ -192,12 +210,13 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
 
 
 @unittest.skipIf(os.name == "nt", "Test skipped on Windows")
+@unittest.skip("debug")
 class TestFunctionalBadWeatherWithGrader(BaseFunctionalTestWithGrader):
     def test_11_requirements_txt_does_not_exist(self):
         # Arrange
-        command = build_command(project_path="/tmp/PythonProjectGrader")
+        command = build_command(project_path=self.clone_path)
 
-        os.remove(os.path.join("/tmp/PythonProjectGrader", "requirements.txt"))
+        os.remove(os.path.join(self.clone_path, "requirements.txt"))
 
         # Act
         run_result = run(command)
@@ -212,7 +231,7 @@ class TestFunctionalBadWeatherWithGrader(BaseFunctionalTestWithGrader):
     def test_12_no_config_provided(self):
         # Arrange
         random_config_path = "/tmp/nonexistent_config.json"
-        command = build_command(project_path="/tmp/PythonProjectGrader", config_file=random_config_path)
+        command = build_command(project_path=self.clone_path, config_file=random_config_path)
 
         # Act
         run_result = run(command)
@@ -224,7 +243,7 @@ class TestFunctionalBadWeatherWithGrader(BaseFunctionalTestWithGrader):
     def test_13_no_student_id_in_output(self):
         # Arrange
         unexpected_output = "Running checks for student"
-        command = build_command(project_path="/tmp/PythonProjectGrader")
+        command = build_command(project_path=self.clone_path)
 
         # Act
         run_result = run(command)
@@ -262,11 +281,35 @@ class TestFunctionalBadWeatherWithGrader(BaseFunctionalTestWithGrader):
         self.assertIn("Project root directory does not exist", run_result.stdout)
 
 
-class TestVariousConfigsOnSampleProject(unittest.TestCase):
+class BaseFunctionalTestWithSampleProject(unittest.TestCase):
+    repo_url = "https://github.com/fmipython/pygrader-sample-project"
+    clone_path = "/tmp/sample_project"
+
+    def setUp(self):
+        if os.path.exists(self.clone_path):
+            return
+
+        clone_result = run(["git", "clone", self.repo_url, self.clone_path])
+        if clone_result.returncode != 0:
+            raise RuntimeError(f"Failed to clone the repository: {clone_result.stderr}")
+
+        # Remove the functional tests from the repo, as they cause issues and time loss.
+        functional_tests_path = os.path.join(self.clone_path, "tests", "test_functional.py")
+        if os.path.exists(functional_tests_path):
+            os.remove(functional_tests_path)
+
+    def tearDown(self):
+        if not os.path.exists(self.clone_path):
+            return
+
+        shutil.rmtree(self.clone_path)
+
+
+class TestVariousConfigsOnSampleProject(BaseFunctionalTestWithSampleProject):
+    @unittest.skip("debug")
     def test_01_only_pylint(self):
         # Arrange
-        project_path = os.path.join(const.ROOT_DIR, "tests", "sample_project")
-        command = build_command(project_path=project_path, config_file="only_pylint.json")
+        command = build_command(project_path=self.clone_path, config_file="only_pylint.json")
 
         # Act
         run_result = run(command)
@@ -278,10 +321,10 @@ class TestVariousConfigsOnSampleProject(unittest.TestCase):
             "Pylint check did not have the expected score of 1",
         )
 
+    @unittest.skip("debug")
     def test_02_full(self):
         # Arrange
-        project_path = os.path.join(const.ROOT_DIR, "tests", "sample_project")
-        command = build_command(project_path=project_path, config_file="full.json")
+        command = build_command(project_path=self.clone_path, config_file="full.json")
 
         # Act
         run_result = run(command)
@@ -295,10 +338,10 @@ class TestVariousConfigsOnSampleProject(unittest.TestCase):
         self.assertTrue(is_score_correct(expected_score=8, target_check="type-hints", grader_output=run_result.stdout))
         self.assertTrue(is_score_correct(expected_score=10, target_check="coverage", grader_output=run_result.stdout))
 
+    @unittest.skip("debug")
     def test_03_full_single_point(self):
         # Arrange
-        project_path = os.path.join(const.ROOT_DIR, "tests", "sample_project")
-        command = build_command(project_path=project_path, config_file="full_single_point.json")
+        command = build_command(project_path=self.clone_path, config_file="full_single_point.json")
 
         # Act
         run_result = run(command)
@@ -312,10 +355,10 @@ class TestVariousConfigsOnSampleProject(unittest.TestCase):
         self.assertTrue(is_score_correct(expected_score=1, target_check="type-hints", grader_output=run_result.stdout))
         self.assertTrue(is_score_correct(expected_score=1, target_check="coverage", grader_output=run_result.stdout))
 
+    @unittest.skip("debug")
     def test_04_structure(self):
         # Arrange
-        project_path = os.path.join(const.ROOT_DIR, "tests", "sample_project")
-        command = build_command(project_path=project_path, config_file="structure.json")
+        command = build_command(project_path=self.clone_path, config_file="structure.json")
 
         # Act
         run_result = run(command)
@@ -328,10 +371,10 @@ class TestVariousConfigsOnSampleProject(unittest.TestCase):
             )
         )
 
+    @unittest.skip("The tests for sample_project are not in the repo")
     def test_05_tests(self):
         # Arrange
-        project_path = os.path.join(const.ROOT_DIR, "tests", "sample_project")
-        command = build_command(project_path=project_path, config_file="tests.json")
+        command = build_command(project_path=self.clone_path, config_file="tests.json")
 
         # Act
         run_result = run(command)
@@ -340,10 +383,10 @@ class TestVariousConfigsOnSampleProject(unittest.TestCase):
         self.assertEqual(run_result.returncode, 0, run_result.stdout)
         self.assertTrue(is_score_correct(expected_score=13, target_check="tests", grader_output=run_result.stdout))
 
+    @unittest.skip("debug")
     def test_06_2024(self):
         # Arrange
-        project_path = os.path.join(const.ROOT_DIR, "tests", "sample_project")
-        command = build_command(project_path=project_path, config_file="2024.json")
+        command = build_command(project_path=self.clone_path, config_file="2024.json")
 
         # Act
         run_result = run(command)

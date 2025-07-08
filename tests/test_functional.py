@@ -44,7 +44,6 @@ class BaseFunctionalTestWithGrader(unittest.TestCase):
 
 @unittest.skipIf(os.name == "nt", "Test skipped on Windows")
 class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
-    @unittest.skip("debug")
     def test_01_requirements_txt_exists(self) -> None:
         # Arrange
         command = build_command(project_path=self.clone_path)
@@ -59,7 +58,6 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
         self.assertEqual(run_returncode, 0, run_stdout)
         self.assertTrue(is_score_correct(expected_score=10, target_check="requirements", grader_output=run_stdout))
 
-    @unittest.skip("debug")
     def test_02_pylint_check(self) -> None:
         # Arrange
         command = build_command(project_path=self.clone_path)
@@ -102,7 +100,6 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
         self.assertEqual(run_returncode, 0, run_stdout)
         self.assertTrue(is_score_correct(expected_score=7, target_check="coverage", grader_output=run_stdout))
 
-    @unittest.skip("debug")
     def test_05_log_file_created(self) -> None:
         # Arrange
         log_file = "grader.log"
@@ -118,7 +115,6 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
         self.assertTrue(os.path.exists(log_file), "Log file was not created")
         os.remove(log_file)
 
-    @unittest.skip("debug")
     def test_06_log_file_with_student_id(self) -> None:
         # Arrange
         student_id = "student123"
@@ -135,7 +131,6 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
         self.assertTrue(os.path.exists(log_file), f"Log file with student ID '{student_id}' was not created")
         os.remove(log_file)
 
-    @unittest.skip("debug")
     def test_07_student_id_in_output(self) -> None:
         # Arrange
         student_id = "student123"
@@ -151,7 +146,6 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
             expected_output, run_result.stdout, f"Expected output '{expected_output}' not found in the tool's output"
         )
 
-    @unittest.skip("debug")
     def test_08_default_log_file_name(self) -> None:
         # Arrange
         log_file = "grader.log"
@@ -167,7 +161,6 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
         self.assertTrue(os.path.exists(log_file), "Default log file 'grader.log' was not created")
         os.remove(log_file)
 
-    @unittest.skip("debug")
     def test_09_all_checks_score_one(self) -> None:
         # Arrange
         config_file = "full_single_point.json"
@@ -187,7 +180,6 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
                 f"Check '{check}' did not have the expected score of 1",
             )
 
-    @unittest.skip("debug")
     def test_10_only_pylint_check(self) -> None:
         # Arrange
         config_file = "only_pylint.json"
@@ -210,7 +202,6 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
 
 
 @unittest.skipIf(os.name == "nt", "Test skipped on Windows")
-@unittest.skip("debug")
 class TestFunctionalBadWeatherWithGrader(BaseFunctionalTestWithGrader):
     def test_11_requirements_txt_does_not_exist(self) -> None:
         # Arrange
@@ -306,7 +297,6 @@ class BaseFunctionalTestWithSampleProject(unittest.TestCase):
 
 
 class TestVariousConfigsOnSampleProject(BaseFunctionalTestWithSampleProject):
-    @unittest.skip("debug")
     def test_01_only_pylint(self) -> None:
         # Arrange
         command = build_command(project_path=self.clone_path, config_file="only_pylint.json")
@@ -321,7 +311,6 @@ class TestVariousConfigsOnSampleProject(BaseFunctionalTestWithSampleProject):
             "Pylint check did not have the expected score of 1",
         )
 
-    @unittest.skip("debug")
     def test_02_full(self) -> None:
         # Arrange
         command = build_command(project_path=self.clone_path, config_file="full.json")
@@ -338,7 +327,6 @@ class TestVariousConfigsOnSampleProject(BaseFunctionalTestWithSampleProject):
         self.assertTrue(is_score_correct(expected_score=8, target_check="type-hints", grader_output=run_result.stdout))
         self.assertTrue(is_score_correct(expected_score=10, target_check="coverage", grader_output=run_result.stdout))
 
-    @unittest.skip("debug")
     def test_03_full_single_point(self) -> None:
         # Arrange
         command = build_command(project_path=self.clone_path, config_file="full_single_point.json")
@@ -355,7 +343,6 @@ class TestVariousConfigsOnSampleProject(BaseFunctionalTestWithSampleProject):
         self.assertTrue(is_score_correct(expected_score=1, target_check="type-hints", grader_output=run_result.stdout))
         self.assertTrue(is_score_correct(expected_score=1, target_check="coverage", grader_output=run_result.stdout))
 
-    @unittest.skip("debug")
     def test_04_structure(self) -> None:
         # Arrange
         command = build_command(project_path=self.clone_path, config_file="structure.json")
@@ -383,7 +370,6 @@ class TestVariousConfigsOnSampleProject(BaseFunctionalTestWithSampleProject):
         self.assertEqual(run_result.returncode, 0, run_result.stdout)
         self.assertTrue(is_score_correct(expected_score=13, target_check="tests", grader_output=run_result.stdout))
 
-    @unittest.skip("debug")
     def test_06_2024(self) -> None:
         # Arrange
         command = build_command(project_path=self.clone_path, config_file="2024.json")

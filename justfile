@@ -47,9 +47,18 @@ clean:
     rm -rf docs/build
     rm -f lcov.info
     rm -rf *.log.*
+    rm -rf "pygrader-sample-project"
 
 clean_logs:
     rm -rf *.log.*
 
 clean_venv:
     rm -rf .venv
+
+
+setup_sample_project: clean_sample_project
+    git clone https://github.com/fmipython/pygrader-sample-project
+
+
+clean_sample_project:
+    if [ -d "pygrader-sample-project" ]; then rm -rf "pygrader-sample-project"; fi

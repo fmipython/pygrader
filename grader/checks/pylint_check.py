@@ -121,12 +121,12 @@ class PylintCustomReporter(TextReporter):
     By default, the pylint library shows everything on the stdout.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.output = StringIO()
         super().__init__(self.output)
 
-    def display_messages(self, layout):
+    def display_messages(self, layout) -> None:  # type: ignore
         pass
 
-    def display_reports(self, layout):
+    def display_reports(self, layout) -> None:  # type: ignore
         pass

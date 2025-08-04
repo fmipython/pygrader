@@ -66,7 +66,7 @@ class AbstractCheck(ABC, Generic[T]):
         """
         return VirtualEnvironment.is_initialized
 
-    def _pre_run(self):
+    def _pre_run(self) -> None:
         """
         Pre-run checks to ensure the environment is set up correctly.
 

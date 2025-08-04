@@ -2,10 +2,10 @@
 Module containing the virtual environment class.
 """
 
+from __future__ import annotations  # Python 3.14 will fix this
 import logging
 import os
 import shutil
-
 import grader.utils.constants as const
 
 from grader.utils.logger import VERBOSE
@@ -27,16 +27,16 @@ class VirtualEnvironment:
         self._venv_path = os.path.join(project_path, const.VENV_NAME)
         self.__keep_venv = keep_venv
 
-    def __enter__(self):
+    def __enter__(self) -> VirtualEnvironment:
         self.setup()
         VirtualEnvironment.is_initialized = True
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:  # type: ignore
         self.teardown()
         VirtualEnvironment.is_initialized = False
 
-    def setup(self):
+    def setup(self) -> None:
         """
         Setup the virtual environment.
         Check if there is an existing venv, if so, delete it.
@@ -78,7 +78,7 @@ class VirtualEnvironment:
         grader_requirements_path = const.GRADER_REQUIREMENTS
         VirtualEnvironment.__install_requirements(self._venv_path, grader_requirements_path)
 
-    def teardown(self):
+    def teardown(self) -> None:
         """
         Delete the virtual environment.
         """
@@ -86,7 +86,7 @@ class VirtualEnvironment:
             shutil.rmtree(self._venv_path)
 
     @staticmethod
-    def __install_requirements(venv_path: str, requirements_path: str):
+    def __install_requirements(venv_path: str, requirements_path: str) -> None:
         """
         Install the requirements specified in the requirements file into the virtual environment.
         :param venv_path: The path to the virtual environment.

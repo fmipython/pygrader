@@ -3,12 +3,13 @@ Module containing the check for running tests against the submitted code.
 """
 
 from collections import defaultdict
+from typing import Optional
 import logging
 import os
-from typing import Optional
 
 from grader.checks.abstract_check import CheckError, ScoredCheck, ScoredCheckResult
 from grader.utils.constants import PYTEST_ARGS, PYTEST_PATH, PYTEST_ROOT_DIR_ARG
+from grader.utils.external_resources import is_resource_remote, download_file_from_url
 
 from grader.utils import process
 
@@ -130,3 +131,10 @@ class RunTestsCheck(ScoredCheck):
                 failed_tests.append(test_name)
 
         return passed_tests, failed_tests
+
+    def _pre_run(self) -> None:
+        super()._pre_run()
+
+        self.__tests_path = [
+            path if not is_resource_remote(path) else download_file_from_url(path) for path in self.__tests_path
+        ]

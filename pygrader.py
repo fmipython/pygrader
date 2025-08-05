@@ -5,6 +5,7 @@ Calls all the checks, and stores their results
 
 from logging import Logger
 import os
+import shutil
 import sys
 import grader.utils.constants as const
 
@@ -84,6 +85,8 @@ class Grader:
         with VirtualEnvironment(self.__project_root, self.__is_keeping_venv):
             scores += [self.__run_check(check) for check in venv_checks]
 
+        self.__cleanup()
+
         return scores
 
     def __run_check(self, check: AbstractCheck) -> CheckResult:
@@ -101,6 +104,13 @@ class Grader:
                     raise TypeError(f"Unknown check type: {type(check)}") from error
 
         return check_result
+
+    def __cleanup(self) -> None:
+        """
+        Cleanup temporary files created during the grading process.
+        This is called at the end of grading to ensure no temporary files are left behind.
+        """
+        shutil.rmtree(const.TEMP_FILES_DIR, ignore_errors=True)
 
 
 def build_reporter(report_format: str) -> ResultsReporter:

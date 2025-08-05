@@ -27,9 +27,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/docker
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
   docs:
     needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/docs
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}

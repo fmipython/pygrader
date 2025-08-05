@@ -32,10 +32,10 @@ class AbstractCheck(ABC, Generic[T]):
     Each check has a name and a project root path.
     """
 
-    def __init__(self, name: str, project_root: str, is_venv_requred: bool = False):
+    def __init__(self, name: str, project_root: str, is_venv_required: bool = False):
         self._name = name
         self._project_root = project_root
-        self._is_venv_required = is_venv_requred
+        self._is_venv_required = is_venv_required
 
     @abstractmethod
     def run(self) -> CheckResult[T]:  # TODO - Check if we need the Optional

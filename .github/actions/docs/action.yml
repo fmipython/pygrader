@@ -11,7 +11,7 @@ runs:
 
     - name: Install dependencies
       run: |
-        pip install sphinx sphinx_rtd_theme sphinx_rtd_theme_ext_color_contrast
+        pip install sphinx sphinx_rtd_theme sphinx_rtd_theme_ext_color_contrast pylint
       shell: bash
 
     - name: Build Sphinx documentation

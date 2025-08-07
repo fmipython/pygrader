@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/docker
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   docs:
     needs: test
     runs-on: ubuntu-latest
@@ -36,4 +36,4 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/docs
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

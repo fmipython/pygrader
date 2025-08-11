@@ -29,6 +29,8 @@ jobs:
       - uses: ./.github/actions/docker
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REGISTRY: ghcr.io
+          IMAGE_NAME: fmipython/grader
   docs:
     # needs: test
     runs-on: ubuntu-latest
@@ -37,5 +39,3 @@ jobs:
       - uses: ./.github/actions/docs
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REGISTRY: ghcr.io
-          IMAGE_NAME: fmipython/grader

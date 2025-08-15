@@ -62,6 +62,7 @@ class Grader:
         self.__logger.debug("Configuration file: %s", config_path)
         self.__logger.debug("Keeping virtual environment: %s", is_keeping_venv)
         self.__logger.debug("Skipping virtual environment creation: %s", is_skipping_venv_creation)
+        self.__logger.debug("PYTHONPATH: %s", os.environ.get("PYTHONPATH", "Not set"))
 
         self.__project_root = project_root
         if not os.path.exists(self.__project_root):

@@ -388,6 +388,24 @@ class TestVariousConfigsOnSampleProject(BaseFunctionalTestWithSampleProject):
         )
 
 
+class TestRemoteTests(BaseFunctionalTestWithSampleProject):
+    def test_01_remote_tests(self) -> None:
+        # Arrange
+        path_to_tests = os.path.join(self.clone_path, "tests", "test_sample_code.py")
+        os.remove(path_to_tests)
+
+        command = build_command(project_path=self.clone_path, config_file="tests.json")
+
+        # Act
+        run_result = run(command)
+
+        # input("press any key to continue...")
+
+        # Assert
+        self.assertEqual(run_result.returncode, 0, run_result.stdout)
+        self.assertTrue(is_score_correct(expected_score=13, target_check="tests", grader_output=run_result.stdout))
+
+
 def build_command(
     project_path: Optional[str], config_file: str = "full.json", student_id: Optional[str] = None
 ) -> list[str]:

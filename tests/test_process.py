@@ -15,7 +15,7 @@ class TestRunProcess(unittest.TestCase):
     """
 
     @patch("subprocess.run")
-    def test_01_non_zero_return_code(self, mocked_subprocess: MagicMock):
+    def test_01_non_zero_return_code(self, mocked_subprocess: MagicMock) -> None:
         """
         Test that the run function logs the correct messages and returns the expected result
         when the subprocess returns a non-zero return code.
@@ -37,7 +37,8 @@ class TestRunProcess(unittest.TestCase):
             actual_subprocess_result = run([expected_command])
 
             is_command_name_logged = (
-                f"DEBUG:grader:Running command: {[expected_command]}, from directory: {None}" in log.output
+                f"DEBUG:grader:Running command: {expected_command}, from directory: {None}, with environment variables: {None}"
+                in log.output
             )
             is_additional_information_logged = (
                 f"DEBUG:grader:Command failed: {expected_returncode} {expected_stdout} {expected_stderr}" in log.output
@@ -52,7 +53,7 @@ class TestRunProcess(unittest.TestCase):
         )
 
     @patch("subprocess.run")
-    def test_02_zero_return_code(self, mocked_subprocess: MagicMock):
+    def test_02_zero_return_code(self, mocked_subprocess: MagicMock) -> None:
         """
         Test that the run function logs the correct messages and returns the expected result
         when the subprocess returns a zero return code.
@@ -73,7 +74,8 @@ class TestRunProcess(unittest.TestCase):
             actual_subprocess_result = run([expected_command])
 
             is_command_name_logged = (
-                f"DEBUG:grader:Running command: {[expected_command]}, from directory: {None}" in log.output
+                f"DEBUG:grader:Running command: {expected_command}, from directory: {None}, with environment variables: {None}"
+                in log.output
             )
             is_additional_information_logged = f"DEBUG:grader:Command succeeded: {expected_stdout}" in log.output
 

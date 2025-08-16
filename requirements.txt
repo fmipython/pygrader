@@ -41,5 +41,6 @@ sphinxcontrib-serializinghtml==2.0.0
 tomli==2.2.1
 tomlkit==0.13.2
 types-PyYAML==6.0.12.20241230
+types-requests==2.32.4.20250809
 typing_extensions==4.12.2
 urllib3==2.3.0

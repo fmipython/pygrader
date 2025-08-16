@@ -11,15 +11,17 @@ runs:
 
     - name: Install dependencies
       run: |
-        pip install sphinx sphinx_rtd_theme sphinx_rtd_theme_ext_color_contrast
+        pip install sphinx sphinx_rtd_theme sphinx_rtd_theme_ext_color_contrast pylint
+      shell: bash
 
     - name: Build Sphinx documentation
       run: |
         sphinx-build docs/source _build  # Adjust 'docs' if your Sphinx files are located elsewhere
+      shell: bash
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ inputs.GITHUB_TOKEN }}
         publish_dir: _build/
         force_orphan: true

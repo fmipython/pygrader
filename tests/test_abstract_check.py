@@ -30,7 +30,7 @@ class TestAbstractCheck(unittest.TestCase):
                 super()._pre_run()
                 return CheckResult("dummy", 0)
 
-        check = DummyCheck("dummy", "dummy", is_venv_requred=True)
+        check = DummyCheck("dummy", "dummy", is_venv_required=True)
 
         # Act & Assert
         with self.assertRaises(CheckError):

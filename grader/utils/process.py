@@ -27,11 +27,18 @@ def run(
     :param env_vars: A dictionary of environment variables to set for the subprocess
     :return: The output of the command (returncode, stdout, stderr)
     """
-    logger.debug("Running command: %s, from directory: %s", command, current_directory)
+    logger.debug(
+        "Running command: %s, from directory: %s, with environment variables: %s",
+        " ".join(command),
+        current_directory,
+        env_vars,
+    )
 
     # Prepare the environment variables
     if env_vars is not None:
-        env_vars.update(os.environ.copy())
+        for key, value in os.environ.items():
+            if key not in env_vars:
+                env_vars[key] = value
 
     output = subprocess.run(command, check=False, capture_output=True, text=True, cwd=current_directory, env=env_vars)
 
@@ -50,6 +57,12 @@ def extend_env_variable(variable: str, value: str) -> dict[str, str]:
     :param value: The value to append to the environment variable
     :return: A dictionary with the updated environment variable
     """
-    env = os.environ.copy()
-    env[variable] = f"{env.get(variable, '')}:{value}"
+    env = {}
+
+    try:
+        old_value = os.environ[variable]
+        env[variable] = f"{value}:{old_value}"
+    except KeyError:
+        env[variable] = value
+
     return env

@@ -1,5 +1,9 @@
 # pygrader
 
+## 1.2.0
+
+- Introduced support for downloading tests from URLs.
+
 ## 1.1.0
 
 - Introduced change log

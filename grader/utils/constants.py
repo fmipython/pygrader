@@ -4,12 +4,13 @@ Module containing the constants
 
 import os
 
-VERSION = "1.1.0"
+VERSION = "1.2.0"
 
 # Directories
 ROOT_DIR = os.path.dirname(os.path.realpath(__name__))
 REPORTS_TEMP_DIR = os.path.join(ROOT_DIR, "reports")
 CONFIG_DIR = os.path.join(ROOT_DIR, "config")
+TEMP_FILES_DIR = os.path.join(ROOT_DIR, "temp_files")
 
 # Python
 PYTHON_BIN_WINDOWS = "python.exe"

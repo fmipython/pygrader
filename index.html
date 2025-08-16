@@ -1,0 +1,171 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PythonProjectGrader &mdash; PythonProjectGrader 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/sphinx_rtd_theme_ext_color_contrast.css?v=8e8ea19f" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Usage" href="usage.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            PythonProjectGrader
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functionality.html">Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="checks.html">Checks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev_guide.html">Developer’s guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">PythonProjectGrader</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">PythonProjectGrader</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pythonprojectgrader">
+<h1>PythonProjectGrader<a class="headerlink" href="#pythonprojectgrader" title="Link to this heading"></a></h1>
+<p>A grader for Python projects, used in the <a class="reference external" href="https://github.com/fmipython">“Programming with Python”</a> course at Sofia University “St. Kliment Ohridski”, Faculty of Mathematics and Informatics.</p>
+<p>Automatically grade Python projects based on a set of checks.
+Current supported set of checks are:</p>
+<ul class="simple">
+<li><p>If the project has a requirements.txt file</p></li>
+<li><p>Pylint</p></li>
+<li><p>Type hints (via mypy)</p></li>
+<li><p>Code coverage (via pytest &amp; coverage)</p></li>
+</ul>
+<p>The tool supports configuration files, where you can specify the score for each check.</p>
+<section id="quickstart-via-docker">
+<h2>Quickstart (via Docker)<a class="headerlink" href="#quickstart-via-docker" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>If you don’t have Docker (or Docker Desktop) already, install it from [here](<a class="reference external" href="https://docs.docker.com/get-docker">https://docs.docker.com/get-docker</a>).</p></li>
+<li><p>Download or clone this repository, if you haven’t already.</p></li>
+<li><p>Navigate to the project repository in a terminal and execute the following command:</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./run<span class="w"> </span>&lt;path_to_Python_project&gt;
+</pre></div>
+</div>
+<p>Replace <code class="docutils literal notranslate"><span class="pre">&lt;path_to_Python_project&gt;</span></code> with the path to your project directory. This command should work on all operating systems.</p>
+<p>⚠️ <em>If you are on Windows,</em> <code class="docutils literal notranslate"><span class="pre">&lt;path_to_Python_project&gt;</span></code> <em>should be a full path, not a relative one. For example, write</em> <code class="docutils literal notranslate"><span class="pre">C:\Users\YourName\Documents\Project</span></code> <em>instead of just</em> <code class="docutils literal notranslate"><span class="pre">..\Project</span></code>.</p>
+</section>
+<section id="quickstart-via-source">
+<h2>Quickstart (via source)<a class="headerlink" href="#quickstart-via-source" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Clone the repository and create a virtual environment:</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/fmipython/PythonProjectGrader
+<span class="nb">cd</span><span class="w"> </span>PythonProjectGrader
+python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Activate the virtual environment: Linux/MacOS - <code class="docutils literal notranslate"><span class="pre">source</span> <span class="pre">.venv/bin/activate</span></code>, or for Windows - <code class="docutils literal notranslate"><span class="pre">.venv\Scripts\activate</span></code></p></li>
+</ol>
+<p>3. Install the package:
+<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-r</span> <span class="pre">requirements.txt</span></code></p>
+<p>4. Run the grader:
+<code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">pygrader.py</span> <span class="pre">-c</span> <span class="pre">./config/2024.json</span> <span class="pre">PROJECT_PATH</span></code></p>
+<p>Where <code class="docutils literal notranslate"><span class="pre">PROJECT_PATH</span></code> is the path to the project you want to grade.</p>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functionality.html">Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="checks.html">Checks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev_guide.html">Developer’s guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="checks_dev.html">Checks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html">Source code reference</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="usage.html" class="btn btn-neutral float-right" title="Usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Lyuboslav Karev.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

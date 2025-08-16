@@ -1,0 +1,356 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>grader.utils package &mdash; PythonProjectGrader 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/sphinx_rtd_theme_ext_color_contrast.css?v=8e8ea19f" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="grader.checks package" href="grader.checks.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            PythonProjectGrader
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functionality.html">Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="checks.html">Checks</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="dev_guide.html">Developer’s guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="checks_dev.html">Checks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">Utilities</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="modules.html">Source code reference</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="grader.html">grader package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="grader.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grader.html#module-grader">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">PythonProjectGrader</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="dev_guide.html">Developer’s guide</a></li>
+          <li class="breadcrumb-item"><a href="modules.html">Source code reference</a></li>
+          <li class="breadcrumb-item"><a href="grader.html">grader package</a></li>
+      <li class="breadcrumb-item active">grader.utils package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/grader.utils.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="grader-utils-package">
+<h1>grader.utils package<a class="headerlink" href="#grader-utils-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-grader.utils.cli">
+<span id="grader-utils-cli-module"></span><h2>grader.utils.cli module<a class="headerlink" href="#module-grader.utils.cli" title="Link to this heading"></a></h2>
+<p>Module containing the CLI arguments parser.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="grader.utils.cli.get_args">
+<span class="sig-prename descclassname"><span class="pre">grader.utils.cli.</span></span><span class="sig-name descname"><span class="pre">get_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/grader/utils/cli.html#get_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.utils.cli.get_args" title="Link to this definition"></a></dt>
+<dd><p>Create the CLI parser and return the parsed arguments</p>
+<p>My personal preference is to return a dictionary, instead of the normal argparse.Namespace object.
+:returns: Dictionary, containing the parsed arguments</p>
+</dd></dl>
+
+</section>
+<section id="module-grader.utils.config">
+<span id="grader-utils-config-module"></span><h2>grader.utils.config module<a class="headerlink" href="#module-grader.utils.config" title="Link to this heading"></a></h2>
+<p>Module for loading the configuration file.</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="grader.utils.config.InvalidConfigError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grader.utils.config.</span></span><span class="sig-name descname"><span class="pre">InvalidConfigError</span></span><a class="reference internal" href="_modules/grader/utils/config.html#InvalidConfigError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.utils.config.InvalidConfigError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Custom exception for invalid configuration files.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="grader.utils.config.load_config">
+<span class="sig-prename descclassname"><span class="pre">grader.utils.config.</span></span><span class="sig-name descname"><span class="pre">load_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/grader/utils/config.html#load_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.utils.config.load_config" title="Link to this definition"></a></dt>
+<dd><p>Load the configuration file.
+:param config_file_path: Path to the configuration file.
+:return: The configuration as a dictionary.</p>
+</dd></dl>
+
+</section>
+<section id="module-grader.utils.constants">
+<span id="grader-utils-constants-module"></span><h2>grader.utils.constants module<a class="headerlink" href="#module-grader.utils.constants" title="Link to this heading"></a></h2>
+<p>Module containing the constants</p>
+</section>
+<section id="module-grader.utils.files">
+<span id="grader-utils-files-module"></span><h2>grader.utils.files module<a class="headerlink" href="#module-grader.utils.files" title="Link to this heading"></a></h2>
+<p>Module containing the file-related functions.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="grader.utils.files.find_all_files_under_directory">
+<span class="sig-prename descclassname"><span class="pre">grader.utils.files.</span></span><span class="sig-name descname"><span class="pre">find_all_files_under_directory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extension</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/grader/utils/files.html#find_all_files_under_directory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.utils.files.find_all_files_under_directory" title="Link to this definition"></a></dt>
+<dd><p>Find all files under a directory with a specific extension.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>directory</strong> – The directory to search in</p></li>
+<li><p><strong>extension</strong> – The extension of the files to search for</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of all files under the directory with the specified extension</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="grader.utils.files.find_all_python_files">
+<span class="sig-prename descclassname"><span class="pre">grader.utils.files.</span></span><span class="sig-name descname"><span class="pre">find_all_python_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_root_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/grader/utils/files.html#find_all_python_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.utils.files.find_all_python_files" title="Link to this definition"></a></dt>
+<dd><p>Find all python files in the project directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>project_root_dir</strong> – The path to the project directory</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of all python files in the project directory</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="grader.utils.files.find_all_source_files">
+<span class="sig-prename descclassname"><span class="pre">grader.utils.files.</span></span><span class="sig-name descname"><span class="pre">find_all_source_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_root_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/grader/utils/files.html#find_all_source_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.utils.files.find_all_source_files" title="Link to this definition"></a></dt>
+<dd><p>Find all source files in the project directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>project_root_dir</strong> – The path to the project directory</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of all source files in the project directory</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="grader.utils.files.find_all_test_files">
+<span class="sig-prename descclassname"><span class="pre">grader.utils.files.</span></span><span class="sig-name descname"><span class="pre">find_all_test_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tests_directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/grader/utils/files.html#find_all_test_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.utils.files.find_all_test_files" title="Link to this definition"></a></dt>
+<dd><p>Find all test files in the project directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tests_directory</strong> – The tests directory, defaults to None</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of all test files in the project directory. If no tests directory is found, return an empty list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="grader.utils.files.get_tests_directory_name">
+<span class="sig-prename descclassname"><span class="pre">grader.utils.files.</span></span><span class="sig-name descname"><span class="pre">get_tests_directory_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_root_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/grader/utils/files.html#get_tests_directory_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.utils.files.get_tests_directory_name" title="Link to this definition"></a></dt>
+<dd><p>Check if the project directory contains a tests directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>project_root_dir</strong> – The path to the project directory</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The path to the tests directory if found, otherwise None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-grader.utils.logger">
+<span id="grader-utils-logger-module"></span><h2>grader.utils.logger module<a class="headerlink" href="#module-grader.utils.logger" title="Link to this heading"></a></h2>
+<p>Module containing the logger setup function and the custom VERBOSE level.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="grader.utils.logger.setup_logger">
+<span class="sig-prename descclassname"><span class="pre">grader.utils.logger.</span></span><span class="sig-name descname"><span class="pre">setup_logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">student_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suppress_info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Logger</span></span></span><a class="reference internal" href="_modules/grader/utils/logger.html#setup_logger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.utils.logger.setup_logger" title="Link to this definition"></a></dt>
+<dd><p>Setup the logger with the given verbosity level and student id</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>student_id</strong> – The id of the student. Defaults to None.</p></li>
+<li><p><strong>verbosity</strong> – . Defaults to 0.</p></li>
+<li><p><strong>suppress_info</strong> – Suppress info and warning messages. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The configured logger object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>logging.Logger</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-grader.utils.process">
+<span id="grader-utils-process-module"></span><h2>grader.utils.process module<a class="headerlink" href="#module-grader.utils.process" title="Link to this heading"></a></h2>
+<p>Module containing a wrapper for launching shell commands</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="grader.utils.process.extend_env_variable">
+<span class="sig-prename descclassname"><span class="pre">grader.utils.process.</span></span><span class="sig-name descname"><span class="pre">extend_env_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/grader/utils/process.html#extend_env_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.utils.process.extend_env_variable" title="Link to this definition"></a></dt>
+<dd><p>Extend an environment variable with a new value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>variable</strong> – The name of the environment variable to extend</p></li>
+<li><p><strong>value</strong> – The value to append to the environment variable</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary with the updated environment variable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="grader.utils.process.run">
+<span class="sig-prename descclassname"><span class="pre">grader.utils.process.</span></span><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env_vars</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">CompletedProcess</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/grader/utils/process.html#run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.utils.process.run" title="Link to this definition"></a></dt>
+<dd><p>Execute a command in the terminal.
+Wraps the subprocess.run function, with the check=False, capture_output=True and text=True flags.</p>
+<p>If the command passes, log the stdout.
+If the command fails, log the returncode, stdout and stderr.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>command</strong> – The command to execute</p></li>
+<li><p><strong>current_directory</strong> – The directory to execute the command in</p></li>
+<li><p><strong>env_vars</strong> – A dictionary of environment variables to set for the subprocess</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The output of the command (returncode, stdout, stderr)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-grader.utils.virtual_environment">
+<span id="grader-utils-virtual-environment-module"></span><h2>grader.utils.virtual_environment module<a class="headerlink" href="#module-grader.utils.virtual_environment" title="Link to this heading"></a></h2>
+<p>Module containing the virtual environment class.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="grader.utils.virtual_environment.VirtualEnvironment">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grader.utils.virtual_environment.</span></span><span class="sig-name descname"><span class="pre">VirtualEnvironment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_venv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grader/utils/virtual_environment.html#VirtualEnvironment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.utils.virtual_environment.VirtualEnvironment" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class that handles the creation and deletion of a virtual environment.
+Acts as a context manager. Everything executed within it, can assume that the venv is setup.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grader.utils.virtual_environment.VirtualEnvironment.is_initialized">
+<span class="sig-name descname"><span class="pre">is_initialized</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#grader.utils.virtual_environment.VirtualEnvironment.is_initialized" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grader.utils.virtual_environment.VirtualEnvironment.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/grader/utils/virtual_environment.html#VirtualEnvironment.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.utils.virtual_environment.VirtualEnvironment.setup" title="Link to this definition"></a></dt>
+<dd><p>Setup the virtual environment.
+Check if there is an existing venv, if so, delete it.
+Check if there is a requirements.txt file.
+Create a new venv and install the requirements.
+Install the grader dependencies as well.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grader.utils.virtual_environment.VirtualEnvironment.teardown">
+<span class="sig-name descname"><span class="pre">teardown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/grader/utils/virtual_environment.html#VirtualEnvironment.teardown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.utils.virtual_environment.VirtualEnvironment.teardown" title="Link to this definition"></a></dt>
+<dd><p>Delete the virtual environment.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="grader.utils.virtual_environment.VirtualEnvironmentError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grader.utils.virtual_environment.</span></span><span class="sig-name descname"><span class="pre">VirtualEnvironmentError</span></span><a class="reference internal" href="_modules/grader/utils/virtual_environment.html#VirtualEnvironmentError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.utils.virtual_environment.VirtualEnvironmentError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Exception raised when an error occurs during the virtual environment setup.</p>
+</dd></dl>
+
+</section>
+<section id="module-grader.utils">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-grader.utils" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="grader.checks.html" class="btn btn-neutral float-left" title="grader.checks package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Lyuboslav Karev.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

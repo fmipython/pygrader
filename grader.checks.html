@@ -1,0 +1,404 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>grader.checks package &mdash; PythonProjectGrader 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/sphinx_rtd_theme_ext_color_contrast.css?v=8e8ea19f" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="grader.utils package" href="grader.utils.html" />
+    <link rel="prev" title="grader package" href="grader.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            PythonProjectGrader
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functionality.html">Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="checks.html">Checks</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="dev_guide.html">Developer’s guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="checks_dev.html">Checks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">Utilities</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="modules.html">Source code reference</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="grader.html">grader package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="grader.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grader.html#module-grader">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">PythonProjectGrader</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="dev_guide.html">Developer’s guide</a></li>
+          <li class="breadcrumb-item"><a href="modules.html">Source code reference</a></li>
+          <li class="breadcrumb-item"><a href="grader.html">grader package</a></li>
+      <li class="breadcrumb-item active">grader.checks package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/grader.checks.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="grader-checks-package">
+<h1>grader.checks package<a class="headerlink" href="#grader-checks-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-grader.checks.abstract_check">
+<span id="grader-checks-abstract-check-module"></span><h2>grader.checks.abstract_check module<a class="headerlink" href="#module-grader.checks.abstract_check" title="Link to this heading"></a></h2>
+<p>Module containing a class representing an abstract check.
+Each check should inherit from this class.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="grader.checks.abstract_check.AbstractCheck">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grader.checks.abstract_check.</span></span><span class="sig-name descname"><span class="pre">AbstractCheck</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_venv_required</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grader/checks/abstract_check.html#AbstractCheck"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.checks.abstract_check.AbstractCheck" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">T</span></code>]</p>
+<p>Each check has a name and a project root path.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="grader.checks.abstract_check.AbstractCheck.is_running_within_venv">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_running_within_venv</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/grader/checks/abstract_check.html#AbstractCheck.is_running_within_venv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.checks.abstract_check.AbstractCheck.is_running_within_venv" title="Link to this definition"></a></dt>
+<dd><p>Determine if the check is running within a virtual environment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if running within a virtual environment, False otherwise.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grader.checks.abstract_check.AbstractCheck.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#grader.checks.abstract_check.AbstractCheck.name" title="Link to this definition"></a></dt>
+<dd><p>Get the name of the check.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The name of the check.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grader.checks.abstract_check.AbstractCheck.run">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#grader.checks.abstract_check.CheckResult" title="grader.checks.abstract_check.CheckResult"><span class="pre">CheckResult</span></a><span class="p"><span class="pre">[</span></span><span class="pre">T</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/grader/checks/abstract_check.html#AbstractCheck.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.checks.abstract_check.AbstractCheck.run" title="Link to this definition"></a></dt>
+<dd><p>Main method that executes the check.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The result of the check.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Optional[T]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="grader.checks.abstract_check.CheckError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grader.checks.abstract_check.</span></span><span class="sig-name descname"><span class="pre">CheckError</span></span><a class="reference internal" href="_modules/grader/checks/abstract_check.html#CheckError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.checks.abstract_check.CheckError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Custom exception for check errors.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="grader.checks.abstract_check.CheckResult">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grader.checks.abstract_check.</span></span><span class="sig-name descname"><span class="pre">CheckResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">T</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grader/checks/abstract_check.html#CheckResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.checks.abstract_check.CheckResult" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">T</span></code>]</p>
+<p>Class representing the result of a check.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grader.checks.abstract_check.CheckResult.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#grader.checks.abstract_check.CheckResult.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grader.checks.abstract_check.CheckResult.result">
+<span class="sig-name descname"><span class="pre">result</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">T</span></em><a class="headerlink" href="#grader.checks.abstract_check.CheckResult.result" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="grader.checks.abstract_check.NonScoredCheck">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grader.checks.abstract_check.</span></span><span class="sig-name descname"><span class="pre">NonScoredCheck</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_fatal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_venv_requred</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grader/checks/abstract_check.html#NonScoredCheck"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.checks.abstract_check.NonScoredCheck" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#grader.checks.abstract_check.AbstractCheck" title="grader.checks.abstract_check.AbstractCheck"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractCheck</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>]</p>
+<p>Non-scored checks do not have a maximum amount of points.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="grader.checks.abstract_check.NonScoredCheck.is_fatal">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_fatal</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#grader.checks.abstract_check.NonScoredCheck.is_fatal" title="Link to this definition"></a></dt>
+<dd><p>True if the check failing is fatal, False otherwise.
+:rtype: bool</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>returns</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="grader.checks.abstract_check.NonScoredCheckResult">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grader.checks.abstract_check.</span></span><span class="sig-name descname"><span class="pre">NonScoredCheckResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">T</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grader/checks/abstract_check.html#NonScoredCheckResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.checks.abstract_check.NonScoredCheckResult" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#grader.checks.abstract_check.CheckResult" title="grader.checks.abstract_check.CheckResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">CheckResult</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>]</p>
+<p>Class representing the result of a non-scored check.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="grader.checks.abstract_check.ScoredCheck">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grader.checks.abstract_check.</span></span><span class="sig-name descname"><span class="pre">ScoredCheck</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_venv_requred</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grader/checks/abstract_check.html#ScoredCheck"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.checks.abstract_check.ScoredCheck" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#grader.checks.abstract_check.AbstractCheck" title="grader.checks.abstract_check.AbstractCheck"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractCheck</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</p>
+<p>Each scored check has a maximum amount of points.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="grader.checks.abstract_check.ScoredCheck.max_points">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_points</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#grader.checks.abstract_check.ScoredCheck.max_points" title="Link to this definition"></a></dt>
+<dd><p>The maximum amount of points that can be achieved by the check.
+:rtype: int</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>returns</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="grader.checks.abstract_check.ScoredCheckResult">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grader.checks.abstract_check.</span></span><span class="sig-name descname"><span class="pre">ScoredCheckResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_score</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grader/checks/abstract_check.html#ScoredCheckResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.checks.abstract_check.ScoredCheckResult" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#grader.checks.abstract_check.CheckResult" title="grader.checks.abstract_check.CheckResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">CheckResult</span></code></a>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">T</span></code>]</p>
+<p>Class representing the result of a scored check.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grader.checks.abstract_check.ScoredCheckResult.max_score">
+<span class="sig-name descname"><span class="pre">max_score</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#grader.checks.abstract_check.ScoredCheckResult.max_score" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="grader-checks-checks-factory-module">
+<h2>grader.checks.checks_factory module<a class="headerlink" href="#grader-checks-checks-factory-module" title="Link to this heading"></a></h2>
+</section>
+<section id="module-grader.checks.coverage_check">
+<span id="grader-checks-coverage-check-module"></span><h2>grader.checks.coverage_check module<a class="headerlink" href="#module-grader.checks.coverage_check" title="Link to this heading"></a></h2>
+<p>Module containing the unit test code coverage check.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="grader.checks.coverage_check.CoverageCheck">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grader.checks.coverage_check.</span></span><span class="sig-name descname"><span class="pre">CoverageCheck</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_venv_required</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grader/checks/coverage_check.html#CoverageCheck"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.checks.coverage_check.CoverageCheck" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#grader.checks.abstract_check.ScoredCheck" title="grader.checks.abstract_check.ScoredCheck"><code class="xref py py-class docutils literal notranslate"><span class="pre">ScoredCheck</span></code></a></p>
+<p>The Coverage check class.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="grader.checks.coverage_check.CoverageCheck.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#grader.checks.abstract_check.ScoredCheckResult" title="grader.checks.abstract_check.ScoredCheckResult"><span class="pre">ScoredCheckResult</span></a></span></span><a class="reference internal" href="_modules/grader/checks/coverage_check.html#CoverageCheck.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.checks.coverage_check.CoverageCheck.run" title="Link to this definition"></a></dt>
+<dd><p>Run the coverage check on the project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The score from the coverage check.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-grader.checks.pylint_check">
+<span id="grader-checks-pylint-check-module"></span><h2>grader.checks.pylint_check module<a class="headerlink" href="#module-grader.checks.pylint_check" title="Link to this heading"></a></h2>
+<p>Module containing the pylint check.
+It uses the pylint python library directly to run the check.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="grader.checks.pylint_check.PylintCheck">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grader.checks.pylint_check.</span></span><span class="sig-name descname"><span class="pre">PylintCheck</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_venv_required</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grader/checks/pylint_check.html#PylintCheck"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.checks.pylint_check.PylintCheck" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#grader.checks.abstract_check.ScoredCheck" title="grader.checks.abstract_check.ScoredCheck"><code class="xref py py-class docutils literal notranslate"><span class="pre">ScoredCheck</span></code></a></p>
+<p>The Pylint check class.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="grader.checks.pylint_check.PylintCheck.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#grader.checks.abstract_check.ScoredCheckResult" title="grader.checks.abstract_check.ScoredCheckResult"><span class="pre">ScoredCheckResult</span></a></span></span><a class="reference internal" href="_modules/grader/checks/pylint_check.html#PylintCheck.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.checks.pylint_check.PylintCheck.run" title="Link to this definition"></a></dt>
+<dd><p>Run the pylint check on the project.
+First, find all python files in the project, then create a custom reporter (to suppress all output).
+Run the pylint check itself and map the score within the desired bounds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The score from the pylint check.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="grader.checks.pylint_check.PylintCustomReporter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grader.checks.pylint_check.</span></span><span class="sig-name descname"><span class="pre">PylintCustomReporter</span></span><a class="reference internal" href="_modules/grader/checks/pylint_check.html#PylintCustomReporter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.checks.pylint_check.PylintCustomReporter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TextReporter</span></code></p>
+<p>Custom reported to suppress all output.
+By default, the pylint library shows everything on the stdout.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="grader.checks.pylint_check.PylintCustomReporter.display_messages">
+<span class="sig-name descname"><span class="pre">display_messages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layout</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/grader/checks/pylint_check.html#PylintCustomReporter.display_messages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.checks.pylint_check.PylintCustomReporter.display_messages" title="Link to this definition"></a></dt>
+<dd><p>Hook for displaying the messages of the reporter.</p>
+<p>This will be called whenever the underlying messages
+needs to be displayed. For some reporters, it probably
+doesn’t make sense to display messages as soon as they
+are available, so some mechanism of storing them could be used.
+This method can be implemented to display them after they’ve
+been aggregated.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grader.checks.pylint_check.PylintCustomReporter.display_reports">
+<span class="sig-name descname"><span class="pre">display_reports</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layout</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/grader/checks/pylint_check.html#PylintCustomReporter.display_reports"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.checks.pylint_check.PylintCustomReporter.display_reports" title="Link to this definition"></a></dt>
+<dd><p>Display results encapsulated in the layout tree.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-grader.checks.requirements_check">
+<span id="grader-checks-requirements-check-module"></span><h2>grader.checks.requirements_check module<a class="headerlink" href="#module-grader.checks.requirements_check" title="Link to this heading"></a></h2>
+<p>Module containing the requirements.txt check.
+It checks if requirements.txt exists in the project root.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="grader.checks.requirements_check.RequirementsCheck">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grader.checks.requirements_check.</span></span><span class="sig-name descname"><span class="pre">RequirementsCheck</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_venv_required</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grader/checks/requirements_check.html#RequirementsCheck"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.checks.requirements_check.RequirementsCheck" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#grader.checks.abstract_check.ScoredCheck" title="grader.checks.abstract_check.ScoredCheck"><code class="xref py py-class docutils literal notranslate"><span class="pre">ScoredCheck</span></code></a></p>
+<p>The requirements.txt check class.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="grader.checks.requirements_check.RequirementsCheck.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#grader.checks.abstract_check.ScoredCheckResult" title="grader.checks.abstract_check.ScoredCheckResult"><span class="pre">ScoredCheckResult</span></a></span></span><a class="reference internal" href="_modules/grader/checks/requirements_check.html#RequirementsCheck.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.checks.requirements_check.RequirementsCheck.run" title="Link to this definition"></a></dt>
+<dd><p>Run the requirements check on the project.
+Check if requirements.txt exists in the project root - the score is either 0 or full points.
+:return: The score from the requirements.txt check
+:rtype: float</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-grader.checks.type_hints_check">
+<span id="grader-checks-type-hints-check-module"></span><h2>grader.checks.type_hints_check module<a class="headerlink" href="#module-grader.checks.type_hints_check" title="Link to this heading"></a></h2>
+<p>Module containing the type hints check.
+It calls mypy as a subprocess to generate a report and then read from the report.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="grader.checks.type_hints_check.TypeHintsCheck">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grader.checks.type_hints_check.</span></span><span class="sig-name descname"><span class="pre">TypeHintsCheck</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_venv_required</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grader/checks/type_hints_check.html#TypeHintsCheck"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.checks.type_hints_check.TypeHintsCheck" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#grader.checks.abstract_check.ScoredCheck" title="grader.checks.abstract_check.ScoredCheck"><code class="xref py py-class docutils literal notranslate"><span class="pre">ScoredCheck</span></code></a></p>
+<p>The TypeHints check class.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="grader.checks.type_hints_check.TypeHintsCheck.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#grader.checks.abstract_check.ScoredCheckResult" title="grader.checks.abstract_check.ScoredCheckResult"><span class="pre">ScoredCheckResult</span></a></span></span><a class="reference internal" href="_modules/grader/checks/type_hints_check.html#TypeHintsCheck.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grader.checks.type_hints_check.TypeHintsCheck.run" title="Link to this definition"></a></dt>
+<dd><p>Run the mypy check on the project.</p>
+<p>First, find all python files in the project, then run mypy on all files with the special config.
+Mypy then generates a report with the amount of lines with type hints and the total amount of lines.</p>
+<p>The first line in the report contains the values for all files.
+The line contains a lot of stuff, we just need the type-hinted lines and the total amount of lines.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The score from the mypy check.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-grader.checks">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-grader.checks" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="grader.html" class="btn btn-neutral float-left" title="grader package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="grader.utils.html" class="btn btn-neutral float-right" title="grader.utils package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Lyuboslav Karev.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -3,6 +3,7 @@ Unit tests for the CoverageCheck class in the coverage_check module.
 """
 
 import unittest
+from typing import Optional
 from subprocess import CompletedProcess
 from unittest.mock import patch, MagicMock
 
@@ -15,7 +16,7 @@ class TestCoverageCheck(unittest.TestCase):
     Test cases for the CoverageCheck class.
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         """
         Set up the CoverageCheck instance for testing.
         """
@@ -24,7 +25,7 @@ class TestCoverageCheck(unittest.TestCase):
         return super().setUp()
 
     @patch("subprocess.run")
-    def test_01_coverage_run_fail(self, mocked_run: MagicMock):
+    def test_01_coverage_run_fail(self, mocked_run: MagicMock) -> None:
         """
         Test that a failed coverage run logs an error and raises an exception.
         """
@@ -41,17 +42,18 @@ class TestCoverageCheck(unittest.TestCase):
         self.assertTrue(is_message_logged)
 
     @patch("subprocess.run")
-    def test_02_coverage_report_fail(self, mocked_run: MagicMock):
+    def test_02_coverage_report_fail(self, mocked_run: MagicMock) -> None:
         """
         Test that a failed coverage report logs an error and returns a score of 0.0.
         """
 
         # Arrange
-        def mocked_run_side_effect(*args, **kwargs):
+        def mocked_run_side_effect(*args: list, **_: dict) -> Optional[CompletedProcess]:
             if "run" in args[0]:
                 return CompletedProcess(args=["coverage", "run"], returncode=0)
             if "report" in args[0]:
                 return CompletedProcess(args=["coverage", "report"], returncode=1)
+            return None
 
         mocked_run.side_effect = mocked_run_side_effect
         # Act
@@ -65,7 +67,7 @@ class TestCoverageCheck(unittest.TestCase):
 
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_run")
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_report")
-    def test_03_translate_score_zero(self, mocked_report: MagicMock, mocked_run: MagicMock):
+    def test_03_translate_score_zero(self, mocked_report: MagicMock, mocked_run: MagicMock) -> None:
         """
         Test that a coverage report of 0 translates to a score of 0.
         """
@@ -82,7 +84,7 @@ class TestCoverageCheck(unittest.TestCase):
 
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_run")
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_report")
-    def test_04_translate_score_inside_first_range(self, mocked_report: MagicMock, mocked_run: MagicMock):
+    def test_04_translate_score_inside_first_range(self, mocked_report: MagicMock, mocked_run: MagicMock) -> None:
         """
         Test that a coverage report inside the first range translates to a score of 0.
         """
@@ -99,7 +101,7 @@ class TestCoverageCheck(unittest.TestCase):
 
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_run")
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_report")
-    def test_05_translate_score_right_bound_first_range(self, mocked_report: MagicMock, mocked_run: MagicMock):
+    def test_05_translate_score_right_bound_first_range(self, mocked_report: MagicMock, mocked_run: MagicMock) -> None:
         """
         Test that a coverage report at the right bound of the first range translates to a score of 1.
         """
@@ -116,7 +118,7 @@ class TestCoverageCheck(unittest.TestCase):
 
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_run")
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_report")
-    def test_06_translate_score_left_bound_second_range(self, mocked_report: MagicMock, mocked_run: MagicMock):
+    def test_06_translate_score_left_bound_second_range(self, mocked_report: MagicMock, mocked_run: MagicMock) -> None:
         """
         Test that a coverage report at the left bound of the second range translates to a score of 1.
         """
@@ -133,7 +135,9 @@ class TestCoverageCheck(unittest.TestCase):
 
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_run")
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_report")
-    def test_07_translate_score_inside_bound_second_range(self, mocked_report: MagicMock, mocked_run: MagicMock):
+    def test_07_translate_score_inside_bound_second_range(
+        self, mocked_report: MagicMock, mocked_run: MagicMock
+    ) -> None:
         """
         Test that a coverage report inside the second range translates to a score of 1.
         """
@@ -150,7 +154,9 @@ class TestCoverageCheck(unittest.TestCase):
 
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_run")
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_report")
-    def test_08_translate_score_right_bound_second_range(self, mocked_report: MagicMock, mocked_run: MagicMock):
+    def test_08_translate_score_right_bound_second_range(
+        self, mocked_report: MagicMock, mocked_run: MagicMock
+    ) -> None:
         """
         Test that a coverage report at the right bound of the second range translates to a score of 2.
         """
@@ -167,7 +173,9 @@ class TestCoverageCheck(unittest.TestCase):
 
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_run")
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_report")
-    def test_09_translate_score_inside_bound_third_range(self, mocked_report: MagicMock, mocked_run: MagicMock):
+    def test_09_translate_score_inside_bound_third_range(
+        self, mocked_report: MagicMock, mocked_run: MagicMock
+    ) -> None:
         """
         Test that a coverage report inside the third range translates to a score of 2.
         """
@@ -184,7 +192,7 @@ class TestCoverageCheck(unittest.TestCase):
 
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_run")
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_report")
-    def test_10_translate_score_max(self, mocked_report: MagicMock, mocked_run: MagicMock):
+    def test_10_translate_score_max(self, mocked_report: MagicMock, mocked_run: MagicMock) -> None:
         """
         Test that a coverage report of 100 translates to a score of 2.
         """
@@ -200,17 +208,18 @@ class TestCoverageCheck(unittest.TestCase):
         self.assertEqual(expected_score, actual_score)
 
     @patch("subprocess.run")
-    def test_11_coverage_report_read_properly(self, mocked_run: MagicMock):
+    def test_11_coverage_report_read_properly(self, mocked_run: MagicMock) -> None:
         """
         Test that the coverage report is read properly and returns the correct score.
         """
 
         # Arrange
-        def mocked_run_side_effect(*args, **kwargs):
+        def mocked_run_side_effect(*args: list, **_: dict) -> Optional[CompletedProcess]:
             if "run" in args[0]:
                 return CompletedProcess(args=["coverage", "run"], returncode=0)
             if "report" in args[0]:
                 return CompletedProcess(args=["coverage", "report"], returncode=0, stdout="100")
+            return None
 
         mocked_run.side_effect = mocked_run_side_effect
         # Act

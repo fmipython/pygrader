@@ -3,7 +3,7 @@ Unit tests for the TestsCheck class.
 """
 
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 from grader.checks.run_tests_check import RunTestsCheck
 from grader.checks.abstract_check import CheckError, ScoredCheckResult
@@ -14,7 +14,7 @@ class TestTestsCheck(unittest.TestCase):
     Test cases for the TestsCheck class.
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         """
         Set up the test environment.
         """
@@ -37,7 +37,7 @@ class TestTestsCheck(unittest.TestCase):
         )
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
-    def test_01_all_tests_pass(self, mock_pytest_run):
+    def test_01_all_tests_pass(self, mock_pytest_run: MagicMock) -> None:
         """
         Verify run calculates the correct score when all tests pass.
         """
@@ -52,7 +52,7 @@ class TestTestsCheck(unittest.TestCase):
         self.assertEqual(score, expected_score)
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
-    def test_02_some_tests_fail(self, mock_pytest_run):
+    def test_02_some_tests_fail(self, mock_pytest_run: MagicMock) -> None:
         """
         Verify run calculates the correct score when some tests fail.
         """
@@ -67,7 +67,7 @@ class TestTestsCheck(unittest.TestCase):
         self.assertEqual(score, expected_score)
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
-    def test_03_score_exceeds_max_points(self, mock_pytest_run):
+    def test_03_score_exceeds_max_points(self, mock_pytest_run: MagicMock) -> None:
         """
         Verify run raises CheckError when total score exceeds max_points.
         """
@@ -91,7 +91,7 @@ class TestTestsCheck(unittest.TestCase):
             max_score_exceeded_check.run()
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
-    def test_04_logs_correct_passed_and_failed_counts(self, mock_pytest_run):
+    def test_04_logs_correct_passed_and_failed_counts(self, mock_pytest_run: MagicMock) -> None:
         """
         Verify run logs the correct number of passed and failed tests.
         """
@@ -107,7 +107,7 @@ class TestTestsCheck(unittest.TestCase):
         self.assertIn("INFO:grader:Failed tests: 1/2", log.output)
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
-    def test_05_empty_test_results(self, mock_pytest_run):
+    def test_05_empty_test_results(self, mock_pytest_run: MagicMock) -> None:
         """
         Verify run handles empty test results gracefully.
         """
@@ -122,7 +122,7 @@ class TestTestsCheck(unittest.TestCase):
         self.assertEqual(score, expected_score)
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
-    def test_06_invalid_pytest_output(self, mock_pytest_run):
+    def test_06_invalid_pytest_output(self, mock_pytest_run: MagicMock) -> None:
         """
         Verify run handles invalid pytest output gracefully.
         """
@@ -137,7 +137,7 @@ class TestTestsCheck(unittest.TestCase):
         self.assertEqual(score, expected_score)
 
     @patch("grader.utils.process.run")
-    def test_07_pytest_raises_os_error(self, mock_run):
+    def test_07_pytest_raises_os_error(self, mock_run: MagicMock) -> None:
         """
         Verify run raises CheckError when pytest raises OSError.
         """
@@ -149,7 +149,7 @@ class TestTestsCheck(unittest.TestCase):
             self.tests_check.run()
 
     @patch("grader.utils.process.run")
-    def test_08_pytest_raises_value_error(self, mock_run):
+    def test_08_pytest_raises_value_error(self, mock_run: MagicMock) -> None:
         """
         Verify run raises CheckError when pytest raises ValueError.
         """
@@ -161,7 +161,7 @@ class TestTestsCheck(unittest.TestCase):
             self.tests_check.run()
 
     @patch("grader.utils.process.run")
-    def test_09_pytest_returncode_greater_than_2(self, mock_run):
+    def test_09_pytest_returncode_greater_than_2(self, mock_run: MagicMock) -> None:
         """
         Verify run raises CheckError when pytest returncode is greater than 2.
         """

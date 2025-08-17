@@ -12,31 +12,31 @@ class TestChecksFactory(unittest.TestCase):
     Unit tests for the create_checks function in the checks_factory module.
     """
 
-    def test_01_no_checks_in_config(self):
+    def test_01_no_checks_in_config(self) -> None:
         """
         Test that an empty config raises an InvalidConfigError.
         """
         # Arrange
-        config = {}
+        config: dict[str, str] = {}
         project_root = "test_project"
 
         # Act
         with self.assertRaises(InvalidConfigError):
             create_checks(config, project_root)
 
-    def test_02_invalid_check_configuration(self):
+    def test_02_invalid_check_configuration(self) -> None:
         """
         Test that an invalid check configuration raises an InvalidConfigError.
         """
         # Arrange
-        config = {"checks": [{}]}
+        config: dict[str, list[dict[str, str]]] = {"checks": [{}]}
         project_root = "test_project"
 
         # Act
         with self.assertRaises(InvalidConfigError):
             create_checks(config, project_root)
 
-    def test_03_max_points_missing(self):
+    def test_03_max_points_missing(self) -> None:
         """
         Test that a missing max_points field raises an InvalidConfigError.
         """
@@ -48,7 +48,7 @@ class TestChecksFactory(unittest.TestCase):
         with self.assertRaises(InvalidConfigError):
             create_checks(config, project_root)
 
-    def test_04_name_missing(self):
+    def test_04_name_missing(self) -> None:
         """
         Test that a missing name field raises an InvalidConfigError.
         """
@@ -60,7 +60,7 @@ class TestChecksFactory(unittest.TestCase):
         with self.assertRaises(InvalidConfigError):
             create_checks(config, project_root)
 
-    def test_05_unknown_check_name(self):
+    def test_05_unknown_check_name(self) -> None:
         """
         Test that an unknown check name raises an InvalidCheckError.
         """
@@ -72,7 +72,7 @@ class TestChecksFactory(unittest.TestCase):
         with self.assertRaises(InvalidCheckError):
             create_checks(config, project_root)
 
-    def test_06_venv_required(self):
+    def test_06_venv_required(self) -> None:
         """
         Test that checks requiring a virtual environment are separated correctly.
         """
@@ -87,7 +87,7 @@ class TestChecksFactory(unittest.TestCase):
         self.assertEqual(len(non_venv_checks), 0)
         self.assertEqual(len(venv_checks), 1)
 
-    def test_07_venv_not_required(self):
+    def test_07_venv_not_required(self) -> None:
         """
         Test that checks not requiring a virtual environment are separated correctly.
         """
@@ -102,7 +102,7 @@ class TestChecksFactory(unittest.TestCase):
         self.assertEqual(len(non_venv_checks), 1)
         self.assertEqual(len(venv_checks), 0)
 
-    def test_08_is_venv_required_not_present(self):
+    def test_08_is_venv_required_not_present(self) -> None:
         """
         Test that when is_venv_required is not present, an InvalidConfigError is raised.
         """

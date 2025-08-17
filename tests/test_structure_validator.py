@@ -14,7 +14,7 @@ class TestStructureValidator(unittest.TestCase):
     Test cases for the StructureValidator class.
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         """
         Set up the test case environment.
         """
@@ -23,7 +23,7 @@ class TestStructureValidator(unittest.TestCase):
         return super().setUp()
 
     @patch("pathlib.Path.glob")
-    def test_01_is_structure_valid_all_patterns_match(self, mocked_glob: MagicMock):
+    def test_01_is_structure_valid_all_patterns_match(self, mocked_glob: MagicMock) -> None:
         """
         Test that is_structure_valid returns True when all patterns match files.
         """
@@ -39,7 +39,7 @@ class TestStructureValidator(unittest.TestCase):
         mocked_glob.assert_any_call("tests/*.py")
 
     @patch("pathlib.Path.glob")
-    def test_02_is_structure_valid_some_patterns_do_not_match(self, mocked_glob: MagicMock):
+    def test_02_is_structure_valid_some_patterns_do_not_match(self, mocked_glob: MagicMock) -> None:
         """
         Test that is_structure_valid returns False when some patterns do not match files.
         """
@@ -56,7 +56,7 @@ class TestStructureValidator(unittest.TestCase):
 
     @unittest.skipIf(os.name == "nt", "Skipping test on Windows due to path normalization.")
     @patch("pathlib.Path.glob")
-    def test_03_get_matching_files(self, mocked_glob: MagicMock):
+    def test_03_get_matching_files(self, mocked_glob: MagicMock) -> None:
         """
         Test that get_matching_files returns the correct list of matching files.
         """
@@ -84,7 +84,7 @@ class TestStructureValidator(unittest.TestCase):
         mocked_glob.assert_any_call("*.py")
         mocked_glob.assert_any_call("tests/*.py")
 
-    def test_04_from_dict(self):
+    def test_04_from_dict(self) -> None:
         """
         Test that from_dict correctly creates a StructureValidator instance.
         """
@@ -99,7 +99,7 @@ class TestStructureValidator(unittest.TestCase):
         self.assertFalse(validator.required)
         self.assertEqual(validator.patterns, ["*.md", "docs/*.md"])
 
-    def test_05_init(self):
+    def test_05_init(self) -> None:
         """
         Test that the __init__ method correctly initializes attributes.
         """
@@ -117,7 +117,7 @@ class TestStructureValidator(unittest.TestCase):
         self.assertEqual(validator.patterns, patterns)
 
     @patch("pathlib.Path.glob")
-    def test_06_is_structure_valid_empty_patterns(self, mocked_glob: MagicMock):
+    def test_06_is_structure_valid_empty_patterns(self, mocked_glob: MagicMock) -> None:
         """
         Test that is_structure_valid returns True when patterns list is empty.
         """
@@ -132,7 +132,7 @@ class TestStructureValidator(unittest.TestCase):
         mocked_glob.assert_not_called()
 
     @patch("pathlib.Path.glob")
-    def test_07_get_matching_files_empty_patterns(self, mocked_glob: MagicMock):
+    def test_07_get_matching_files_empty_patterns(self, mocked_glob: MagicMock) -> None:
         """
         Test that get_matching_files returns an empty list when patterns list is empty.
         """
@@ -147,7 +147,7 @@ class TestStructureValidator(unittest.TestCase):
         mocked_glob.assert_not_called()
 
     @patch("pathlib.Path.glob")
-    def test_08_is_structure_valid_invalid_project_root(self, mocked_glob: MagicMock):
+    def test_08_is_structure_valid_invalid_project_root(self, mocked_glob: MagicMock) -> None:
         """
         Test that is_structure_valid handles invalid project_root gracefully.
         """
@@ -159,7 +159,7 @@ class TestStructureValidator(unittest.TestCase):
             self.validator.is_structure_valid("invalid_path")
 
     @patch("pathlib.Path.glob")
-    def test_09_get_matching_files_invalid_project_root(self, mocked_glob: MagicMock):
+    def test_09_get_matching_files_invalid_project_root(self, mocked_glob: MagicMock) -> None:
         """
         Test that get_matching_files handles invalid project_root gracefully.
         """

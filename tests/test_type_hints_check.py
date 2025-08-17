@@ -18,7 +18,7 @@ class TestTypeHintsCheck(unittest.TestCase):
     Test cases for the TypeHintsCheck class.
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         """
         Set up the test environment.
         """
@@ -28,7 +28,7 @@ class TestTypeHintsCheck(unittest.TestCase):
 
     @patch("grader.utils.process.run")
     @patch("grader.utils.files.find_all_source_files")
-    def test_01_mypy_called(self, mocked_find_python_files: MagicMock, mocked_run: MagicMock):
+    def test_01_mypy_called(self, mocked_find_python_files: MagicMock, mocked_run: MagicMock) -> None:
         """
         Test if mypy is called with the correct arguments.
 
@@ -57,7 +57,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         self.assertIn("file2.py", called_with[0][0])
 
     @patch("grader.utils.process.run")
-    def test_03_mypy_report_missing(self, mocked_run: MagicMock):
+    def test_03_mypy_report_missing(self, mocked_run: MagicMock) -> None:
         """
         Test if an error is logged when the mypy linecount report is missing.
 
@@ -80,7 +80,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         self.assertTrue(is_error_logged)
 
     @patch("grader.utils.process.run")
-    def test_04_translate_score_zero(self, mocked_run: MagicMock):
+    def test_04_translate_score_zero(self, mocked_run: MagicMock) -> None:
         """
         Test if a score of 0 is translated correctly.
 
@@ -101,7 +101,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         self.assertEqual(expected_score, actual_score)
 
     @patch("grader.utils.process.run")
-    def test_05_translate_score_inside_first_range(self, mocked_run: MagicMock):
+    def test_05_translate_score_inside_first_range(self, mocked_run: MagicMock) -> None:
         """
         Test if a score inside the first range is translated correctly.
 
@@ -122,7 +122,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         self.assertEqual(expected_score, actual_score)
 
     @patch("grader.utils.process.run")
-    def test_06_translate_score_right_bound_first_range(self, mocked_run: MagicMock):
+    def test_06_translate_score_right_bound_first_range(self, mocked_run: MagicMock) -> None:
         """
         Test if a score at the right bound of the first range is translated correctly.
 
@@ -143,7 +143,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         self.assertEqual(expected_score, actual_score)
 
     @patch("grader.utils.process.run")
-    def test_07_translate_score_left_bound_second_range(self, mocked_run: MagicMock):
+    def test_07_translate_score_left_bound_second_range(self, mocked_run: MagicMock) -> None:
         """
         Test if a score at the left bound of the second range is translated correctly.
 
@@ -164,7 +164,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         self.assertEqual(expected_score, actual_score)
 
     @patch("grader.utils.process.run")
-    def test_08_translate_score_inside_bound_second_range(self, mocked_run: MagicMock):
+    def test_08_translate_score_inside_bound_second_range(self, mocked_run: MagicMock) -> None:
         """
         Test if a score inside the second range is translated correctly.
 
@@ -185,7 +185,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         self.assertEqual(expected_score, actual_score)
 
     @patch("grader.utils.process.run")
-    def test_09_translate_score_right_bound_second_range(self, mocked_run: MagicMock):
+    def test_09_translate_score_right_bound_second_range(self, mocked_run: MagicMock) -> None:
         """
         Test if a score at the right bound of the second range is translated correctly.
 
@@ -206,7 +206,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         self.assertEqual(expected_score, actual_score)
 
     @patch("grader.utils.process.run")
-    def test_10_translate_score_inside_bound_third_range(self, mocked_run: MagicMock):
+    def test_10_translate_score_inside_bound_third_range(self, mocked_run: MagicMock) -> None:
         """
         Test if a score inside the third range is translated correctly.
 
@@ -227,7 +227,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         self.assertEqual(expected_score, actual_score)
 
     @patch("grader.utils.process.run")
-    def test_11_translate_score_max(self, mocked_run: MagicMock):
+    def test_11_translate_score_max(self, mocked_run: MagicMock) -> None:
         """
         Test if a maximum score is translated correctly.
 
@@ -248,7 +248,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         self.assertEqual(expected_score, actual_score)
 
     @patch("grader.utils.process.run")
-    def test_12_translate_score_all_zeros(self, mocked_run: MagicMock):
+    def test_12_translate_score_all_zeros(self, mocked_run: MagicMock) -> None:
         """
         Test if a score of all zeros is translated correctly.
 

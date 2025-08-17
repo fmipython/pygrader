@@ -33,6 +33,10 @@ from grader.utils.virtual_environment import VirtualEnvironment
 
 
 class Grader:
+    """
+    Main grader class that orchestrates the grading process.
+    """
+
     def __init__(
         self,
         student_id: str,
@@ -70,6 +74,11 @@ class Grader:
             sys.exit(1)
 
     def grade(self) -> list[CheckResult]:
+        """
+        Main grader method that runs all checks and returns their results.
+
+        :return: A list of CheckResult objects containing the results of the checks.
+        """
         tests_directory = get_tests_directory_name(self.__project_root)
         if tests_directory is None:
             self.__logger.warning(
@@ -91,6 +100,13 @@ class Grader:
         return scores
 
     def __run_check(self, check: AbstractCheck) -> CheckResult:
+        """
+        Run a single check and return the result.
+
+        :param check: The check to run, which can be either a scored or non-scored check.
+        :raises TypeError: If the check is of an unknown type.
+        :return: The result of the check.
+        """
         try:
             check_result = check.run()
         except CheckError as error:
@@ -135,10 +151,10 @@ def build_reporter(report_format: str) -> ResultsReporter:
 if __name__ == "__main__":
     args = get_args()
     is_suppressing_info = args["report_format"] == "json" or args["report_format"] == "csv" or args["suppress_info"]
-    logger = setup_logger(args["student_id"], verbosity=args["verbosity"], suppress_info=is_suppressing_info)
+    log = setup_logger(args["student_id"], verbosity=args["verbosity"], suppress_info=is_suppressing_info)
 
     grader = Grader(
-        args["student_id"], args["project_root"], args["config"], logger, args["keep_venv"], args["skip_venv_creation"]
+        args["student_id"], args["project_root"], args["config"], log, args["keep_venv"], args["skip_venv_creation"]
     )
 
     checks_results = grader.grade()

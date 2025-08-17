@@ -14,7 +14,7 @@ class TestRequirementsCheck(unittest.TestCase):
     Unit tests for the RequirementsCheck class.
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         """
         Set up the test case environment.
         """
@@ -22,7 +22,7 @@ class TestRequirementsCheck(unittest.TestCase):
         return super().setUp()
 
     @patch("os.path.exists")
-    def test_01_requirements_exist(self, mocked_exists: MagicMock):
+    def test_01_requirements_exist(self, mocked_exists: MagicMock) -> None:
         """
         Test that the requirements file exists.
         """
@@ -37,7 +37,7 @@ class TestRequirementsCheck(unittest.TestCase):
         self.assertEqual(expected_score, actual_score)
 
     @patch("os.path.exists")
-    def test_02_requirements_does_not_exist(self, mocked_exists: MagicMock):
+    def test_02_requirements_does_not_exist(self, mocked_exists: MagicMock) -> None:
         """
         Test that the requirements file does not exist.
         """

@@ -1,0 +1,140 @@
+@startuml
+
+' ==============================
+' Global style settings
+' ==============================
+' skinparam ranksep 140
+' skinparam nodesep 120
+skinparam packageStyle rectangle
+skinparam linetype ortho
+skinparam class {
+    BackgroundColor White
+    BorderColor Black
+}
+left to right direction
+
+' ==============================
+' Layer 1: Checks
+' ==============================
+
+package "checks" {
+    ["abstract_check"]
+    ["checks_factory"]
+    ["coverage_check"]
+    ["pylint_check"]
+    ["requirements_check"]
+    ["run_tests_check"]
+    ["structure_check"]
+    ["type_hints_check"]
+}
+
+
+' ==============================
+' Layer 2: Utils
+' ==============================
+package "utils" {
+    ["logger"]
+    ["process"]
+    ["files"]
+    ["structure_validator"]
+    ["external_resources"]
+    ["virtual_environment"]
+    ["config"]
+    ["constants"]
+}
+
+' ==============================
+' Layer 3: PyGrader
+' ==============================
+
+package "desktop" {
+    ["main"]
+    ["cli"]
+    ["results_reporter"]
+}
+
+package "pygrader" {
+    ["grader"]
+}
+
+
+' ==============================
+' Dependencies (each arrow unique color per source)
+' Palette used: #1f77b4, #ff7f0e, #2ca02c, #d62728, #9467bd, #8c564b, #e377c2, #7f7f7f, #bcbd22, #17becf
+' ==============================
+
+["abstract_check"] -[#1f77b4]-> ["logger"]
+["abstract_check"] -[#ff7f0e]-> ["virtual_environment"]
+
+' --- Checks Factory arrows
+["checks_factory"] -[#1f77b4]-> ["abstract_check"]
+["checks_factory"] -[#ff7f0e]-> ["coverage_check"]
+["checks_factory"] -[#2ca02c]-> ["pylint_check"]
+["checks_factory"] -[#d62728]-> ["requirements_check"]
+["checks_factory"] -[#9467bd]-> ["structure_check"]
+["checks_factory"] -[#8c564b]-> ["type_hints_check"]
+["checks_factory"] -[#e377c2]-> ["run_tests_check"]
+["checks_factory"] -[#7f7f7f]-> ["config"]
+
+' --- Coverage Check arrows
+["coverage_check"] -[#1f77b4]-> ["constants"]
+["coverage_check"] -[#ff7f0e]-> ["abstract_check"]
+["coverage_check"] -[#2ca02c]-> ["files"]
+["coverage_check"] -[#d62728]-> ["process"]
+
+' --- Pylint Check arrows
+["pylint_check"] -[#1f77b4]-> ["constants"]
+["pylint_check"] -[#ff7f0e]-> ["process"]
+["pylint_check"] -[#2ca02c]-> ["files"]
+["pylint_check"] -[#d62728]-> ["abstract_check"]
+
+' --- Requirements Check arrows
+["requirements_check"] -[#1f77b4]-> ["constants"]
+["requirements_check"] -[#ff7f0e]-> ["abstract_check"]
+
+' --- process Tests Check arrows
+["run_tests_check"] -[#1f77b4]-> ["constants"]
+["run_tests_check"] -[#ff7f0e]-> ["abstract_check"]
+["run_tests_check"] -[#2ca02c]-> ["external_resources"]
+
+' --- Structure Check arrows
+["structure_check"] -[#1f77b4]-> ["logger"]
+["structure_check"] -[#ff7f0e]-> ["structure_validator"]
+["structure_check"] -[#2ca02c]-> ["abstract_check"]
+
+' --- Type Hints Check arrows
+["type_hints_check"] -[#1f77b4]-> ["constants"]
+["type_hints_check"] -[#ff7f0e]-> ["process"]
+["type_hints_check"] -[#2ca02c]-> ["files"]
+["type_hints_check"] -[#d62728]-> ["abstract_check"]
+
+' --- Abstract Check arrows
+["abstract_check"] -[#1f77b4]-> ["logger"]
+["abstract_check"] -[#ff7f0e]-> ["virtual_environment"]
+
+' --- Utils arrows
+["external_resources"] -[#1f77b4]-> ["constants"]
+
+["files"] -[#ff7f0e]-> ["constants"]
+["files"] -[#2ca02c]-> ["structure_validator"]
+
+["virtual_environment"] -[#d62728]-> ["constants"]
+["virtual_environment"] -[#9467bd]-> ["logger"]
+["virtual_environment"] -[#8c564b]-> ["process"]
+
+' --- Results Reporter arrows
+["results_reporter"] -[#1f77b4]-> ["abstract_check"]
+
+' --- PyGrader arrows
+["grader"] -[#1f77b4]-> ["abstract_check"]
+["grader"] -[#7f7f7f]-> ["checks_factory"]
+["grader"] -[#17becf]-> ["config"]
+["grader"] -[#1f77b4]-> ["files"]
+["grader"] -[#9467bd]-> ["virtual_environment"]
+
+["main"] -[#1f77b4]-> ["grader"]
+["main"] -[#7f7f7f]-> ["cli"]
+["main"] -[#d62728]-> ["logger"]
+["main"] -[#2ca02c]-> ["results_reporter"]
+
+@enduml

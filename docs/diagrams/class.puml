@@ -1,0 +1,80 @@
+@startuml
+' grader.checks.abstract_check.
+
+' Generic type parameter
+!define T T
+
+' Base classes
+abstract class grader.checks.abstract_check.AbstractCheck<T> {
+    - _name: str
+    - _project_root: str
+    - _is_venv_required: bool
+    + __init__(name: str, project_root: str, is_venv_required: bool = False)
+    + run(): CheckResult<T>
+    + name: str
+    + is_running_within_venv(): bool
+    - _pre_run(): None
+}
+
+class grader.checks.abstract_check.CheckResult<T> {
+    + name: str
+    + result: T
+}
+
+class grader.checks.abstract_check.ScoredCheckResult<T> {
+    + max_score: int
+}
+
+class grader.checks.abstract_check.NonScoredCheckResult {
+}
+
+class grader.checks.abstract_check.ScoredCheck {
+    - _max_points: int
+    --
+    + __init__(name: str, max_points: int, project_root: str, is_venv_required: bool = False)
+    + max_points: int
+}
+
+class grader.checks.abstract_check.NonScoredCheck {
+    - _is_fatal: bool
+    --
+    + __init__(name: str, project_root: str, is_fatal: bool, is_venv_required: bool = False)
+    + is_fatal: bool
+}
+
+exception grader.checks.abstract_check.CheckError
+
+' Relationships
+AbstractCheck <|-- ScoredCheck
+AbstractCheck <|-- NonScoredCheck
+
+CheckResult <|-- ScoredCheckResult
+CheckResult <|-- NonScoredCheckResult
+
+
+class grader.checks.coverage_check.CoverageCheck {
+    - __coverage_full_path: str
+    + run(): ScoredCheckResult
+    - __translate_score(coverage_score: float): float
+    - __coverage_run(): None
+    - __coverage_report(): int
+}
+
+
+CoverageCheck <|-- ScoredCheck
+
+
+class grader.checks.pylint_check.PylintCheck {
+    - __pylint_max_score: int
+    + run(): ScoredCheckResult
+    - __translate_score(pylint_score: float): float
+    - __get_pylint_score(): float
+}
+
+class grader.checks.pylint_check.PylintCustomReporter {
+    + __init__()
+    + display_messages(layout): None
+    + display_reports(layout): None
+}
+PylintCheck <|-- ScoredCheck
+@enduml

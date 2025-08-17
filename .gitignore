@@ -176,3 +176,5 @@ cython_debug/
 reports
 lcov.info
 .vscode
+
+docs/diagrams/out

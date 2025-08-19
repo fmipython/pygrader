@@ -1,3 +1,7 @@
+"""
+Module containing the Grader class.
+"""
+
 from logging import Logger
 import os
 import shutil
@@ -34,7 +38,6 @@ class Grader:
         is_keeping_venv: bool = False,
         is_skipping_venv_creation: bool = False,
     ):
-        self.__student_id = student_id
         self.__logger = logger
 
         self.__logger.info("Python project grader, %s", const.VERSION)
@@ -116,3 +119,8 @@ class Grader:
         This is called at the end of grading to ensure no temporary files are left behind.
         """
         shutil.rmtree(const.TEMP_FILES_DIR, ignore_errors=True)
+
+        coverage_file_full_path = os.path.join(self.__project_root, const.COVERAGE_FILE)
+        if os.path.exists(coverage_file_full_path):
+            os.remove(coverage_file_full_path)
+        shutil.rmtree(os.path.join(self.__project_root, const.PYTEST_CACHE), ignore_errors=True)

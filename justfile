@@ -60,3 +60,7 @@ setup_sample_project: clean_sample_project
 
 clean_sample_project:
     if [ -d "pygrader-sample-project" ]; then rm -rf "pygrader-sample-project"; fi
+
+
+build_diagrams:
+    java -jar ~/plantuml-1.2025.4.jar ./docs/diagrams/*.puml -o out

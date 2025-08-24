@@ -14,6 +14,15 @@ runs:
         pip install sphinx sphinx_rtd_theme sphinx_rtd_theme_ext_color_contrast pylint
       shell: bash
 
+    - name: plantuml
+      id: plantuml
+      uses: grassedge/generate-plantuml-action@v1.5
+      with:
+        path: "./docs/diagrams/out"
+        message: "Render PlantUML files"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Build Sphinx documentation
       run: |
         sphinx-build docs/source _build  # Adjust 'docs' if your Sphinx files are located elsewhere

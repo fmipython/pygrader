@@ -29,7 +29,7 @@ push: venv lint test
 coverage: venv
     find tests -type f -name "test_*.py" -not -name "test_functional.py" | xargs coverage run --source="grader" -m unittest
     coverage lcov -o lcov.info
-    coverage report -m --fail-under 75
+    coverage report -m --fail-under 85 --sort=cover
 
 run: venv
     python3 src/pygrader.py

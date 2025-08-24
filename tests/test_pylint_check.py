@@ -8,7 +8,7 @@ from unittest.mock import patch, MagicMock
 
 import grader.utils.constants as const
 from grader.checks.pylint_check import PylintCheck
-from grader.checks.abstract_check import ScoredCheckResult
+from grader.checks.abstract_check import CheckError, ScoredCheckResult
 
 
 class TestPylintCheck(unittest.TestCase):
@@ -246,6 +246,42 @@ class TestPylintCheck(unittest.TestCase):
 
         # Assert
         self.assertEqual(expected_score, actual_score)
+
+    @patch("grader.utils.files.find_all_python_files")
+    def test_12_find_all_python_files_raises_os_error(self, mocked_find: MagicMock):
+        """
+        Test if when finding all Python files an OSError is raised, the check fails with CheckError.
+        """
+        # Arrange
+        mocked_find.side_effect = OSError("Test error")
+
+        # Act
+        with self.assertRaises(CheckError):
+            self.pylint_check.run()
+
+    @patch("grader.utils.process.run")
+    def test_13_run_pylint_raises_os_error(self, mocked_run: MagicMock):
+        """
+        Test if when running pylint an OSError is raised, the check fails with CheckError.
+        """
+        # Arrange
+        mocked_run.side_effect = OSError("Test error")
+
+        # Act
+        with self.assertRaises(CheckError):
+            self.pylint_check.run()
+
+    @patch("grader.utils.process.run")
+    def test_13_run_pylint_exits_with_non_zero(self, mocked_run: MagicMock):
+        """
+        Test if when running pylint it exits with a non-zero status, the check fails with CheckError.
+        """
+        # Arrange
+        mocked_run.return_value = CompletedProcess("pylint", 1)
+
+        # Act
+        with self.assertRaises(CheckError):
+            self.pylint_check.run()
 
     @staticmethod
     def __create_sample_pylint_output(score: float) -> str:

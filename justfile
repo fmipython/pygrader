@@ -10,6 +10,7 @@ lint: venv
     python3 -m pylint grader tests pygrader.py --fail-under 9
     mypy grader pygrader.py --ignore-missing-imports
     flake8 grader pygrader.py
+    complexipy .
 
 lint_file file: venv
     python3 -m pylint {{file}} --fail-under 9

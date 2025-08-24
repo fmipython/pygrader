@@ -25,4 +25,5 @@ runs:
         python3 -m pylint $(git ls-files '*.py') --fail-under 9
         mypy grader --ignore-missing-imports
         flake8 grader
+        complexipy
       shell: bash

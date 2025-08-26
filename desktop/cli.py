@@ -5,6 +5,7 @@ Module containing the CLI arguments parser.
 import argparse
 
 from typing import Any
+from grader.utils.constants import VERSION
 
 
 def get_args() -> dict[str, Any]:
@@ -35,5 +36,7 @@ def get_args() -> dict[str, Any]:
     parser.add_argument(
         "--keep-venv", action="store_true", help="Keep the virtual environment after grading", default=False
     )
+
+    parser.add_argument("--version", action="version", help="Show the version of the tool", version=VERSION)
 
     return parser.parse_args().__dict__

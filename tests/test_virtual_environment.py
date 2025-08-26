@@ -6,6 +6,8 @@ import os
 import shutil
 import subprocess
 import unittest
+
+from subprocess import CompletedProcess
 from unittest.mock import MagicMock, patch
 
 import grader.utils.constants as const
@@ -19,7 +21,7 @@ class TestsVirtualEnvironment(unittest.TestCase):
     Test cases for the VirtualEnvironment class.
     """
 
-    def __init__(self, methodName="runTest"):
+    def __init__(self, methodName: str = "runTest") -> None:
         """
         Initialize the test case.
 
@@ -31,7 +33,7 @@ class TestsVirtualEnvironment(unittest.TestCase):
         self.__sample_package_version = "3.3.3"
         super().__init__(methodName)
 
-    def setUp(self):
+    def setUp(self) -> None:
         """
         Set up the test environment.
         """
@@ -39,7 +41,7 @@ class TestsVirtualEnvironment(unittest.TestCase):
 
         return super().setUp()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """
         Tear down the test environment.
         """
@@ -48,7 +50,7 @@ class TestsVirtualEnvironment(unittest.TestCase):
 
         return super().tearDown()
 
-    def test_01_existing_venv(self):
+    def test_01_existing_venv(self) -> None:
         """
         Verify that the VirtualEnvironment class cleans pre-existing virtual environments.
         """
@@ -67,7 +69,7 @@ class TestsVirtualEnvironment(unittest.TestCase):
         # Assert
         self.assertTrue(not any(do_directories_exist))
 
-    def test_02_non_existing_requirements(self):
+    def test_02_non_existing_requirements(self) -> None:
         """
         Verify that the VirtualEnvironment class reports when it can't find a requirements.txt file.
         """
@@ -82,7 +84,7 @@ class TestsVirtualEnvironment(unittest.TestCase):
         # Assert
         self.assertTrue(is_message_in_log)
 
-    def test_03_successful_venv_creation(self):
+    def test_03_successful_venv_creation(self) -> None:
         """
         Verify that the VirtualEnvironment class can successfully create a virtual environment.
         """
@@ -102,7 +104,7 @@ class TestsVirtualEnvironment(unittest.TestCase):
         self.assertTrue(does_python_exist)
 
     @patch("subprocess.run")
-    def test_04_failed_venv_creation(self, patched_run: MagicMock):
+    def test_04_failed_venv_creation(self, patched_run: MagicMock) -> None:
         """
         Verify that the VirtualEnvironment class raises an exception when it can't create a virtual environment.
 
@@ -117,7 +119,7 @@ class TestsVirtualEnvironment(unittest.TestCase):
             with VirtualEnvironment(self.__sample_root_dir_path):
                 pass
 
-    def test_05_install_requirements(self):
+    def test_05_install_requirements(self) -> None:
         """
         Verify that the VirtualEnvironment class installs the requirements.
         """
@@ -139,7 +141,7 @@ class TestsVirtualEnvironment(unittest.TestCase):
         self.assertTrue(is_version_correct)
 
     @patch("subprocess.run")
-    def test_06_fail_install_requirements(self, patched_run: MagicMock):
+    def test_06_fail_install_requirements(self, patched_run: MagicMock) -> None:
         """
         Verify that the VirtualEnvironment class raises an exception when it fails to install the requirements.
 
@@ -148,10 +150,10 @@ class TestsVirtualEnvironment(unittest.TestCase):
         """
 
         # Arrange
-        def custom_run_behavior(command: list[str], *args, **kwargs):
+        def custom_run_behavior(command: list[str], *args: list, **kwargs: dict) -> CompletedProcess:
             if "install" in command:
-                return subprocess.CompletedProcess("", 1)
-            return subprocess.CompletedProcess("", 0)
+                return CompletedProcess("", 1)
+            return CompletedProcess("", 0)
 
         patched_run.side_effect = custom_run_behavior
 
@@ -160,7 +162,7 @@ class TestsVirtualEnvironment(unittest.TestCase):
             with VirtualEnvironment(self.__sample_root_dir_path):
                 pass
 
-    def test_07_install_grader_requirements(self):
+    def test_07_install_grader_requirements(self) -> None:
         """
         Verify that the VirtualEnvironment class installs the grader requirements.
         """
@@ -179,7 +181,7 @@ class TestsVirtualEnvironment(unittest.TestCase):
         self.assertTrue(is_version_correct)
 
     @patch("subprocess.run")
-    def test_08_fail_install_grader_requirements(self, patched_run: MagicMock):
+    def test_08_fail_install_grader_requirements(self, patched_run: MagicMock) -> None:
         """
         Verify that the VirtualEnvironment class raises an exception when it fails to install the grader requirements.
 
@@ -188,10 +190,10 @@ class TestsVirtualEnvironment(unittest.TestCase):
         """
 
         # Arrange
-        def custom_run_behavior(command: list[str], *args, **kwargs):
+        def custom_run_behavior(command: list[str], *args: list, **kwargs: dict) -> CompletedProcess:
             if "install" in command:
-                return subprocess.CompletedProcess("", 1)
-            return subprocess.CompletedProcess("", 0)
+                return CompletedProcess("", 1)
+            return CompletedProcess("", 0)
 
         patched_run.side_effect = custom_run_behavior
 
@@ -200,7 +202,7 @@ class TestsVirtualEnvironment(unittest.TestCase):
             with VirtualEnvironment(self.__sample_root_dir_path):
                 pass
 
-    def test_09_teardown(self):
+    def test_09_teardown(self) -> None:
         """
         Verify that the VirtualEnvironment class removes the virtual environment when the context manager is exited.
         """
@@ -217,7 +219,7 @@ class TestsVirtualEnvironment(unittest.TestCase):
         self.assertTrue(does_venv_exist_before)
         self.assertFalse(does_venv_exist_after)
 
-    def __create_sample_requirements(self, requirements_path: str):
+    def __create_sample_requirements(self, requirements_path: str) -> None:
         """
         Create a sample requirements.txt file.
 

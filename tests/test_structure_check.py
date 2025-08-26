@@ -16,7 +16,7 @@ class TestStructureCheck(unittest.TestCase):
     Test cases for the StructureCheck class.
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         """
         Set up the test environment.
         """
@@ -24,7 +24,7 @@ class TestStructureCheck(unittest.TestCase):
         return super().setUp()
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
-    def test_01_valid_structure(self, mock_load_structure_file):
+    def test_01_valid_structure(self, mock_load_structure_file: MagicMock) -> None:
         """
         Verify that the run method returns True when all structure elements are valid.
         """
@@ -42,7 +42,7 @@ class TestStructureCheck(unittest.TestCase):
         self.assertEqual(result, expected)
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
-    def test_02_invalid_required_structure(self, mock_load_structure_file):
+    def test_02_invalid_required_structure(self, mock_load_structure_file: MagicMock) -> None:
         """
         Verify that the run method returns False when a required structure element is invalid.
         """
@@ -60,7 +60,7 @@ class TestStructureCheck(unittest.TestCase):
         self.assertEqual(result, expected)
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
-    def test_03_invalid_non_required_structure(self, mock_load_structure_file):
+    def test_03_invalid_non_required_structure(self, mock_load_structure_file: MagicMock) -> None:
         """
         Verify that the run method returns True when a non-required structure element is invalid.
         """
@@ -78,7 +78,7 @@ class TestStructureCheck(unittest.TestCase):
         self.assertEqual(result, expected)
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
-    def test_04_empty_structure_file(self, mock_load_structure_file):
+    def test_04_empty_structure_file(self, mock_load_structure_file: MagicMock) -> None:
         """
         Verify that the run method returns True when the structure file is empty.
         """
@@ -93,7 +93,7 @@ class TestStructureCheck(unittest.TestCase):
         self.assertEqual(result, expected)
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
-    def test_05_logs_structure_validity(self, mock_load_structure_file):
+    def test_05_logs_structure_validity(self, mock_load_structure_file: MagicMock) -> None:
         """
         Verify that the run method logs the validity of each structure element.
         """
@@ -113,7 +113,7 @@ class TestStructureCheck(unittest.TestCase):
         self.assertTrue(any(expected_log_output in message for message in log.output))
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
-    def test_06_raises_check_error_on_invalid_structure_file(self, mock_load_structure_file):
+    def test_06_raises_check_error_on_invalid_structure_file(self, mock_load_structure_file: MagicMock) -> None:
         """
         Verify that the run method raises a CheckError when the structure file is invalid.
         """
@@ -125,7 +125,7 @@ class TestStructureCheck(unittest.TestCase):
             self.structure_check.run()
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
-    def test_07_multiple_valid_elements(self, mock_load_structure_file):
+    def test_07_multiple_valid_elements(self, mock_load_structure_file: MagicMock) -> None:
         """
         Verify that the run method returns True when all structure elements are valid.
         """
@@ -148,7 +148,7 @@ class TestStructureCheck(unittest.TestCase):
         self.assertEqual(result, expected)
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
-    def test_08_multiple_elements_with_invalid_required(self, mock_load_structure_file):
+    def test_08_multiple_elements_with_invalid_required(self, mock_load_structure_file: MagicMock) -> None:
         """
         Verify that the run method returns False when one required structure element is invalid.
         """
@@ -171,7 +171,7 @@ class TestStructureCheck(unittest.TestCase):
         self.assertEqual(result, expected)
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
-    def test_09_multiple_elements_with_invalid_non_required(self, mock_load_structure_file):
+    def test_09_multiple_elements_with_invalid_non_required(self, mock_load_structure_file: MagicMock) -> None:
         """
         Verify that the run method returns True when only non-required structure elements are invalid.
         """
@@ -194,7 +194,7 @@ class TestStructureCheck(unittest.TestCase):
         self.assertEqual(result, expected)
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
-    def test_10_all_invalid_elements(self, mock_load_structure_file):
+    def test_10_all_invalid_elements(self, mock_load_structure_file: MagicMock) -> None:
         """
         Verify that the run method returns False when all structure elements are invalid and at least one is required.
         """
@@ -219,7 +219,9 @@ class TestStructureCheck(unittest.TestCase):
     @patch("grader.utils.structure_validator.StructureValidator.is_structure_valid")
     @patch("grader.checks.structure_check.open", create=True)
     @patch("grader.checks.structure_check.yaml.safe_load")
-    def test_11_load_structure_file_valid(self, mock_safe_load, mock_open, mock_structure_valid):
+    def test_11_load_structure_file_valid(
+        self, mock_safe_load: MagicMock, mock_open: MagicMock, mock_structure_valid: MagicMock
+    ) -> None:
         """
         Verify that run correctly processes a valid structure file.
         """
@@ -243,7 +245,7 @@ class TestStructureCheck(unittest.TestCase):
 
     @patch("grader.checks.structure_check.yaml.safe_load")
     @patch("grader.checks.structure_check.open", create=True)
-    def test_12_load_structure_file_invalid(self, mock_open, mock_safe_load):
+    def test_12_load_structure_file_invalid(self, mock_open: MagicMock, mock_safe_load: MagicMock) -> None:
         """
         Verify that run raises CheckError for an invalid structure file.
         """
@@ -258,7 +260,7 @@ class TestStructureCheck(unittest.TestCase):
 
     @patch("grader.checks.structure_check.open", create=True)
     @patch("grader.checks.structure_check.yaml.safe_load")
-    def test_13_load_structure_file_empty(self, mock_safe_load, mock_open):
+    def test_13_load_structure_file_empty(self, mock_safe_load: MagicMock, mock_open: MagicMock) -> None:
         """
         Verify that run returns True for an empty structure file.
         """
@@ -274,7 +276,7 @@ class TestStructureCheck(unittest.TestCase):
 
     @patch("grader.checks.structure_check.open", create=True)
     @patch("grader.checks.structure_check.yaml.safe_load")
-    def test_14_load_structure_file_yaml_error(self, mock_safe_load, mock_open):
+    def test_14_load_structure_file_yaml_error(self, mock_safe_load: MagicMock, mock_open: MagicMock) -> None:
         """
         Verify that run raises CheckError for a YAMLError.
         """
@@ -290,7 +292,7 @@ class TestStructureCheck(unittest.TestCase):
 
     @patch("grader.checks.structure_check.open", create=True)
     @patch("grader.checks.structure_check.yaml.safe_load")
-    def test_15_load_structure_file_not_found(self, mock_safe_load, mock_open):
+    def test_15_load_structure_file_not_found(self, mock_safe_load: MagicMock, mock_open: MagicMock) -> None:
         """
         Verify that run raises CheckError for a FileNotFoundError.
         """

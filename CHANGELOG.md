@@ -1,5 +1,11 @@
 # pygrader
 
+## 1.3.0
+
+- Internals refactoring.
+- Desktop execution is now a separate package.
+- Grader logic is also now a separate module.
+
 ## 1.2.0
 
 - Introduced support for downloading tests from URLs.

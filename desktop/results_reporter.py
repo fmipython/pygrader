@@ -1,3 +1,7 @@
+"""
+Module for handling the output of results from checks.
+"""
+
 import json
 import sys
 from abc import ABC, abstractmethod
@@ -15,7 +19,11 @@ class ResultsReporter(ABC):
 
     @abstractmethod
     def display(self, results: list[CheckResult], file_descriptor: TextIO = sys.stdout) -> None:
-        pass
+        """
+        Display the results in a specific format.
+        :param results: A list of CheckResult objects to display.
+        :param file_descriptor: The file descriptor to write the output to, defaults to sys.stdout.
+        """
 
     def _to_file_descriptor(self, content: str, file_descriptor: TextIO) -> None:
         """Write the content to the specified file descriptor.

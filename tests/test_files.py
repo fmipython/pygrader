@@ -22,7 +22,7 @@ class TestFindAllPythonFiles(unittest.TestCase):
     Test cases for the find_all_python_files function.
     """
 
-    def __init__(self, methodName="runTest"):
+    def __init__(self, methodName: str = "runTest") -> None:
         """
         Initialize the test case.
 
@@ -33,7 +33,7 @@ class TestFindAllPythonFiles(unittest.TestCase):
         super().__init__(methodName)
 
     @patch("grader.utils.structure_validator.StructureValidator.get_matching_files")
-    def test_01_find_all_python_files(self, mocked_function: MagicMock):
+    def test_01_find_all_python_files(self, mocked_function: MagicMock) -> None:
         """
         Verify that find_all_python_files returns the proper files.
 
@@ -94,7 +94,7 @@ class TestFindAllSourceFiles(unittest.TestCase):
     Test cases for the find_all_source_files function.
     """
 
-    def __init__(self, methodName="runTest"):
+    def __init__(self, methodName: str = "runTest") -> None:
         """
         Initialize the test case.
 
@@ -112,7 +112,7 @@ class TestFindAllSourceFiles(unittest.TestCase):
         mocked_tests_directory_name: MagicMock,
         mocked_all_python_files: MagicMock,
         mocked_find_all_test_files: MagicMock,
-    ):
+    ) -> None:
         """
         Verify that find_all_source_files returns the proper files.
 
@@ -153,7 +153,7 @@ class TestFindAllTestFiles(unittest.TestCase):
     Test cases for the find_all_test_files function.
     """
 
-    def __init__(self, methodName="runTest"):
+    def __init__(self, methodName: str = "runTest") -> None:
         """
         Initialize the test case.
 
@@ -164,7 +164,7 @@ class TestFindAllTestFiles(unittest.TestCase):
         super().__init__(methodName)
 
     @patch("grader.utils.files.find_all_files_under_directory")
-    def test_01_no_directory_provided(self, mocked_find_all_files_under_directory: MagicMock):
+    def test_01_no_directory_provided(self, mocked_find_all_files_under_directory: MagicMock) -> None:
         """
         Verify that find_all_test_files returns an empty list when no directory is provided.
 
@@ -182,7 +182,7 @@ class TestFindAllTestFiles(unittest.TestCase):
         mocked_find_all_files_under_directory.assert_not_called()
 
     @patch("grader.utils.structure_validator.StructureValidator.get_matching_files")
-    def test_02_directory_provided(self, mocked_find_all_files_under_directory: MagicMock):
+    def test_02_directory_provided(self, mocked_find_all_files_under_directory: MagicMock) -> None:
         """
         Verify that find_all_test_files returns the proper files when a directory is provided.
 
@@ -210,7 +210,7 @@ class TestGetTestsDirectoryName(unittest.TestCase):
     Test cases for the get_tests_directory_name function.
     """
 
-    def __init__(self, methodName="runTest"):
+    def __init__(self, methodName: str = "runTest") -> None:
         """
         Initialize the test case.
 
@@ -220,7 +220,7 @@ class TestGetTestsDirectoryName(unittest.TestCase):
         self.__sample_dir = "sample_dir"
         super().__init__(methodName)
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """
         Tear down the test environment.
         """
@@ -228,7 +228,7 @@ class TestGetTestsDirectoryName(unittest.TestCase):
             shutil.rmtree(self.__sample_dir)
         return super().tearDown()
 
-    def test_01_tests_directory(self):
+    def test_01_tests_directory(self) -> None:
         """
         Verify that get_tests_directory_name returns the proper directory name.
         """
@@ -243,7 +243,7 @@ class TestGetTestsDirectoryName(unittest.TestCase):
         # Assert
         self.assertEqual(expected_test_dir, actual_test_dir)
 
-    def test_02_test_directory(self):
+    def test_02_test_directory(self) -> None:
         """
         Verify that get_tests_directory_name returns the proper directory name.
         """
@@ -258,7 +258,7 @@ class TestGetTestsDirectoryName(unittest.TestCase):
         # Assert
         self.assertEqual(expected_test_dir, actual_test_dir)
 
-    def test_03_tst_directory(self):
+    def test_03_tst_directory(self) -> None:
         """
         Verify that get_tests_directory_name returns the proper directory name.
         """
@@ -273,7 +273,7 @@ class TestGetTestsDirectoryName(unittest.TestCase):
         # Assert
         self.assertEqual(expected_test_dir, actual_test_dir)
 
-    def test_04_no_directory(self):
+    def test_04_no_directory(self) -> None:
         """
         Verify that get_tests_directory_name returns None when there is no tests directory.
         """
@@ -288,7 +288,7 @@ class TestGetTestsDirectoryName(unittest.TestCase):
         self.assertIsNone(actual_test_dir)
 
     @staticmethod
-    def __create_structure(root_dir: str, tests_dir: str):
+    def __create_structure(root_dir: str, tests_dir: str) -> None:
         """
         Create the directory structure for the test.
 
@@ -308,7 +308,7 @@ class TestFindAllFilesUnderDirectory(unittest.TestCase):
 
     DirectoryStructure: TypeAlias = list[tuple[str, list[str], list[str]]]
 
-    def __init__(self, methodName="runTest"):
+    def __init__(self, methodName: str = "runTest") -> None:
         """
         Initialize the test case.
 
@@ -319,7 +319,7 @@ class TestFindAllFilesUnderDirectory(unittest.TestCase):
         super().__init__(methodName)
 
     @patch("os.walk")
-    def test_01_partial_files_result(self, mocked_os_walk: MagicMock):
+    def test_01_partial_files_result(self, mocked_os_walk: MagicMock) -> None:
         """
         Verify that find_all_files_under_directory returns the proper files
             when there are multiple files with different extensions.
@@ -338,7 +338,7 @@ class TestFindAllFilesUnderDirectory(unittest.TestCase):
         self.__base_test(mocked_os_walk, mocked_files, extension_to_search_for=".txt")
 
     @patch("os.walk")
-    def test_02_all_files_result(self, mocked_os_walk: MagicMock):
+    def test_02_all_files_result(self, mocked_os_walk: MagicMock) -> None:
         """
         Verify that find_all_files_under_directory returns the proper files
             when there are multiple files with the same extension.
@@ -357,7 +357,7 @@ class TestFindAllFilesUnderDirectory(unittest.TestCase):
         self.__base_test(mocked_os_walk, mocked_files, extension_to_search_for=".txt")
 
     @patch("os.walk")
-    def test_03_no_files_result(self, mocked_os_walk: MagicMock):
+    def test_03_no_files_result(self, mocked_os_walk: MagicMock) -> None:
         """
         Verify that find_all_files_under_directory returns an empty list
             when there are no files with the searched extension.
@@ -377,7 +377,7 @@ class TestFindAllFilesUnderDirectory(unittest.TestCase):
         self.__base_test(mocked_os_walk, mocked_files, extension_to_search_for=".py")
 
     @patch("os.walk")
-    def test_03_no_files_overall(self, mocked_os_walk: MagicMock):
+    def test_03_no_files_overall(self, mocked_os_walk: MagicMock) -> None:
         """
         Verify that find_all_files_under_directory returns an empty list
             when there are no files.
@@ -392,7 +392,7 @@ class TestFindAllFilesUnderDirectory(unittest.TestCase):
         mocked_os_walk: MagicMock,
         mocked_files: DirectoryStructure,
         extension_to_search_for: str,
-    ):
+    ) -> None:
         """
         Base test for find_all_files_under_directory.
 

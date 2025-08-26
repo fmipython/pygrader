@@ -14,7 +14,8 @@ import grader.utils.constants as const
 from grader.utils import process
 from grader.checks.abstract_check import ScoredCheck, CheckError, ScoredCheckResult
 
-import grader.utils.files as files
+# import grader.utils.files as files
+from grader.utils import files
 
 logger = logging.getLogger("grader")
 

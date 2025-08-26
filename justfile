@@ -10,6 +10,7 @@ lint: venv
     python3 -m pylint grader tests pygrader.py --fail-under 9
     mypy grader pygrader.py --ignore-missing-imports
     flake8 grader pygrader.py
+    complexipy .
 
 lint_file file: venv
     python3 -m pylint {{file}} --fail-under 9
@@ -29,7 +30,7 @@ push: venv lint test
 coverage: venv
     find tests -type f -name "test_*.py" -not -name "test_functional.py" | xargs coverage run --source="grader" -m unittest
     coverage lcov -o lcov.info
-    coverage report -m --fail-under 75
+    coverage report -m --fail-under 85 --sort=cover
 
 run: venv
     python3 src/pygrader.py
@@ -60,3 +61,7 @@ setup_sample_project: clean_sample_project
 
 clean_sample_project:
     if [ -d "pygrader-sample-project" ]; then rm -rf "pygrader-sample-project"; fi
+
+
+build_diagrams:
+    java -jar ~/plantuml-1.2025.4.jar ./docs/diagrams/*.puml -o out

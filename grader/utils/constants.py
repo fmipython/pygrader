@@ -4,7 +4,7 @@ Module containing the constants
 
 import os
 
-VERSION = "1.2.0"
+VERSION = "1.3.0"
 
 # Directories
 ROOT_DIR = os.path.dirname(os.path.realpath(__name__))
@@ -51,6 +51,8 @@ PYTEST_PATH = PYTEST_PATH_WINDOWS if os.name == "nt" else PYTEST_PATH_UNIX
 PYTEST_ARGS = ["--no-header", "-r A"]
 PYTEST_ROOT_DIR_ARG = "--rootdir={}"
 
+PYTEST_CACHE = ".pytest_cache"
+
 # Coverage constants
 COVERAGE_BIN_WINDOWS = "coverage.exe"
 COVERAGE_BIN_UNIX = "coverage"
@@ -63,6 +65,8 @@ COVERAGE_RUN_ARGS = ["run", "-m"]
 COVERAGE_RUN_PYTEST_ARGS = ["pytest"]
 COVERAGE_REPORT_ARGS = ["report", "--format=total"]
 COVERAGE_REPORT_ARGS_NO_FORMAT = ["report"]
+
+COVERAGE_FILE = ".coverage"
 
 # Tests constants
 POSSIBLE_TEST_DIRS = ["tests", "test", "tst"]

@@ -12,7 +12,7 @@ class TestAbstractCheck(unittest.TestCase):
     Test cases for the AbstractCheck class.
     """
 
-    def test_01_run_without_venv_when_required(self):
+    def test_01_run_without_venv_when_required(self) -> None:
         """
         Test that running the check without a virtual environment when it is required raises a RuntimeError.
         """

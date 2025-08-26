@@ -1,0 +1,9 @@
+[tool.complexipy]
+paths = ["grader", "tests"]
+max-complexity-allowed = 10
+quiet = false
+sort = "asc"
+details = "low"
+
+[tool.complexipy.output]
+json = true

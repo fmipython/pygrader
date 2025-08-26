@@ -93,7 +93,7 @@ class TestDownloadFileFromUrl(unittest.TestCase):
     @patch("requests.get")
     @patch("os.makedirs")
     @patch("builtins.open")
-    def test_01_directory_created(self, mock_open: MagicMock, mock_makedirs: MagicMock, mock_get: MagicMock) -> None:
+    def test_01_directory_created(self, _: MagicMock, mock_makedirs: MagicMock, mock_get: MagicMock) -> None:
         """
         Test if the function creates the TEMP_FILES_DIR directory.
         """
@@ -111,7 +111,7 @@ class TestDownloadFileFromUrl(unittest.TestCase):
     @patch("builtins.open")
     @patch("urllib.parse.urlparse")
     def test_02_parse_filename_if_not_passed(
-        self, mock_urlparse: MagicMock, mock_open: MagicMock, mock_makedirs: MagicMock, mock_get: MagicMock
+        self, mock_urlparse: MagicMock, mock_open: MagicMock, _: MagicMock, mock_get: MagicMock
     ) -> None:
         """
         Test if the function creates the TEMP_FILES_DIR directory.
@@ -133,7 +133,7 @@ class TestDownloadFileFromUrl(unittest.TestCase):
     @patch("builtins.open")
     @patch("urllib.parse.urlparse")
     def test_03_default_filename(
-        self, mock_urlparse: MagicMock, mock_open: MagicMock, mock_makedirs: MagicMock, mock_get: MagicMock
+        self, mock_urlparse: MagicMock, mock_open: MagicMock, _: MagicMock, mock_get: MagicMock
     ) -> None:
         """
         Test if the function creates the TEMP_FILES_DIR directory.
@@ -156,7 +156,7 @@ class TestDownloadFileFromUrl(unittest.TestCase):
     @patch("builtins.open")
     @patch("urllib.parse.urlparse")
     def test_04_passed_filename(
-        self, mock_urlparse: MagicMock, mock_open: MagicMock, mock_makedirs: MagicMock, mock_get: MagicMock
+        self, mock_urlparse: MagicMock, mock_open: MagicMock, _: MagicMock, mock_get: MagicMock
     ) -> None:
         """
         Test if the function creates the TEMP_FILES_DIR directory.

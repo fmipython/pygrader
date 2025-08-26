@@ -38,7 +38,7 @@ class AbstractCheck(ABC, Generic[T]):
         self._is_venv_required = is_venv_required
 
     @abstractmethod
-    def run(self) -> CheckResult[T]:  # TODO - Check if we need the Optional
+    def run(self) -> CheckResult[T]:
         """
         Main method that executes the check.
 

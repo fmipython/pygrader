@@ -50,9 +50,17 @@ def setup_logger(student_id: Optional[str] = None, verbosity: int = 0, suppress_
         console_format = "%(message)s"
 
     # Console handler setup
+    class NoExceptionFormatter(logging.Formatter):
+        def formatException(self, ei: tuple) -> str:
+            return ""
+
+        def format(self, record: logging.LogRecord) -> str:
+            record.exc_text = ""
+            return super().format(record)
+
     console_handler = logging.StreamHandler(stream=sys.stdout)
     console_handler.setLevel(console_level)
-    console_handler.setFormatter(logging.Formatter(console_format))
+    console_handler.setFormatter(NoExceptionFormatter(console_format))
 
     # Rotating file handler setup
     file_format = "%(asctime)s - %(levelname)s - %(message)s"

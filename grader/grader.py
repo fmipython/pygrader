@@ -5,7 +5,6 @@ Module containing the Grader class.
 from logging import Logger
 import os
 import shutil
-import sys
 import grader.utils.constants as const
 
 from grader.checks.abstract_check import (

@@ -1,5 +1,10 @@
 # pygrader
 
+
+## 1.5.0
+- Structure check files are now in JSON format.
+
+
 ## 1.4.0
 - Pygrader now works with config from the web.
 

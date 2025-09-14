@@ -5,7 +5,7 @@ Unit tests for the StructureCheck class in the structure_check module.
 import unittest
 from unittest.mock import patch, MagicMock
 
-from yaml import YAMLError
+from json import JSONDecodeError
 
 from grader.checks.abstract_check import CheckError, NonScoredCheckResult
 from grader.checks.structure_check import StructureCheck
@@ -20,7 +20,7 @@ class TestStructureCheck(unittest.TestCase):
         """
         Set up the test environment.
         """
-        self.structure_check = StructureCheck("structure", "sample_dir", "structure.yaml", is_venv_required=False)
+        self.structure_check = StructureCheck("structure", "sample_dir", "structure.json", is_venv_required=False)
         return super().setUp()
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
@@ -218,7 +218,7 @@ class TestStructureCheck(unittest.TestCase):
 
     @patch("grader.utils.structure_validator.StructureValidator.is_structure_valid")
     @patch("grader.checks.structure_check.open", create=True)
-    @patch("grader.checks.structure_check.yaml.safe_load")
+    @patch("grader.checks.structure_check.json.load")
     def test_11_load_structure_file_valid(
         self, mock_safe_load: MagicMock, mock_open: MagicMock, mock_structure_valid: MagicMock
     ) -> None:
@@ -243,7 +243,7 @@ class TestStructureCheck(unittest.TestCase):
         # Assert
         self.assertTrue(result)
 
-    @patch("grader.checks.structure_check.yaml.safe_load")
+    @patch("grader.checks.structure_check.json.load")
     @patch("grader.checks.structure_check.open", create=True)
     def test_12_load_structure_file_invalid(self, mock_open: MagicMock, mock_safe_load: MagicMock) -> None:
         """
@@ -259,7 +259,7 @@ class TestStructureCheck(unittest.TestCase):
         self.assertIn("Invalid structure file", str(context.exception))
 
     @patch("grader.checks.structure_check.open", create=True)
-    @patch("grader.checks.structure_check.yaml.safe_load")
+    @patch("grader.checks.structure_check.json.load")
     def test_13_load_structure_file_empty(self, mock_safe_load: MagicMock, mock_open: MagicMock) -> None:
         """
         Verify that run returns True for an empty structure file.
@@ -275,14 +275,14 @@ class TestStructureCheck(unittest.TestCase):
         self.assertTrue(result)
 
     @patch("grader.checks.structure_check.open", create=True)
-    @patch("grader.checks.structure_check.yaml.safe_load")
+    @patch("grader.checks.structure_check.json.load")
     def test_14_load_structure_file_yaml_error(self, mock_safe_load: MagicMock, mock_open: MagicMock) -> None:
         """
         Verify that run raises CheckError for a YAMLError.
         """
         # Arrange
 
-        mock_safe_load.side_effect = YAMLError("YAML parsing error")
+        mock_safe_load.side_effect = JSONDecodeError("Expecting value", "doc", 0)
         mock_open.return_value.__enter__.return_value = MagicMock()
 
         # Act & Assert
@@ -291,7 +291,7 @@ class TestStructureCheck(unittest.TestCase):
         self.assertIn("Invalid structure file", str(context.exception))
 
     @patch("grader.checks.structure_check.open", create=True)
-    @patch("grader.checks.structure_check.yaml.safe_load")
+    @patch("grader.checks.structure_check.json.load")
     def test_15_load_structure_file_not_found(self, mock_safe_load: MagicMock, mock_open: MagicMock) -> None:
         """
         Verify that run raises CheckError for a FileNotFoundError.

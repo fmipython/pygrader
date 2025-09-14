@@ -110,6 +110,7 @@ class Grader:
                 case _:
                     raise TypeError(f"Unknown check type: {type(check)}") from error
 
+        self.__logger.debug("Check result: %s", check_result)
         return check_result
 
     def __cleanup(self) -> None:

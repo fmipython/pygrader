@@ -24,7 +24,7 @@ class TestTestsCheck(unittest.TestCase):
         self.is_venv_required = False
         self.tests_path = ["test_file.py"]
         self.default_test_score = 10.0
-        self.test_score_mapping = {"test_1": 20.0, "test_2": 30.0}
+        self.test_score_mapping = {"test_1": 20.0, "test_2": 30.0, "ClassA": 15.0}
 
         self.tests_check = RunTestsCheck(
             self.name,
@@ -42,7 +42,7 @@ class TestTestsCheck(unittest.TestCase):
         Verify run calculates the correct score when all tests pass.
         """
         # Arrange
-        mock_pytest_run.return_value = "PASSED test_1::test_1\nPASSED test_2::test_2"
+        mock_pytest_run.return_value = "PASSED ::test_1::test_1\nPASSED ::test_2::test_2"
         expected_score = ScoredCheckResult(self.name, 50.0, self.max_points)
 
         # Act
@@ -57,7 +57,7 @@ class TestTestsCheck(unittest.TestCase):
         Verify run calculates the correct score when some tests fail.
         """
         # Arrange
-        mock_pytest_run.return_value = "PASSED test_1::test_1\nFAILED test_2::test_2"
+        mock_pytest_run.return_value = "PASSED ::test_1::test_1\nFAILED ::test_2::test_2"
         expected_score = ScoredCheckResult(self.name, 20.0, self.max_points)
 
         # Act
@@ -84,7 +84,7 @@ class TestTestsCheck(unittest.TestCase):
             test_score_mapping,
         )
 
-        mock_pytest_run.return_value = "PASSED test_1::test_1\nPASSED test_2::test_2\nPASSED test_3::test_3"
+        mock_pytest_run.return_value = "PASSED ::test_1::test_1\nPASSED ::test_2::test_2\nPASSED ::test_3::test_3"
 
         # Act & Assert
         with self.assertRaises(CheckError):
@@ -96,7 +96,7 @@ class TestTestsCheck(unittest.TestCase):
         Verify run logs the correct number of passed and failed tests.
         """
         # Arrange
-        mock_pytest_run.return_value = "PASSED test_1::test_1\nFAILED test_2::test_2"
+        mock_pytest_run.return_value = "PASSED ::test_1::test_1\nFAILED ::test_2::test_2"
 
         # Act
         with self.assertLogs("grader", level="INFO") as log:
@@ -171,3 +171,66 @@ class TestTestsCheck(unittest.TestCase):
         # Act & Assert
         with self.assertRaises(CheckError):
             self.tests_check.run()
+
+    @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
+    def test_10_class_scored(self, mock_pytest_run: MagicMock) -> None:
+        """
+        Verify run calculates the correct score when there is class-based scoring.
+        """
+        # Arrange
+        mock_pytest_run.return_value = "PASSED ::ClassB::test_1\nPASSED ::ClassB::test_2\nPASSED ::ClassA::test_3"
+        expected_score = ScoredCheckResult(self.name, 65.0, self.max_points)
+
+        # Act
+        score = self.tests_check.run()
+
+        # Assert
+        self.assertEqual(score, expected_score)
+
+    @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
+    def test_11_test_scored_both_name_and_class(self, mock_pytest_run: MagicMock) -> None:
+        """
+        Verify run calculates the correct score when there is name and class-based scoring.
+        """
+        # Arrange
+        mock_pytest_run.return_value = "PASSED ::ClassB::test_1\nPASSED ::ClassB::test_2\nPASSED ::ClassA::test_3"
+        expected_score = ScoredCheckResult(self.name, 100.0, self.max_points)
+
+        tests_check = RunTestsCheck(
+            self.name,
+            self.project_root,
+            self.max_points,
+            self.is_venv_required,
+            self.tests_path,
+            self.default_test_score,
+            {"test_1": 20.0, "test_2": 30.0, "test_3": 50.0, "ClassA": 15.0},
+        )
+        # Act
+        score = tests_check.run()
+
+        # Assert
+        self.assertEqual(score, expected_score)
+
+    @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
+    def test_12_test_default_scored(self, mock_pytest_run: MagicMock) -> None:
+        """
+        Verify run calculates the correct score when there is name and class-based scoring.
+        """
+        # Arrange
+        mock_pytest_run.return_value = "PASSED ::ClassB::test_1\nPASSED ::ClassB::test_2\nPASSED ::ClassA::test_3"
+        expected_score = ScoredCheckResult(self.name, 60.0, self.max_points)
+
+        tests_check = RunTestsCheck(
+            self.name,
+            self.project_root,
+            self.max_points,
+            self.is_venv_required,
+            self.tests_path,
+            self.default_test_score,
+            {"test_1": 20.0, "test_2": 30.0},
+        )
+        # Act
+        score = tests_check.run()
+
+        # Assert
+        self.assertEqual(score, expected_score)

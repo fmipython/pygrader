@@ -33,6 +33,9 @@ def build_reporter(report_format: str) -> ResultsReporter:
 
 
 def run_grader() -> None:
+    """
+    Run the grader application.
+    """
     args = get_args()
     is_suppressing_info = args["report_format"] == "json" or args["report_format"] == "csv" or args["suppress_info"]
     log = setup_logger(args["student_id"], verbosity=args["verbosity"], suppress_info=is_suppressing_info)

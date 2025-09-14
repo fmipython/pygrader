@@ -1,5 +1,8 @@
 # pygrader
 
+## 1.4.0
+- Pygrader now works with config from the web.
+
 ## 1.3.0
 
 - Internals refactoring.

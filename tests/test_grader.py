@@ -17,6 +17,10 @@ from grader.checks.abstract_check import (
 
 
 class TestGrader(unittest.TestCase):
+    """
+    Unit tests for the Grader class.
+    """
+
     @patch("grader.utils.config.load_config")
     def test_01_load_config_fails(self, mock_load_config: MagicMock) -> None:
         """
@@ -260,7 +264,7 @@ class TestGrader(unittest.TestCase):
         self.assertIsInstance(results[0], ScoredCheckResult)
         self.assertEqual(results[0].name, "scored_check")
         self.assertEqual(results[0].result, 0)
-        self.assertEqual(results[0].max_score, 10)
+        self.assertEqual(results[0].max_score, 10)  # type: ignore
 
     @patch("grader.grader.create_checks")
     def test_10_nonscored_checkerror_returns_nonscored_result(self, mock_create_checks: MagicMock) -> None:
@@ -295,14 +299,20 @@ class TestGrader(unittest.TestCase):
         """
         Test that if a check is neither ScoredCheck nor NonScoredCheck and raises CheckError, grade raises TypeError.
         """
-        from grader.checks.abstract_check import CheckError
 
         sample_config_path = os.path.join("config", "full_single_point.json")
         sample_project_path = os.path.join("/tmp", "project_root")
         os.makedirs(sample_project_path, exist_ok=True)
 
         class UnknownCheck:
-            def run(self):
+            """
+            Dummy check for the test.
+            """
+
+            def run(self) -> None:
+                """
+                Run the unknown check.
+                """
                 raise CheckError("fail")
 
         mock_unknown_check = UnknownCheck()

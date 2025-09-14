@@ -248,7 +248,7 @@ class TestPylintCheck(unittest.TestCase):
         self.assertEqual(expected_score, actual_score)
 
     @patch("grader.utils.files.find_all_python_files")
-    def test_12_find_all_python_files_raises_os_error(self, mocked_find: MagicMock):
+    def test_12_find_all_python_files_raises_os_error(self, mocked_find: MagicMock) -> None:
         """
         Test if when finding all Python files an OSError is raised, the check fails with CheckError.
         """
@@ -260,7 +260,7 @@ class TestPylintCheck(unittest.TestCase):
             self.pylint_check.run()
 
     @patch("grader.utils.process.run")
-    def test_13_run_pylint_raises_os_error(self, mocked_run: MagicMock):
+    def test_13_run_pylint_raises_os_error(self, mocked_run: MagicMock) -> None:
         """
         Test if when running pylint an OSError is raised, the check fails with CheckError.
         """
@@ -272,7 +272,7 @@ class TestPylintCheck(unittest.TestCase):
             self.pylint_check.run()
 
     @patch("grader.utils.process.run")
-    def test_13_run_pylint_exits_with_non_zero(self, mocked_run: MagicMock):
+    def test_13_run_pylint_exits_with_non_zero(self, mocked_run: MagicMock) -> None:
         """
         Test if when running pylint it exits with a non-zero status, the check fails with CheckError.
         """

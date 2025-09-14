@@ -5,7 +5,6 @@ Module containing the Grader class.
 from logging import Logger
 import os
 import shutil
-import sys
 import grader.utils.constants as const
 
 from grader.checks.abstract_check import (
@@ -19,7 +18,7 @@ from grader.checks.abstract_check import (
 )
 
 from grader.checks.checks_factory import create_checks
-from grader.utils.config import load_config
+from grader.utils.config import load_config, InvalidConfigError
 from grader.utils.files import get_tests_directory_name
 from grader.utils.virtual_environment import VirtualEnvironment
 
@@ -45,10 +44,10 @@ class Grader:
         self.__is_skipping_venv_creation = is_skipping_venv_creation
         try:
             self.__config = load_config(config_path)
-        except FileNotFoundError as exc:
-            self.__logger.error("Configuration file not found")
-            self.__logger.debug("Exception: %s", exc)
-            sys.exit(1)
+        except InvalidConfigError as exc:
+            self.__logger.error("Error with the configuration file")
+            self.__logger.exception(exc)
+            raise GraderError("Could not load configuration file") from exc
 
         if student_id is not None:
             self.__logger.info("Running checks for student %s", student_id)
@@ -62,7 +61,7 @@ class Grader:
         self.__project_root = project_root
         if not os.path.exists(self.__project_root):
             self.__logger.error("Project root directory does not exist")
-            sys.exit(1)
+            raise GraderError("Project root directory does not exist")
 
     def grade(self) -> list[CheckResult]:
         """
@@ -111,6 +110,7 @@ class Grader:
                 case _:
                     raise TypeError(f"Unknown check type: {type(check)}") from error
 
+        self.__logger.debug("Check result: %s", check_result)
         return check_result
 
     def __cleanup(self) -> None:
@@ -124,3 +124,9 @@ class Grader:
         if os.path.exists(coverage_file_full_path):
             os.remove(coverage_file_full_path)
         shutil.rmtree(os.path.join(self.__project_root, const.PYTEST_CACHE), ignore_errors=True)
+
+
+class GraderError(Exception):
+    """
+    Custom exception for grader errors.
+    """

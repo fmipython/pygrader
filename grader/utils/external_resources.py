@@ -42,10 +42,20 @@ def download_file_from_url(url: str, filename: Optional[str] = None) -> str:
         filename = os.path.basename(urlparse(url).path) or "downloaded_file"
     file_path = os.path.join(TEMP_FILES_DIR, filename)
 
-    response = requests.get(url, stream=True, timeout=30)
-    response.raise_for_status()
-    with open(file_path, "wb") as f:
+    try:
+        response = requests.get(url, stream=True, timeout=30)
+        response.raise_for_status()
+    except requests.RequestException as exc:
+        raise ExternalResourceError(f"Error downloading file from {url}") from exc
+
+    with open(file_path, "wb") as file:
         for chunk in response.iter_content(chunk_size=8192):
             if chunk:
-                f.write(chunk)
+                file.write(chunk)
     return file_path
+
+
+class ExternalResourceError(Exception):
+    """
+    Custom exception for external resource errors.
+    """

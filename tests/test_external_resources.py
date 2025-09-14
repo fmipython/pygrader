@@ -5,6 +5,8 @@ Unit tests for the external resources functions.
 import unittest
 from unittest.mock import patch, MagicMock
 
+import requests
+
 from grader.utils.external_resources import is_resource_remote, download_file_from_url
 from grader.utils.constants import TEMP_FILES_DIR
 
@@ -173,3 +175,15 @@ class TestDownloadFileFromUrl(unittest.TestCase):
 
         # Assert
         mock_open.assert_called_once_with(f"{TEMP_FILES_DIR}/{expected_filename}", "wb")
+
+    @patch("requests.get")
+    def test_05_download_raises_exception_on_failure(self, mock_get: MagicMock) -> None:
+        """
+        Test if the function raises an exception when the download fails.
+        """
+        # Arrange
+        mock_get.side_effect = requests.RequestException("Download failed")
+
+        # Act / Assert
+        with self.assertRaises(Exception):
+            download_file_from_url("http://example.com/resource")

@@ -122,7 +122,7 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
 
         # Assert
         self.assertEqual(run_returncode, 0, run_stdout)
-        self.assertTrue(is_score_correct(expected_score=7, target_check="coverage", grader_output=run_stdout))
+        self.assertTrue(is_score_correct(expected_score=8, target_check="coverage", grader_output=run_stdout))
 
     def test_05_log_file_created(self) -> None:
         """

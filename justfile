@@ -7,9 +7,9 @@ init:
     pip install -r requirements.txt
 
 lint: venv
-    python3 -m pylint grader tests pygrader.py --fail-under 9
-    mypy grader pygrader.py --ignore-missing-imports
-    flake8 grader pygrader.py
+    python3 -m pylint grader desktop tests pygrader.py --fail-under 9
+    mypy grader desktop tests pygrader.py --ignore-missing-imports
+    flake8 grader desktop tests pygrader.py
     complexipy .
 
 lint_file file: venv
@@ -19,7 +19,7 @@ lint_file file: venv
 test: unit_tests functional_tests
 
 unit_tests: venv
-    find tests -type f -name "test_*.py" -not -name "test_functional.py" -not -path "*sample_project*" | xargs python3 -m unittest
+    find tests -type f -name "test_*.py" -not -name "test_functional.py" -not -path "*sample_project*" | xargs python3 -m unittest -v
 
 functional_tests: venv
     python3 -m unittest discover -s tests -p "test_functional.py"
@@ -28,7 +28,7 @@ push: venv lint test
     git push
 
 coverage: venv
-    find tests -type f -name "test_*.py" -not -name "test_functional.py" | xargs coverage run --source="grader" -m unittest
+    find tests -type f -name "test_*.py" -not -name "test_functional.py" | xargs coverage run --source="grader,desktop" -m unittest
     coverage lcov -o lcov.info
     coverage report -m --fail-under 85 --sort=cover
 
@@ -50,6 +50,7 @@ clean:
 
 clean_logs:
     rm -rf *.log.*
+    rm -rf *.log
 
 clean_venv:
     rm -rf .venv

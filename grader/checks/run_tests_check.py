@@ -44,6 +44,7 @@ class RunTestsCheck(ScoredCheck):
         :param test_score_mapping: A mapping of test names to their respective scores.
         """
         super().__init__(name, max_points, project_root, is_venv_required)
+        self.__default_test_score = default_test_score
         self.__test_score_mapping = defaultdict(lambda: default_test_score)
 
         if test_score_mapping is not None:
@@ -69,9 +70,7 @@ class RunTestsCheck(ScoredCheck):
         passed, failed = self.__parse_pytest_output(pytest_stdout)
         total_amount = len(passed) + len(failed)
 
-        passed_tests_score = sum(self.__test_score_mapping[test] for test in passed)
-        failed_tests_score = sum(self.__test_score_mapping[test] for test in failed)
-        total_score = passed_tests_score + failed_tests_score
+        passed_tests_score, _, total_score = self.__calculate_score(passed, failed)
 
         if total_score > self.max_points:
             raise CheckError("Total score exceeds maximum points")
@@ -111,7 +110,7 @@ class RunTestsCheck(ScoredCheck):
 
         return output.stdout
 
-    def __parse_pytest_output(self, output: str) -> tuple[list[str], list[str]]:
+    def __parse_pytest_output(self, output: str) -> tuple[list[tuple[str, str]], list[tuple[str, str]]]:
         """
         Parse the output from pytest to determine passed and failed tests.
 
@@ -123,12 +122,16 @@ class RunTestsCheck(ScoredCheck):
         failed_tests = []
 
         for line in output.splitlines():
+            items = line.split("::")
+
             if line.startswith("PASSED"):
-                test_name = line.split("::")[-1]
-                passed_tests.append(test_name)
+                class_name = items[-2]
+                test_name = items[-1]
+                passed_tests.append((class_name, test_name))
             elif line.startswith("FAILED"):
-                test_name = line.split("::")[-1]
-                failed_tests.append(test_name)
+                class_name = items[-2]
+                test_name = items[-1]
+                failed_tests.append((class_name, test_name))
 
         return passed_tests, failed_tests
 
@@ -138,3 +141,55 @@ class RunTestsCheck(ScoredCheck):
         self.__tests_path = [
             path if not is_resource_remote(path) else download_file_from_url(path) for path in self.__tests_path
         ]
+
+    def __calculate_score(
+        self, passed_tests: list[tuple[str, str]], failed_tests: list[tuple[str, str]]
+    ) -> tuple[float, float, float]:
+        """
+        Calculate the total score based on passed and failed tests.
+
+        :param passed_tests: A list of names of passed tests.
+        :param failed_tests: A list of names of failed tests.
+        :returns: The total score from the tests.
+        :rtype: float
+        """
+
+        passed_tests_score = sum(
+            self.__score_test(passed_test_class, passed_test_name)
+            for passed_test_class, passed_test_name in passed_tests
+        )
+
+        failed_tests_score = sum(
+            self.__score_test(failed_test_class, failed_test_name)
+            for failed_test_class, failed_test_name in failed_tests
+        )
+
+        total_score = passed_tests_score + failed_tests_score
+
+        return passed_tests_score, failed_tests_score, total_score
+
+    def __score_test(self, test_class: str, test_name: str) -> float:
+        """
+        Score an individual test based on its class and name.
+
+        If the class is scored, take it's score
+        If the test is scored, take it's score
+        If neither is scored, take the default score
+        However, if both the class and the test itself are scored, test score takes precedences
+
+        :param test_class: The name of the test class.
+        :param test_name: The name of the test.
+        :return: The score for the test.
+        """
+
+        if test_class in self.__test_score_mapping and test_name in self.__test_score_mapping:
+            score = self.__test_score_mapping[test_name]
+        elif test_class in self.__test_score_mapping and test_name not in self.__test_score_mapping:
+            score = self.__test_score_mapping[test_class]
+        elif test_class not in self.__test_score_mapping and test_name in self.__test_score_mapping:
+            score = self.__test_score_mapping[test_name]
+        else:
+            score = self.__default_test_score
+
+        logger.debug("Test %s::%s scored %.2f", test_class, test_name, score)
+        return score

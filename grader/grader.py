@@ -69,12 +69,6 @@ class Grader:
 
         :return: A list of CheckResult objects containing the results of the checks.
         """
-        tests_directory = get_tests_directory_name(self.__project_root)
-        if tests_directory is None:
-            self.__logger.warning(
-                "No tests directory found in the project directory. Either it is missing or named differently."
-            )
-
         non_venv_checks, venv_checks = create_checks(self.__config, self.__project_root)
 
         scores = [self.__run_check(check) for check in non_venv_checks]

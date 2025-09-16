@@ -57,7 +57,7 @@ class VirtualEnvironment:
 
         does_requirements_exist = os.path.exists(requirements_path)
         if not does_requirements_exist:
-            logger.error("No requirements.txt file found in the project directory")
+            logger.debug("No requirements.txt file found in the project directory")
 
         # Create new venv
         logger.log(VERBOSE, "Creating new venv")

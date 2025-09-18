@@ -7,6 +7,7 @@ from unittest.mock import patch, MagicMock
 
 from grader.checks.run_tests_check import RunTestsCheck
 from grader.checks.abstract_check import CheckError, ScoredCheckResult
+from grader.utils.logger import VERBOSE
 
 
 class TestTestsCheck(unittest.TestCase):
@@ -99,12 +100,12 @@ class TestTestsCheck(unittest.TestCase):
         mock_pytest_run.return_value = "PASSED ::test_1::test_1\nFAILED ::test_2::test_2"
 
         # Act
-        with self.assertLogs("grader", level="INFO") as log:
+        with self.assertLogs("grader", level=VERBOSE) as log:
             self.tests_check.run()
 
         # Assert
-        self.assertIn("INFO:grader:Passed tests: 1/2", log.output)
-        self.assertIn("INFO:grader:Failed tests: 1/2", log.output)
+        self.assertIn("VERBOSE:grader:Passed tests: 1/2", log.output)
+        self.assertIn("VERBOSE:grader:Failed tests: 1/2", log.output)
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
     def test_05_empty_test_results(self, mock_pytest_run: MagicMock) -> None:

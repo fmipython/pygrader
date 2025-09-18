@@ -4,7 +4,7 @@ Module containing the constants
 
 import os
 
-VERSION = "1.4.0"
+VERSION = "1.5.0"
 
 # Directories
 ROOT_DIR = os.path.dirname(os.path.realpath(__name__))

@@ -1,0 +1,45 @@
+{
+  "source": {
+    "name": "Source files",
+    "required": true,
+    "patterns": [
+      "src/**/*.py"
+    ]
+  },
+  "init": {
+    "name": "Init files",
+    "required": true,
+    "patterns": [
+      "src/**/__init__.py"
+    ]
+  },
+  "tests": {
+    "name": "Test files",
+    "required": false,
+    "patterns": [
+      "tests/**/*.py",
+      "tst/**/*.py"
+    ]
+  },
+  "requirements": {
+    "name": "Requirements file",
+    "required": false,
+    "patterns": [
+      "requirements.txt"
+    ]
+  },
+  "main": {
+    "name": "Main file",
+    "required": true,
+    "patterns": [
+      "main.py"
+    ]
+  },
+  "readme": {
+    "name": "Readme file",
+    "required": false,
+    "patterns": [
+      "README.md"
+    ]
+  }
+}

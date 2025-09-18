@@ -5,7 +5,7 @@ It checks if the project structure is correct.
 
 import logging
 
-import yaml
+import json
 
 from grader.checks.abstract_check import NonScoredCheck, CheckError, NonScoredCheckResult
 from grader.utils.logger import VERBOSE
@@ -59,8 +59,8 @@ class StructureCheck(NonScoredCheck):
         """
         try:
             with open(filepath, "r", encoding="utf-8") as file_pointer:
-                raw_structure = yaml.safe_load(file_pointer)
-        except yaml.YAMLError as error:
+                raw_structure = json.load(file_pointer)
+        except json.JSONDecodeError as error:
             raise CheckError(f"Invalid structure file: {error}") from error
         except OSError as error:
             raise CheckError(f"Cannot read structure file: {error}") from error

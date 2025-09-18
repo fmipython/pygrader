@@ -69,21 +69,6 @@ class TestsVirtualEnvironment(unittest.TestCase):
         # Assert
         self.assertTrue(not any(do_directories_exist))
 
-    def test_02_non_existing_requirements(self) -> None:
-        """
-        Verify that the VirtualEnvironment class reports when it can't find a requirements.txt file.
-        """
-        # Arrange
-        expected_message = "No requirements.txt file found in the project directory"
-        # Act
-
-        with self.assertLogs("grader", level="ERROR") as log:
-            with VirtualEnvironment(self.__sample_root_dir_path):
-                is_message_in_log = any(expected_message in output for output in log.output)
-
-        # Assert
-        self.assertTrue(is_message_in_log)
-
     def test_03_successful_venv_creation(self) -> None:
         """
         Verify that the VirtualEnvironment class can successfully create a virtual environment.

@@ -3,7 +3,7 @@
     {
       "name": "structure",
       "is_venv_required": false,
-      "structure_file": "config/project_structure.yml"
+      "structure_file": "config/project_structure.json"
     }
   ]
 }

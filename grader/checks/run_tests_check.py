@@ -10,7 +10,7 @@ import os
 from grader.checks.abstract_check import CheckError, ScoredCheck, ScoredCheckResult
 from grader.utils.constants import PYTEST_ARGS, PYTEST_PATH, PYTEST_ROOT_DIR_ARG
 from grader.utils.external_resources import is_resource_remote, download_file_from_url
-
+from grader.utils.logger import VERBOSE
 from grader.utils import process
 
 logger = logging.getLogger("grader")
@@ -75,8 +75,8 @@ class RunTestsCheck(ScoredCheck):
         if total_score > self.max_points:
             raise CheckError("Total score exceeds maximum points")
 
-        logger.info("Passed tests: %d/%d", len(passed), total_amount)
-        logger.info("Failed tests: %d/%d", len(failed), total_amount)
+        logger.log(VERBOSE, "Passed tests: %d/%d", len(passed), total_amount)
+        logger.log(VERBOSE, "Failed tests: %d/%d", len(failed), total_amount)
 
         return ScoredCheckResult(self.name, passed_tests_score, self.max_points)
 

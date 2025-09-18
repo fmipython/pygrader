@@ -21,9 +21,6 @@ def load_with_values(file_path: str, **kwargs: str) -> dict:
             raise ValueError(f"Missing value for placeholder: {key}")
 
     for key, value in kwargs.items():
-        if key not in matches:
-            raise ValueError(f"Unexpected value for placeholder: {key}")
-
         placeholder = "${{" + key + "}}"
         content = content.replace(placeholder, str(value))
 

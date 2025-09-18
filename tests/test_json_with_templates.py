@@ -32,19 +32,6 @@ class TestJsonWithTemplates(unittest.TestCase):
             load_with_values("dummy.json", not_missing="test")
         self.assertIn("Missing value for placeholder: missing", str(ctx.exception))
 
-    @patch("builtins.open", new_callable=mock_open, read_data='{"key": "${{value}}"}')
-    def test_03_unexpected_value_in_kwargs(self, _: MagicMock) -> None:
-        """
-        Test error raised when an unexpected value is provided in kwargs.
-        """
-        # Arrange
-        # (mock_file already set up)
-
-        # Act / Assert
-        with self.assertRaises(ValueError) as ctx:
-            load_with_values("dummy.json", value="test", extra="unexpected")
-        self.assertIn("Unexpected value for placeholder: extra", str(ctx.exception))
-
     @patch("builtins.open", new_callable=mock_open, read_data='{"a": "${{x}}", "b": "${{y}}"}')
     def test_04_multiple_placeholders(self, _: MagicMock) -> None:
         """

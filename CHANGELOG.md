@@ -1,11 +1,13 @@
 # pygrader
 
-
 ## 1.5.0
+
 - Structure check files are now in JSON format.
+- Configs accept template parameters
 
 
 ## 1.4.0
+
 - Pygrader now works with config from the web.
 
 ## 1.3.0

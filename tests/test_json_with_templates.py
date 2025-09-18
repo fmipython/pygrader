@@ -1,13 +1,12 @@
 import unittest
 from unittest.mock import patch, mock_open, MagicMock
-from typing import Any
 
 from grader.utils.json_with_templates import load_with_values
 
 
 class TestJsonWithTemplates(unittest.TestCase):
     @patch("builtins.open", new_callable=mock_open, read_data='{"key": "${{value}}"}')
-    def test_01_successful_substitution(self, mock_file: MagicMock) -> None:
+    def test_01_successful_substitution(self, _: MagicMock) -> None:
         """
         Test successful substitution of a single placeholder.
         """
@@ -21,7 +20,7 @@ class TestJsonWithTemplates(unittest.TestCase):
         self.assertEqual(result, {"key": "test"})
 
     @patch("builtins.open", new_callable=mock_open, read_data='{"key": "${{missing}}"}')
-    def test_02_missing_placeholder_value(self, mock_file: MagicMock) -> None:
+    def test_02_missing_placeholder_value(self, _: MagicMock) -> None:
         """
         Test error raised when a placeholder value is missing.
         """
@@ -34,7 +33,7 @@ class TestJsonWithTemplates(unittest.TestCase):
         self.assertIn("Missing value for placeholder: missing", str(ctx.exception))
 
     @patch("builtins.open", new_callable=mock_open, read_data='{"key": "${{value}}"}')
-    def test_03_unexpected_value_in_kwargs(self, mock_file: MagicMock) -> None:
+    def test_03_unexpected_value_in_kwargs(self, _: MagicMock) -> None:
         """
         Test error raised when an unexpected value is provided in kwargs.
         """
@@ -47,7 +46,7 @@ class TestJsonWithTemplates(unittest.TestCase):
         self.assertIn("Unexpected value for placeholder: extra", str(ctx.exception))
 
     @patch("builtins.open", new_callable=mock_open, read_data='{"a": "${{x}}", "b": "${{y}}"}')
-    def test_04_multiple_placeholders(self, mock_file: MagicMock) -> None:
+    def test_04_multiple_placeholders(self, _: MagicMock) -> None:
         """
         Test substitution of multiple placeholders.
         """
@@ -61,12 +60,12 @@ class TestJsonWithTemplates(unittest.TestCase):
         self.assertEqual(result, {"a": "foo", "b": "bar"})
 
     @patch("builtins.open", new_callable=mock_open, read_data='{"num": "${{n}}"}')
-    def test_05_non_string_value(self, mock_file: MagicMock) -> None:
+    def test_05_non_string_value(self, _: MagicMock) -> None:
         """
         Test substitution with a non-string value.
         """
         # Act
-        result = load_with_values("dummy.json", n=123)
+        result = load_with_values("dummy.json", n=123)  # type: ignore
 
         # Assert
         self.assertEqual(result, {"num": "123"})

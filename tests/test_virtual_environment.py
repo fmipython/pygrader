@@ -11,7 +11,6 @@ from subprocess import CompletedProcess
 from unittest.mock import MagicMock, patch
 
 import grader.utils.constants as const
-from grader.utils.logger import VERBOSE
 from grader.utils.process import run
 from grader.utils.virtual_environment import VirtualEnvironment, VirtualEnvironmentError
 

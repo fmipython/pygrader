@@ -19,7 +19,6 @@ from grader.checks.abstract_check import (
 
 from grader.checks.checks_factory import create_checks
 from grader.utils.config import load_config, InvalidConfigError
-from grader.utils.files import get_tests_directory_name
 from grader.utils.virtual_environment import VirtualEnvironment
 
 

@@ -5,10 +5,13 @@ from multiprocessing import Queue, Process
 import streamlit as st
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 
-from web.utils import run_grader, convert_results
+from web.utils import run_grader, convert_results, generate_run_id
 
 
 def run_app() -> None:
+    """
+    Main logic for the streamlit app.
+    """
     st.title("Pygrader Web Interface")
     st.write("Welcome to the Pygrader web application.")
 
@@ -20,9 +23,10 @@ def run_app() -> None:
     if project is not None:
         with st.spinner("Grading project..."):
             handle_upload(project)
+            run_id = generate_run_id()
             queue = Queue()  # type: ignore
 
-            grader = Process(target=run_grader, args=(queue,))
+            grader = Process(target=run_grader, args=(queue, run_id))
             grader.start()
             grader.join()
             results = queue.get()

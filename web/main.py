@@ -1,18 +1,16 @@
 import os
 import zipfile
-from multiprocessing import Queue
+from multiprocessing import Queue, Process
 
-import pandas as pd
 import streamlit as st
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 
-from web.utils import run_grader, convert_result
-from grader.checks.abstract_check import CheckResult
+from web.utils import run_grader, convert_results
 
 
 def run_app() -> None:
-    st.title("PyGrader Web Interface")
-    st.write("Welcome to the PyGrader web application.")
+    st.title("Pygrader Web Interface")
+    st.write("Welcome to the Pygrader web application.")
 
     st.divider()
     # Additional UI components and logic would go here
@@ -23,27 +21,33 @@ def run_app() -> None:
         with st.spinner("Grading project..."):
             handle_upload(project)
             queue = Queue()  # type: ignore
-            run_grader(queue)
 
+            grader = Process(target=run_grader, args=(queue,))
+            grader.start()
+            grader.join()
             results = queue.get()
             queue.close()
+
             st.success("Project graded successfully!")
-            st.dataframe(convert_result(results))
+            st.dataframe(convert_results(results))
     else:
         st.info("Please upload a project to get started.")
 
 
 def handle_upload(file_obj: UploadedFile) -> None:
-    staging_dir = "staging"
+    """
+    Handle the uploaded zip file by extracting its contents to a staging directory.
+    :param file_obj: The uploaded zip file object.
+    """
+    staging_dir = "project"
 
     os.makedirs(staging_dir, exist_ok=True)
 
     zip_file_path = os.path.join(staging_dir, "uploaded_project.zip")
-    extract_path = os.path.join(staging_dir, "project")
     with open(zip_file_path, "wb") as f:
         f.write(file_obj.getbuffer())
 
     with zipfile.ZipFile(zip_file_path, "r") as zip_ref:
-        zip_ref.extractall(extract_path)
+        zip_ref.extractall(staging_dir)
 
     os.remove(zip_file_path)

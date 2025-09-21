@@ -5,14 +5,13 @@ import pandas as pd
 from grader.utils.logger import setup_logger
 from grader.grader import Grader
 from grader.checks.abstract_check import ScoredCheckResult, NonScoredCheckResult, CheckResult
-from desktop.results_reporter import result_to_json  # TODO - This should be moved
 
 
 def run_grader(conn: Queue) -> None:
     student_id = "student123"
     log = setup_logger(student_id)
 
-    project_root = "staging/project"
+    project_root = "project"
     config_path = "config/full_single_point.json"
 
     grader = Grader(student_id, project_root, config_path, log)
@@ -22,8 +21,8 @@ def run_grader(conn: Queue) -> None:
     conn.put(results)
 
 
-def convert_result(check_result: CheckResult) -> pd.DataFrame:
-    return pd.DataFrame([__convert_result(result) for result in check_result])
+def convert_results(check_results: list[CheckResult]) -> pd.DataFrame:
+    return pd.DataFrame([__convert_result(result) for result in check_results])
 
 
 def __convert_result(check_result: CheckResult) -> dict:

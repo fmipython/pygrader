@@ -70,3 +70,7 @@ COVERAGE_FILE = ".coverage"
 
 # Tests constants
 POSSIBLE_TEST_DIRS = ["tests", "test", "tst"]
+
+
+# Ignore paths
+IGNORE_DIRS = [".git", "__pycache__", ".pytest_cache", "_MACOSX"] + POSSIBLE_VENV_DIRS

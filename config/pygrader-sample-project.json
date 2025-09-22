@@ -3,7 +3,7 @@
         {
             "name": "structure",
             "is_venv_required": "false",
-            "structure_file": "${{config_dir}}/pygrader-sample-project-structure.json"
+            "structure_file": "https://raw.githubusercontent.com/fmipython/pygrader/refs/heads/web-view/config/pygrader-sample-project-structure.json"
         },
         {
             "name": "tests",

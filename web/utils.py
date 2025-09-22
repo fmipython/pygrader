@@ -4,7 +4,7 @@ from multiprocessing import Queue
 import pandas as pd
 
 from grader.utils.logger import setup_logger
-from grader.grader import Grader
+from grader.grader import Grader, GraderError
 from grader.checks.abstract_check import ScoredCheckResult, NonScoredCheckResult, CheckResult
 
 
@@ -19,7 +19,11 @@ def run_grader(conn: Queue, run_id: str) -> None:
     project_root = "project"
     config_path = "config/full_single_point.json"
 
-    grader = Grader(run_id, project_root, config_path, log)
+    try:
+        grader = Grader(run_id, project_root, config_path, log)
+    except GraderError:
+        conn.put([])
+        return
 
     results = grader.grade()
 

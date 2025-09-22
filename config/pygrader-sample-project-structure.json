@@ -5,5 +5,12 @@
         "patterns": [
             "src/*.py"
         ]
+    },
+    "main": {
+        "name": "Main file",
+        "required": true,
+        "patterns": [
+            "main.py"
+        ]
     }
 }

@@ -45,6 +45,7 @@ Pygments==2.19.1
 pylint==3.3.3
 pytest==8.3.4
 python-dateutil==2.9.0.post0
+python-dotenv==1.1.1
 pytz==2025.2
 PyYAML==6.0.2
 referencing==0.36.2
@@ -77,3 +78,4 @@ types-requests==2.32.4.20250611
 typing_extensions==4.12.2
 tzdata==2025.2
 urllib3==2.3.0
+watchdog==6.0.0

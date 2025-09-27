@@ -1,11 +1,16 @@
 import datetime
+import os
+import shutil
+import zipfile
 from multiprocessing import Queue
 
 import pandas as pd
+from streamlit.runtime.uploaded_file_manager import UploadedFile
 
-from grader.utils.logger import setup_logger
-from grader.grader import Grader, GraderError
+import web.constants as const
 from grader.checks.abstract_check import ScoredCheckResult, NonScoredCheckResult, CheckResult
+from grader.grader import Grader, GraderError
+from grader.utils.logger import setup_logger
 
 
 def run_grader(conn: Queue, run_id: str) -> None:
@@ -16,8 +21,17 @@ def run_grader(conn: Queue, run_id: str) -> None:
     """
     log = setup_logger(run_id)
 
-    project_root = "project"
-    config_path = "config/full_single_point.json"
+    root_dir = os.getenv("ROOT_DIR", "/tmp/pygrader")
+    project_root = os.path.join(root_dir, const.PROJECT_DIR.format(run_id=run_id))
+
+    os.makedirs(project_root, exist_ok=True)
+
+    if "CONFIG_PATH" not in os.environ:
+        # TODO - Think about this
+        conn.put([])
+        return
+
+    config_path = os.getenv("CONFIG_PATH", "")
 
     try:
         grader = Grader(run_id, project_root, config_path, log)
@@ -64,3 +78,45 @@ def generate_run_id() -> str:
     """
     now = datetime.datetime.now()
     return "run" + now.strftime("%y%m%d%H%M")
+
+
+def handle_upload(file_obj: UploadedFile, run_id: str) -> None:
+    """
+    Handle the uploaded zip file by extracting its contents to a staging directory.
+    :param file_obj: The uploaded zip file object.
+    """
+
+    root_dir = os.getenv("ROOT_DIR", "/tmp/pygrader")
+
+    if not os.path.exists(root_dir):
+        os.makedirs(root_dir)
+
+    zip_file_path = os.path.join(root_dir, const.ARCHIVE_NAME.format(run_id=run_id))
+    with open(zip_file_path, "wb") as f:
+        f.write(file_obj.getbuffer())
+
+    project_dir = os.path.join(root_dir, const.PROJECT_DIR.format(run_id=run_id))
+    with zipfile.ZipFile(zip_file_path, "r") as zip_ref:
+        zip_ref.extractall(project_dir)
+
+    os.remove(zip_file_path)
+
+
+def collect_log(run_id: str) -> None:
+    logs_dir_path = os.path.join(os.getenv("ROOT_DIR", "/tmp/pygrader"), const.LOGS_DIR)
+    if not os.path.exists(logs_dir_path):
+        os.makedirs(logs_dir_path)
+
+    shutil.copy2(f"{run_id}.log", logs_dir_path)
+
+
+def remove_project(run_id: str) -> None:
+    """
+    Remove the project directory and log file associated with the given run ID.
+    :param run_id: The unique identifier for the grading run.
+    """
+    root_dir = os.getenv("ROOT_DIR", "/tmp/pygrader")
+    project_dir = os.path.join(root_dir, const.PROJECT_DIR.format(run_id=run_id))
+
+    if os.path.exists(project_dir):
+        shutil.rmtree(project_dir)

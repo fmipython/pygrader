@@ -1,11 +1,10 @@
 FROM python:3.13-slim
 
 RUN mkdir /app
-RUN mkdir /project
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+COPY requirements-web.txt .
+RUN pip install -r requirements-web.txt
 
 COPY . .
 

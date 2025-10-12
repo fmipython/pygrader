@@ -27,13 +27,16 @@ def run_app() -> None:
             grader = Process(target=run_grader, args=(queue, run_id))
             grader.start()
             grader.join()
-            results = queue.get()
+            code, results = queue.get()
             queue.close()
 
             collect_log(run_id)
             remove_project(run_id)
 
-            st.success("Project graded successfully!")
-            st.dataframe(convert_results(results))
+            if code == 0:
+                st.success("Project graded successfully!")
+                st.dataframe(convert_results(results))
+            else:
+                st.error(f"An error occurred during grading. Run id: {run_id}")
     else:
         st.info("Please upload a project to get started.")

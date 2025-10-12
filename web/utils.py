@@ -27,8 +27,7 @@ def run_grader(conn: Queue, run_id: str) -> None:
     os.makedirs(project_root, exist_ok=True)
 
     if "CONFIG_PATH" not in os.environ:
-        # TODO - Think about this
-        conn.put([])
+        conn.put((1, []))
         return
 
     config_path = os.getenv("CONFIG_PATH", "")
@@ -36,12 +35,12 @@ def run_grader(conn: Queue, run_id: str) -> None:
     try:
         grader = Grader(run_id, project_root, config_path, log)
     except GraderError:
-        conn.put([])
+        conn.put((1, []))
         return
 
     results = grader.grade()
 
-    conn.put(results)
+    conn.put((0, results))
 
 
 def convert_results(check_results: list[CheckResult]) -> pd.DataFrame:
@@ -77,7 +76,7 @@ def generate_run_id() -> str:
     :return: A string representing the run ID.
     """
     now = datetime.datetime.now()
-    return "run" + now.strftime("%y%m%d%H%M")
+    return "run" + now.strftime("%y%m%d%H%M%S") + str(now.microsecond)[:3]
 
 
 def handle_upload(file_obj: UploadedFile, run_id: str) -> None:
@@ -103,6 +102,11 @@ def handle_upload(file_obj: UploadedFile, run_id: str) -> None:
 
 
 def collect_log(run_id: str) -> None:
+    """
+    Collect the log file associated with the given run ID and move it to the logs directory.
+
+    :param run_id: The unique identifier for the grading run.
+    """
     logs_dir_path = os.path.join(os.getenv("ROOT_DIR", "/tmp/pygrader"), const.LOGS_DIR)
     if not os.path.exists(logs_dir_path):
         os.makedirs(logs_dir_path)

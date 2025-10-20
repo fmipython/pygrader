@@ -1,6 +1,7 @@
-FROM python:3.13-slim
+FROM python:3.13-alpine
 
 RUN mkdir /app
+RUN mkdir /config
 WORKDIR /app
 
 COPY requirements-web.txt .

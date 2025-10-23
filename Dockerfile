@@ -8,7 +8,6 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-
 VOLUME ["/project"]
 
 ENTRYPOINT ["python", "pygrader.py", "/project"]

@@ -8,6 +8,7 @@ import logging
 import json
 
 from grader.checks.abstract_check import NonScoredCheck, CheckError, NonScoredCheckResult
+from grader.utils.external_resources import is_resource_remote, download_file_from_url
 from grader.utils.logger import VERBOSE
 from grader.utils.structure_validator import StructureValidator
 
@@ -34,6 +35,11 @@ class StructureCheck(NonScoredCheck):
         :rtype: float
         """
         self._pre_run()
+        self.__structure_file = (
+            self.__structure_file
+            if not is_resource_remote(self.__structure_file)
+            else download_file_from_url(self.__structure_file)
+        )
         structure_elements = StructureCheck.__load_structure_file(self.__structure_file)
 
         for element in structure_elements:

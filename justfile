@@ -66,3 +66,6 @@ clean_sample_project:
 
 build_diagrams:
     java -jar ~/plantuml-1.2025.4.jar ./docs/diagrams/*.puml -o out
+
+build_docker:
+    docker build -f Dockerfile -t pygrader:latest .

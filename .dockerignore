@@ -8,7 +8,11 @@ __pycache__
 .git
 
 *.log
+*.log.*
 .coverage
 .mypy_cache
 .pytest_cache
 
+reports
+
+*.zip

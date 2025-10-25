@@ -1,5 +1,5 @@
 [tool.complexipy]
-paths = ["grader", "tests"]
+paths = ["grader", "tests", "desktop", "web"]
 max-complexity-allowed = 10
 quiet = false
 sort = "asc"

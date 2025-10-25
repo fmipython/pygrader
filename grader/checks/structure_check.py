@@ -55,7 +55,7 @@ class StructureCheck(NonScoredCheck):
     @staticmethod
     def __load_structure_file(filepath: str) -> list[StructureValidator]:
         """
-        Read the structure YAML file and return the structure information.
+        Read the structure JSON file and return the structure information.
 
         :param filepath: The path to the structure file
         :type filepath: str
@@ -63,6 +63,9 @@ class StructureCheck(NonScoredCheck):
         :return: The structure information
         :rtype: list[StructureInformation]
         """
+
+        filepath = filepath if not is_resource_remote(filepath) else download_file_from_url(filepath)
+
         try:
             with open(filepath, "r", encoding="utf-8") as file_pointer:
                 raw_structure = json.load(file_pointer)

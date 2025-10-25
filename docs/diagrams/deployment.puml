@@ -1,0 +1,24 @@
+@startuml
+
+actor Snekmasters
+actor Students
+participant pygrader
+database PythonCourse2025
+database homeworks2025
+
+Snekmasters -> homeworks2025: Upload homework statement, pygrader config and public & private tests
+
+homework_deployer -> homeworks2025: Collect homework statement, pygrader config and public tests
+activate homework_deployer
+homeworks2025 -> homework_deployer: Collect homework statement, pygrader config and public tests
+homework_deployer -> PythonCourse2025: Upload homework statement, pygrader config and public tests
+deactivate homework_deployer
+
+Snekmasters -> pygrader: Enable pygrader
+
+Students -> pygrader: Test homework solutions
+activate pygrader
+pygrader -> PythonCourse2025: Collect pygrader config and public tests
+pygrader -> Students: Display homework results
+deactivate pygrader
+@enduml

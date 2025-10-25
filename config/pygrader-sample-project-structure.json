@@ -1,0 +1,16 @@
+{
+    "source": {
+        "name": "Source files",
+        "required": true,
+        "patterns": [
+            "src/*.py"
+        ]
+    },
+    "main": {
+        "name": "Main file",
+        "required": true,
+        "patterns": [
+            "main.py"
+        ]
+    }
+}

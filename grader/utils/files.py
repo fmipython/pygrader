@@ -18,7 +18,7 @@ def find_all_python_files(project_root_dir: str) -> list[str]:
     """
     python_structure = StructureValidator(name="Python Files", required=False, patterns=["**/*.py"])
     python_files = python_structure.get_matching_files(project_root_dir)
-    return [file for file in python_files if all(venv_path not in file for venv_path in const.POSSIBLE_VENV_DIRS)]
+    return [file for file in python_files if all(ignore_path not in file for ignore_path in const.IGNORE_DIRS)]
 
 
 def find_all_source_files(project_root_dir: str) -> list[str]:

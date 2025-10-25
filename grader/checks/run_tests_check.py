@@ -131,6 +131,7 @@ class RunTestsCheck(ScoredCheck):
             elif line.startswith("FAILED"):
                 class_name = items[-2]
                 test_name = items[-1]
+                logger.log(VERBOSE, f"Test {test_name} failed")
                 failed_tests.append((class_name, test_name))
 
         return passed_tests, failed_tests

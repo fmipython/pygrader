@@ -78,3 +78,6 @@ build_docker_web:
 
 run_docker_web:
     docker run --rm -p 8501:8501 pygrader_web:latest
+
+build_docker:
+    docker build -f Dockerfile -t pygrader:latest .

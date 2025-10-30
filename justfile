@@ -8,19 +8,19 @@ init:
 
 # Linting
 lint:
-    uvx pylint {{project_content}} --fail-under 9
-    uvx mypy {{project_content}} --ignore-missing-imports
-    uvx flake8 {{project_content}}
-    uvx complexipy .
+    uv run pylint {{project_content}} --fail-under 9
+    uv run mypy {{project_content}} --ignore-missing-imports
+    uv run flake8 {{project_content}}
+    uv run complexipy .
 
 # Tests
 test: unit_tests functional_tests
 
 unit_tests:
-    find tests -type f -name "test_*.py" -not -name "test_functional.py" -not -path "*sample_project*" | xargs python3 -m unittest -v
+    find tests -type f -name "test_*.py" -not -name "test_functional.py" -not -path "*sample_project*" | xargs uv run -m unittest -v
 
 functional_tests:
-    python3 -m unittest discover -s tests -p "test_functional.py"
+    uv run -m unittest discover -s tests -p "test_functional.py"
 
 coverage:
     find tests -type f -name "test_*.py" -not -name "test_functional.py" | xargs coverage run --source={{packages}} -m unittest

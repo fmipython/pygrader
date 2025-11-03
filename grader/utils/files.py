@@ -3,6 +3,8 @@ Module containing the file-related functions.
 """
 
 import os
+import zipfile
+from pathlib import Path
 from typing import Optional
 
 import grader.utils.constants as const
@@ -78,3 +80,30 @@ def find_all_files_under_directory(directory: str, extension: str) -> list[str]:
     ]
 
     return files
+
+
+def is_path_zip(path: str) -> bool:
+    """
+    Check if the path is a zip file.
+
+    :param path: The path to check.
+    :return: If the path is a valid zip file
+    """
+    return zipfile.is_zipfile(path)
+
+
+def unzip_archive(archive_path: str, target_directory: Optional[str] = None) -> str:
+    """
+    Unzip the archive containing the project
+
+    :param archive_path: The path to the archive to unzip
+    :param target_directory: The path to the target directory where the archive will be unzipped.
+    :return: The path to the target directory.
+    """
+    archive_stem = Path(archive_path).stem
+    working_directory = target_directory or os.path.join(const.WORK_DIR, archive_stem)
+
+    with zipfile.ZipFile(archive_path, "r") as zip_ref:
+        zip_ref.extractall(working_directory)
+
+    return working_directory

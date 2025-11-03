@@ -1,10 +1,13 @@
 # pygrader
 
+## 1.6.0
+
+- Pygrader now accepts zip archieves as input.
+
 ## 1.5.0
 
 - Structure check files are now in JSON format.
 - Configs accept template parameters
-
 
 ## 1.4.0
 

@@ -4,13 +4,15 @@ Module containing the constants
 
 import os
 
-VERSION = "1.5.0"
+VERSION = "1.6.0"
 
 # Directories
 ROOT_DIR = os.path.dirname(os.path.realpath(__name__))
 REPORTS_TEMP_DIR = os.path.join(ROOT_DIR, "reports")
 CONFIG_DIR = os.path.join(ROOT_DIR, "config")
-TEMP_FILES_DIR = os.path.join(ROOT_DIR, "temp_files")
+TEMP_FILES_DIR = os.path.join(ROOT_DIR, "temp_files")  # TODO - Change this to be under WORK_DIR ?
+
+WORK_DIR = os.path.join("/tmp", "pygrader")
 
 # Python
 PYTHON_BIN_WINDOWS = "python.exe"

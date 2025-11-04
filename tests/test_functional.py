@@ -18,7 +18,7 @@ class BaseFunctionalTestWithGrader(unittest.TestCase):
     """
 
     repo_url = "https://github.com/fmipython/pygrader"
-    clone_path = "/tmp/pygrader"
+    clone_path = "/tmp/pygrader-cloned"
 
     def setUp(self) -> None:
         if os.path.exists(self.clone_path):

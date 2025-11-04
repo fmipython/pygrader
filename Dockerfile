@@ -10,4 +10,4 @@ COPY . .
 
 VOLUME ["/project"]
 
-ENTRYPOINT ["python", "pygrader.py", "--config", "https://api.github.com/repos/fmipython/PythonCourse/contents/homeworks/homework1/config/pygrader_config_public.json", "/project"]
+ENTRYPOINT ["python", "pygrader.py", "--config", "https://api.github.com/repos/fmipython/PythonCourse2025/contents/homeworks/homework1/config/pygrader_config_public.json", "/project"]

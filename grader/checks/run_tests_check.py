@@ -72,7 +72,11 @@ class RunTestsCheck(ScoredCheck):
 
         passed_tests_score, _, total_score = self.__calculate_score(passed, failed)
 
-        if total_score > self.max_points:
+        logger.debug("Passed tests core %f", passed_tests_score)
+        logger.debug("Total score %f", total_score)
+
+        if round(total_score, 2) > round(self.max_points, 2):
+            logger.error("Total score %f exceeds maximum points %f", total_score, self.max_points)
             raise CheckError("Total score exceeds maximum points")
 
         logger.log(VERBOSE, "Passed tests: %d/%d", len(passed), total_amount)
@@ -130,8 +134,8 @@ class RunTestsCheck(ScoredCheck):
                 passed_tests.append((class_name, test_name))
             elif line.startswith("FAILED"):
                 class_name = items[-2]
-                test_name = items[-1]
-                logger.log(VERBOSE, f"Test {test_name} failed")
+                test_name = items[-1].split(" ")[0]  # test_06_str_method - AssertionError: ...
+                logger.log(VERBOSE, f"Test {class_name}::{test_name} failed")
                 failed_tests.append((class_name, test_name))
 
         return passed_tests, failed_tests

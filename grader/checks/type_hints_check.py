@@ -92,7 +92,7 @@ class TypeHintsCheck(ScoredCheck):
         regions = list(zip(steps, steps[1:]))
 
         for score, (start, end) in enumerate(regions):
-            if start <= mypy_score < end:
+            if round(start, 2) <= round(mypy_score, 2) < round(end, 2):
                 return score
 
         return self._max_points

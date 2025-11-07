@@ -1,5 +1,9 @@
 # pygrader
 
+## 1.5.1
+
+- Patch different structure from GitHub API when having a token or not
+
 ## 1.5.0
 
 - Structure check files are now in JSON format.

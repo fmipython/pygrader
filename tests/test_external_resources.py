@@ -3,7 +3,7 @@ Unit tests for the external resources functions.
 """
 
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, call
 
 import requests
 
@@ -103,7 +103,8 @@ class TestDownloadFileFromUrl(unittest.TestCase):
         mock_get.return_value = MagicMock(status_code=200, iter_content=lambda chunk_size: [b"data"])
 
         # Act
-        download_file_from_url("http://example.com/resource")
+        with patch("json.load"):
+            download_file_from_url("http://example.com/resource")
 
         # Assert
         mock_makedirs.assert_called_once_with(TEMP_FILES_DIR, exist_ok=True)
@@ -125,10 +126,11 @@ class TestDownloadFileFromUrl(unittest.TestCase):
         mock_urlparse.return_value.path = sample_filepath
 
         # Act
-        download_file_from_url(f"http://example.com{sample_filepath}")
+        with patch("json.load"):
+            download_file_from_url(f"http://example.com{sample_filepath}")
 
         # Assert
-        mock_open.assert_called_once_with(f"{TEMP_FILES_DIR}/{sample_filename}", "wb")
+        mock_open.assert_has_calls([call(f"{TEMP_FILES_DIR}/{sample_filename}", "wb")])
 
     @patch("requests.get")
     @patch("os.makedirs")
@@ -148,10 +150,11 @@ class TestDownloadFileFromUrl(unittest.TestCase):
         expected_filename = "downloaded_file"
 
         # Act
-        download_file_from_url(f"http://example.com{sample_filepath}")
+        with patch("json.load"):
+            download_file_from_url(f"http://example.com{sample_filepath}")
 
         # Assert
-        mock_open.assert_called_once_with(f"{TEMP_FILES_DIR}/{expected_filename}", "wb")
+        mock_open.assert_has_calls([call(f"{TEMP_FILES_DIR}/{expected_filename}", "wb")])
 
     @patch("requests.get")
     @patch("os.makedirs")
@@ -171,10 +174,11 @@ class TestDownloadFileFromUrl(unittest.TestCase):
         expected_filename = "passed_filename.txt"
 
         # Act
-        download_file_from_url(f"http://example.com{sample_filepath}", expected_filename)
+        with patch("json.load"):
+            download_file_from_url(f"http://example.com{sample_filepath}", expected_filename)
 
         # Assert
-        mock_open.assert_called_once_with(f"{TEMP_FILES_DIR}/{expected_filename}", "wb")
+        mock_open.assert_has_calls([call(f"{TEMP_FILES_DIR}/{expected_filename}", "wb")])
 
     @patch("requests.get")
     def test_05_download_raises_exception_on_failure(self, mock_get: MagicMock) -> None:

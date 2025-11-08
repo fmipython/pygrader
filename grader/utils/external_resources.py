@@ -60,7 +60,7 @@ def download_file_from_url(url: str, filename: Optional[str] = None, is_json: bo
         raise ExternalResourceError(f"Error downloading file from {url}") from exc
 
     with open(file_path, "wb") as file:
-        for chunk in response.iter_content():
+        for chunk in response.iter_content(chunk_size=8192):
             if chunk:
                 file.write(chunk)
 

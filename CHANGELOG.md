@@ -1,5 +1,14 @@
 # pygrader
 
+## 1.5.2
+
+- Float comparison caused issues when there are failing tests
+- Fix parsing of failed tests names
+
+## 1.5.1
+
+- Patch different structure from GitHub API when having a token or not
+
 ## 1.5.0
 
 - Structure check files are now in JSON format.

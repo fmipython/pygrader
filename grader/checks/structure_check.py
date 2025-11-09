@@ -38,7 +38,7 @@ class StructureCheck(NonScoredCheck):
         self.__structure_file = (
             self.__structure_file
             if not is_resource_remote(self.__structure_file)
-            else download_file_from_url(self.__structure_file)
+            else download_file_from_url(self.__structure_file, is_json=True)
         )
         structure_elements = StructureCheck.__load_structure_file(self.__structure_file)
 
@@ -64,7 +64,7 @@ class StructureCheck(NonScoredCheck):
         :rtype: list[StructureInformation]
         """
 
-        filepath = filepath if not is_resource_remote(filepath) else download_file_from_url(filepath)
+        filepath = filepath if not is_resource_remote(filepath) else download_file_from_url(filepath, is_json=True)
 
         try:
             with open(filepath, "r", encoding="utf-8") as file_pointer:

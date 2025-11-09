@@ -33,7 +33,7 @@ class TestConfig(unittest.TestCase):
             pass
 
         # Assert
-        mock_download.assert_called_once_with(sample_config_path)
+        mock_download.assert_called_once_with(sample_config_path, is_json=True)
 
     @patch("grader.utils.config.is_resource_remote")
     @patch("grader.utils.config.download_file_from_url")

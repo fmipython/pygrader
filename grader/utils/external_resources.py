@@ -2,6 +2,7 @@
 Module for handling external resources
 """
 
+import json
 import logging
 import os
 from typing import Optional
@@ -29,7 +30,7 @@ def is_resource_remote(resource_path: str) -> bool:
     return parsed_url.scheme in ["http", "https", "ftp"]
 
 
-def download_file_from_url(url: str, filename: Optional[str] = None) -> str:
+def download_file_from_url(url: str, filename: Optional[str] = None, is_json: bool = False) -> str:
     """
     Download a file from a URL and save it in temp_files under the pygrader root directory.
 
@@ -62,6 +63,19 @@ def download_file_from_url(url: str, filename: Optional[str] = None) -> str:
         for chunk in response.iter_content(chunk_size=8192):
             if chunk:
                 file.write(chunk)
+
+    # If a token is not passed, content is returned in a different way
+    # Github stuff
+
+    with open(file_path, "r") as file:
+        try:
+            parsed = json.load(file)
+        except json.JSONDecodeError:
+            pass
+        else:
+            if "download_url" in parsed:
+                return download_file_from_url(parsed["download_url"], filename)
+
     return file_path
 
 

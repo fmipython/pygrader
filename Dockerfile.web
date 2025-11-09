@@ -8,6 +8,7 @@ COPY requirements-web.txt .
 RUN pip install -r requirements-web.txt
 
 COPY . .
+COPY web.env .
 
 EXPOSE 8501
 

@@ -19,7 +19,7 @@ def load_config(config_path: str) -> dict:
 
     if is_resource_remote(config_path):
         try:
-            config_path = download_file_from_url(config_path)
+            config_path = download_file_from_url(config_path, is_json=True)
         except ExternalResourceError as exc:
             raise InvalidConfigError(f"Could not load configuration from {config_path}") from exc
 

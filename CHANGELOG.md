@@ -2,7 +2,16 @@
 
 ## 1.6.0
 
-- Pygrader now accepts zip archieves as input.
+- Pygrader now accepts zip archieves as input
+
+## 1.5.2
+
+- Float comparison caused issues when there are failing tests
+- Fix parsing of failed tests names
+
+## 1.5.1
+
+- Patch different structure from GitHub API when having a token or not
 
 ## 1.5.0
 

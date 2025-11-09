@@ -65,7 +65,7 @@ class CoverageCheck(ScoredCheck):
         regions = list(zip(steps, steps[1:]))
 
         for score, (start, end) in enumerate(regions):
-            if start <= coverage_score < end:
+            if round(start, 2) <= round(coverage_score, 2) < round(end, 2):
                 return score
 
         return self._max_points

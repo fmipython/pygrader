@@ -13,4 +13,4 @@ RUN uv sync --locked --no-dev
 
 VOLUME ["/project"]
 
-ENTRYPOINT ["uv", "run", "--no-dev", "pygrader.py", "--config", "https://api.github.com/repos/fmipython/homeworks-2025/contents/homework1/pygrader_config_public.json", "/project"]
+ENTRYPOINT ["uv", "run", "--no-dev", "pygrader.py", "--config", "https://api.github.com/repos/fmipython/PythonCourse2025/contents/homeworks/homework1/config/pygrader_config_public.json", "/project"]

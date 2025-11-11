@@ -23,9 +23,9 @@ functional_tests:
     uv run -m unittest discover -s tests -p "test_functional.py"
 
 coverage:
-    find tests -type f -name "test_*.py" -not -name "test_functional.py" | xargs coverage run --source={{packages}} -m unittest
-    coverage lcov -o lcov.info
-    coverage report -m --fail-under 85 --sort=cover
+    find tests -type f -name "test_*.py" -not -name "test_functional.py" | xargs uv run coverage run --source={{packages}} -m unittest
+    uv run coverage lcov -o lcov.info
+    uv run coverage report -m --fail-under 85 --sort=cover
 
 docs:
     sphinx-apidoc -o docs/source grader

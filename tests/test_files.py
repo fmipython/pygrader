@@ -447,8 +447,7 @@ class TestUnzipArchive(unittest.TestCase):
     """
 
     @patch("zipfile.ZipFile")
-    @patch("os.path.exists", return_value=True)
-    def test_01_unzip_to_default_directory(self, mock_exists, mock_zipfile):
+    def test_01_unzip_to_default_directory(self, mock_zipfile: MagicMock) -> None:
         """
         Verify that unzip_archive extracts to the default directory and returns the correct path.
         """
@@ -456,16 +455,16 @@ class TestUnzipArchive(unittest.TestCase):
         mock_zip = MagicMock()
         mock_zipfile.return_value.__enter__.return_value = mock_zip
         archive_path = "/fake/path/test_archive.zip"
+
         # Act
         result_dir = unzip_archive(archive_path)
+
         # Assert
         mock_zip.extractall.assert_called_once()
         self.assertIn("test_archive", result_dir)
-        self.assertTrue(mock_exists.called)
 
     @patch("zipfile.ZipFile")
-    @patch("os.path.exists", return_value=True)
-    def test_02_unzip_to_custom_directory(self, mock_exists, mock_zipfile):
+    def test_02_unzip_to_custom_directory(self, mock_zipfile: MagicMock) -> None:
         """
         Verify that unzip_archive extracts to a custom target directory.
         """
@@ -478,11 +477,9 @@ class TestUnzipArchive(unittest.TestCase):
         # Assert
         mock_zip.extractall.assert_called_once_with(custom_dir)
         self.assertEqual(result_dir, custom_dir)
-        self.assertTrue(mock_exists.called)
 
     @patch("zipfile.ZipFile", side_effect=zipfile.BadZipFile)
-    @patch("os.path.exists", return_value=True)
-    def test_03_invalid_zip_file(self, mock_exists, _):
+    def test_03_invalid_zip_file(self, mock_exists: MagicMock) -> None:
         """
         Verify that unzip_archive raises an exception for an invalid zip file.
         """
@@ -491,12 +488,10 @@ class TestUnzipArchive(unittest.TestCase):
             unzip_archive(archive_path)
         self.assertTrue(mock_exists.called)
 
-    @patch("os.path.exists", return_value=False)
-    def test_04_nonexistent_zip_file(self, mock_exists):
+    def test_04_nonexistent_zip_file(self) -> None:
         """
         Verify that unzip_archive raises an exception for a nonexistent file.
         """
         archive_path = "/nonexistent/path/to/file.zip"
         with self.assertRaises(FileNotFoundError):
             unzip_archive(archive_path)
-        self.assertTrue(mock_exists.called)

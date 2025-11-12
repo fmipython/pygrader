@@ -3,6 +3,11 @@ Main entry point of the program.
 Calls all the checks, and stores their results
 """
 
+import os
+import shutil
+
+import grader.utils.constants as const
+
 from desktop.cli import get_args
 from desktop.results_reporter import (
     JSONResultsReporter,
@@ -11,6 +16,7 @@ from desktop.results_reporter import (
     ResultsReporter,
 )
 from grader.utils.logger import setup_logger
+from grader.utils.files import is_path_zip, unzip_archive
 from grader.grader import Grader
 
 
@@ -40,8 +46,13 @@ def run_grader() -> None:
     is_suppressing_info = args["report_format"] == "json" or args["report_format"] == "csv" or args["suppress_info"]
     log = setup_logger(args["student_id"], verbosity=args["verbosity"], suppress_info=is_suppressing_info)
 
+    if is_path_zip(args["project_root"]):
+        project_root = unzip_archive(args["project_root"])
+    else:
+        project_root = str(args["project_root"])  # type safety
+
     grader = Grader(
-        args["student_id"], args["project_root"], args["config"], log, args["keep_venv"], args["skip_venv_creation"]
+        args["student_id"], project_root, args["config"], log, args["keep_venv"], args["skip_venv_creation"]
     )
 
     checks_results = grader.grade()
@@ -50,3 +61,6 @@ def run_grader() -> None:
 
     # TODO - Add output to a file
     reporter.display(checks_results)
+
+    if os.path.exists(const.WORK_DIR):
+        shutil.rmtree(const.WORK_DIR)

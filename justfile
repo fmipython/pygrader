@@ -1,5 +1,5 @@
-packages := "grader,desktop,web"
-project_content := "grader desktop web tests pygrader.py"
+packages := "grader,desktop"
+project_content := "grader desktop tests pygrader.py"
 
 init:
     python3 -m venv .venv
@@ -57,13 +57,6 @@ clean_sample_project:
 
 build_diagrams:
     java -jar ~/plantuml-1.2025.4.jar ./docs/diagrams/*.puml -o out
-
-# Web via Docker
-build_docker_web:
-    docker build -f Dockerfile.web -t pygrader_web:latest .
-
-run_docker_web:
-    docker run --rm -d -p 8501:8501 --name pygrader_web pygrader_web:latest 
 
 build_docker:
     uv sync

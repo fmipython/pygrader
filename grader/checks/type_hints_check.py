@@ -50,7 +50,10 @@ class TypeHintsCheck(ScoredCheck):
         # Run mypy on all files
         command = [self.__mypy_binary] + self.__mypy_arguments + all_source_files
         try:
-            _ = process.run(command)
+            _ = process.run(
+                command,
+                current_directory=self._project_root,
+            )
         except (OSError, ValueError) as error:
             logger.error("Error while running mypy: %s", error)
             raise CheckError("Error while running mypy") from error

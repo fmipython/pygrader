@@ -1,6 +1,7 @@
 FROM python:3.12-slim
 
 RUN mkdir /app
+RUN mkdir /assets
 WORKDIR /app
 
 COPY requirements-prod.txt .
@@ -8,9 +9,8 @@ RUN pip install -r requirements-prod.txt
 
 COPY . .
 
-COPY /home/lyubolp/homeworks-2025/homework2/pygrader_config_public_local.json /app/config.json
-COPY /home/lyubolp/homeworks-2025/homework2/pygrader_structure.json /app/pygrader_structure.json
+COPY hw2-config/assets /assets
 
 VOLUME ["/project"]
 
-ENTRYPOINT ["python", "pygrader.py", "--config", "/app/config.json", "/project"]
+ENTRYPOINT ["python", "pygrader.py", "--config", "https://api.github.com/repos/fmipython/PythonCourse2025/contents/homeworks/homework2/config/pygrader_config_public.json", "/project"]

@@ -13,4 +13,4 @@ COPY hw2-config/assets /assets
 
 VOLUME ["/project"]
 
-ENTRYPOINT ["python", "pygrader.py", "--config", "/app/hw3-config/pygrader_config_local.json", "/project"]
+ENTRYPOINT ["python", "pygrader.py", "--config", "https://api.github.com/repos/fmipython/PythonCourse2025/contents/homeworks/homework3/pygrader_config_public_web.json", "/project"]

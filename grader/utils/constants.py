@@ -20,9 +20,6 @@ PYTHON_BIN_UNIX = "python3"
 
 PYTHON_BIN = PYTHON_BIN_WINDOWS if os.name == "nt" else PYTHON_BIN_UNIX
 
-# Type hints constants
-MYPY_TYPE_HINT_CONFIG = os.path.join(ROOT_DIR, "config", "mypy_type_hints_2024.ini")
-MYPY_LINE_COUNT_REPORT = os.path.join(REPORTS_TEMP_DIR, "linecount.txt")
 
 # Virtual environment constants
 REQUIREMENTS_FILENAME = "requirements.txt"
@@ -35,12 +32,24 @@ PIP_PATH = PIP_PATH_WINDOWS if os.name == "nt" else PIP_PATH_UNIX
 
 GRADER_REQUIREMENTS = os.path.join(CONFIG_DIR, "grader_requirements.txt")
 
+# Type hints constants
+MYPY_BIN_WINDOWS = "mypy.exe"
+MYPY_BIN_UNIX = "mypy"
+MYPY_BIN = MYPY_BIN_WINDOWS if os.name == "nt" else MYPY_BIN_UNIX
+
+MYPY_TYPE_HINT_CONFIG = os.path.join(ROOT_DIR, "config", "mypy_type_hints_2024.ini")
+MYPY_LINE_COUNT_REPORT = os.path.join(REPORTS_TEMP_DIR, "linecount.txt")
+MYPY_PATH_WINDOWS = os.path.join(VENV_NAME, "Scripts", MYPY_BIN)
+MYPY_PATH_UNIX = os.path.join(VENV_NAME, "bin", MYPY_BIN)
+MYPY_PATH = MYPY_PATH_WINDOWS if os.name == "nt" else MYPY_PATH_UNIX
+
+
 # Pylint constants
 PYLINT_BIN_WINDOWS = os.path.join("Scripts", "pylint.exe")
 PYLINT_BIN_UNIX = os.path.join("bin", "pylint")
 PYLINT_BIN = PYLINT_BIN_WINDOWS if os.name == "nt" else PYLINT_BIN_UNIX
 PYLINT_PATH = os.path.join(VENV_NAME, PYLINT_BIN)
-PYLINTRC = os.path.join(CONFIG_DIR, "2024.pylintrc")
+PYLINTRC = os.path.join(CONFIG_DIR, "2025-hw3.pylintrc")
 
 # Pytest constants
 PYTEST_BIN_WINDOWS = "pytest.exe"
@@ -75,4 +84,11 @@ POSSIBLE_TEST_DIRS = ["tests", "test", "tst"]
 
 
 # Ignore paths
-IGNORE_DIRS = [".git", "__pycache__", ".pytest_cache", "_MACOSX"] + POSSIBLE_VENV_DIRS
+IGNORE_DIRS = [
+    ".git",
+    "__pycache__",
+    ".pytest_cache",
+    "_MACOSX",
+    os.path.join("build", "lib"),
+    *POSSIBLE_VENV_DIRS,
+]

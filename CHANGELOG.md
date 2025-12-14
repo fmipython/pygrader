@@ -4,6 +4,10 @@
 
 - Pygrader now accepts zip archieves as input
 
+## 1.5.3
+
+- Add pyproject.toml install support
+
 ## 1.5.2
 
 - Float comparison caused issues when there are failing tests

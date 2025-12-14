@@ -469,7 +469,7 @@ wheels = [
 [[package]]
 name = "pygrader"
 version = "1.6.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "pylint" },
     { name = "python-dotenv" },

@@ -3,7 +3,8 @@
     {
       "name": "pylint",
       "max_points": 1,
-      "is_venv_required": true
+      "is_venv_required": true,
+      "pylintrc_path": "${{config_dir}}/2024.pylintrc"
     }
   ]
 }

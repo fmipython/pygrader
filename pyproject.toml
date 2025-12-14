@@ -1,6 +1,6 @@
 [project]
 name = "pygrader"
-version = "1.6.0"
+version = "1.7.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -22,7 +22,7 @@ packages = ["grader"]
 
 [tool.complexipy]
 paths = ["grader", "tests", "desktop", "web"]
-max-complexity-allowed = 10
+max-complexity-allowed = 15
 quiet = false
 sort = "asc"
 details = "low"

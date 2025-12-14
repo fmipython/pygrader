@@ -7,6 +7,7 @@ import logging
 import os
 import re
 from io import StringIO
+from typing import Optional
 
 from pylint.reporters.text import TextReporter
 
@@ -25,9 +26,17 @@ class PylintCheck(ScoredCheck):
     The Pylint check class.
     """
 
-    def __init__(self, name: str, project_root: str, max_points: int, is_venv_required: bool):
+    def __init__(
+        self,
+        name: str,
+        project_root: str,
+        max_points: int,
+        is_venv_required: bool,
+        pylintrc_path: Optional[str] = None,
+    ):
         super().__init__(name, max_points, project_root, is_venv_required)
         self.__pylint_max_score = 10
+        self.__pylintrc_path = pylintrc_path or const.PYLINTRC
 
     def run(self) -> ScoredCheckResult:
         """
@@ -49,9 +58,8 @@ class PylintCheck(ScoredCheck):
         logger.debug("Running pylint check on files: %s", pylint_args)
         pylint_args.append("--fail-under=0")
 
-        pylintrc_path = const.PYLINTRC
-        if os.path.exists(pylintrc_path):
-            pylint_args.extend(["--rcfile", pylintrc_path])
+        if os.path.exists(self.__pylintrc_path):
+            pylint_args.extend(["--rcfile", self.__pylintrc_path])
 
         command = [const.PYLINT_PATH] + pylint_args  # Current working directory is set in the process.run method
         try:

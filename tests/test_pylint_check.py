@@ -303,3 +303,47 @@ class TestPylintCheck(unittest.TestCase):
             "Your code has been rated at {score:.2f}/10 (previous run: 1.25/10, +0.00)]",
         ]
         return "\n".join(content).format(score=score)
+
+    @patch("grader.utils.process.run")
+    @patch("os.path.exists")
+    def test_pylint_with_custom_pylintrc(self, mocked_os_path_exists: MagicMock, mocked_pylint: MagicMock) -> None:
+        """
+        Test if pylint is called with the --rcfile argument when a custom pylintrc file is specified and exists.
+        """
+        # Arrange
+        custom_pylintrc = "custom_rc_file"
+        pylint_check = PylintCheck("pylint", "sample_dir", 2, is_venv_required=False, pylintrc_path=custom_pylintrc)
+        mocked_os_path_exists.return_value = True
+        mocked_pylint.return_value = CompletedProcess("pylint", 0, self.__create_sample_pylint_output(10))
+
+        # Act
+        pylint_check.run()
+        called_with = mocked_pylint.call_args
+
+        # Assert
+        mocked_pylint.assert_called_once()
+        self.assertIn("--rcfile", called_with[0][0])
+        self.assertIn(custom_pylintrc, called_with[0][0])
+
+    @patch("grader.utils.process.run")
+    @patch("os.path.exists")
+    def test_pylint_with_nonexistent_custom_pylintrc(
+        self, mocked_os_path_exists: MagicMock, mocked_pylint: MagicMock
+    ) -> None:
+        """
+        Test if pylint is called without the --rcfile argument when a custom pylintrc is specified but does not exist.
+        """
+        # Arrange
+        custom_pylintrc = "non_existent_rc_file"
+        pylint_check = PylintCheck("pylint", "sample_dir", 2, is_venv_required=False, pylintrc_path=custom_pylintrc)
+        mocked_os_path_exists.return_value = False
+        mocked_pylint.return_value = CompletedProcess("pylint", 0, self.__create_sample_pylint_output(10))
+
+        # Act
+        pylint_check.run()
+        called_with = mocked_pylint.call_args
+
+        # Assert
+        mocked_pylint.assert_called_once()
+        self.assertNotIn("--rcfile", called_with[0][0])
+        self.assertNotIn(custom_pylintrc, called_with[0][0])

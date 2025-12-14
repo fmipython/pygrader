@@ -1,5 +1,9 @@
 # pygrader
 
+## 1.7.0
+
+- Pylintrc can now be part of the config
+
 ## 1.6.0
 
 - Pygrader now accepts zip archieves as input

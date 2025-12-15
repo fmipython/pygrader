@@ -28,8 +28,8 @@ coverage:
     uv run coverage report -m --fail-under 85 --sort=cover
 
 docs:
-    sphinx-apidoc -o docs/source grader
-    sphinx-build -b html docs/source docs/build
+    uv run sphinx-apidoc -o docs/source grader
+    uv run sphinx-build -b html docs/source docs/build
 
 # Cleaning
 clean: clean_logs

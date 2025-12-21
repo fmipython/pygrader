@@ -43,11 +43,17 @@ class JSONResultsReporter(ResultsReporter):
     """
 
     def display(self, results: list[CheckResult], file_descriptor: TextIO = sys.stdout) -> None:
+        scored_results = [result for result in results if isinstance(result, ScoredCheckResult)]
+        total_score = sum(scored_result.result for scored_result in scored_results)
+        total_max_score = sum(result.max_score for result in scored_results)
+
         content = {
-            "scored_checks": [result_to_json(result) for result in results if isinstance(result, ScoredCheckResult)],
+            "scored_checks": [result_to_json(result) for result in scored_results],
             "non_scored_checks": [
                 result_to_json(result) for result in results if isinstance(result, NonScoredCheckResult)
             ],
+            "total_score": total_score,
+            "total_max_score": total_max_score,
         }
 
         output = json.dumps(content, indent=4)
@@ -88,8 +94,13 @@ class CSVResultsReporter(ResultsReporter):
     """
 
     def display(self, results: list[CheckResult], file_descriptor: TextIO = sys.stdout) -> None:
+        scored_results = [result for result in results if isinstance(result, ScoredCheckResult)]
+        total_score = sum(scored_result.result for scored_result in scored_results)
+        total_max_score = sum(result.max_score for result in scored_results)
+
         output = ["Check,Score,Max Score"]
         output += [result_to_csv(check_result) for check_result in results]
+        output.append(f"Total,{total_score},{total_max_score}")
 
         self._to_file_descriptor("\n".join(output) + "\n", file_descriptor)
 
@@ -120,7 +131,12 @@ class PlainTextResultsReporter(ResultsReporter):
     """
 
     def display(self, results: list[CheckResult], file_descriptor: TextIO = sys.stdout) -> None:
+        scored_results = [result for result in results if isinstance(result, ScoredCheckResult)]
+        total_score = sum(scored_result.result for scored_result in scored_results)
+        total_max_score = sum(result.max_score for result in scored_results)
+
         output = [result_to_plain_text(check_result) for check_result in results]
+        output.append(f"Total Score: {total_score}/{total_max_score}")
         self._to_file_descriptor("\n".join(output) + "\n", file_descriptor)
 
 

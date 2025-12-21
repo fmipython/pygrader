@@ -3,8 +3,10 @@ Module containing the constants
 """
 
 import os
+from importlib.metadata import version
 
-VERSION = "1.6.0"
+VERSION = version("pygrader")
+
 
 # Directories
 ROOT_DIR = os.path.dirname(os.path.realpath(__name__))

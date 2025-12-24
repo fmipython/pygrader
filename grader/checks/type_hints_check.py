@@ -4,6 +4,7 @@ It calls mypy as a subprocess to generate a report and then read from the report
 """
 
 import logging
+from typing import Optional
 
 from grader.checks.abstract_check import ScoredCheck, CheckError, ScoredCheckResult
 from grader.utils.constants import MYPY_TYPE_HINT_CONFIG, REPORTS_TEMP_DIR, MYPY_LINE_COUNT_REPORT, MYPY_PATH
@@ -18,8 +19,15 @@ class TypeHintsCheck(ScoredCheck):
     The TypeHints check class.
     """
 
-    def __init__(self, name: str, project_root: str, max_points: int, is_venv_required: bool):
-        super().__init__(name, max_points, project_root, is_venv_required)
+    def __init__(
+        self,
+        name: str,
+        project_root: str,
+        max_points: int,
+        is_venv_required: bool,
+        env_vars: Optional[dict[str, str]] = None,
+    ):
+        super().__init__(name, max_points, project_root, is_venv_required, env_vars)
 
         self.__mypy_binary = MYPY_PATH
         self.__mypy_arguments = ["--config-file", MYPY_TYPE_HINT_CONFIG, "--linecount-report", REPORTS_TEMP_DIR]
@@ -53,6 +61,7 @@ class TypeHintsCheck(ScoredCheck):
             _ = process.run(
                 command,
                 current_directory=self._project_root,
+                env_vars=self._env_vars,
             )
         except (OSError, ValueError) as error:
             logger.error("Error while running mypy: %s", error)

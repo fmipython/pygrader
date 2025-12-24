@@ -14,6 +14,7 @@ from grader.utils.constants import (
 )
 from grader.utils.files import find_all_source_files
 from grader.utils.process import run
+from typing import Optional
 
 logger = logging.getLogger("grader")
 
@@ -23,8 +24,15 @@ class CoverageCheck(ScoredCheck):
     The Coverage check class.
     """
 
-    def __init__(self, name: str, project_root: str, max_points: int, is_venv_required: bool):
-        super().__init__(name, max_points, project_root, is_venv_required)
+    def __init__(
+        self,
+        name: str,
+        project_root: str,
+        max_points: int,
+        is_venv_required: bool,
+        env_vars: Optional[dict[str, str]] = None,
+    ):
+        super().__init__(name, max_points, project_root, is_venv_required, env_vars)
 
         self.__coverage_full_path = COVERAGE_PATH
 
@@ -77,7 +85,7 @@ class CoverageCheck(ScoredCheck):
         command = [self.__coverage_full_path] + COVERAGE_RUN_ARGS + COVERAGE_RUN_PYTEST_ARGS
 
         try:
-            output = run(command, current_directory=self._project_root)
+            output = run(command, current_directory=self._project_root, env_vars=self._env_vars)
         except (OSError, ValueError) as e:
             logger.error("Coverage run failed: %s", e)
             raise CheckError("Coverage run failed") from e
@@ -94,14 +102,14 @@ class CoverageCheck(ScoredCheck):
 
         try:
             command = [self.__coverage_full_path] + COVERAGE_REPORT_ARGS_NO_FORMAT + source_files
-            _ = run(command, current_directory=self._project_root)
+            _ = run(command, current_directory=self._project_root, env_vars=self._env_vars)
         except (OSError, ValueError) as e:
             logger.error("Coverage report (no format) failed: %s", e)
             raise CheckError("Coverage report (no format) failed") from e
 
         try:
             command = [self.__coverage_full_path] + COVERAGE_REPORT_ARGS + source_files
-            output = run(command, current_directory=self._project_root)
+            output = run(command, current_directory=self._project_root, env_vars=self._env_vars)
         except (OSError, ValueError) as e:
             logger.error("Coverage report (with format) failed: %s", e)
             raise CheckError("Coverage report (with format) failed") from e

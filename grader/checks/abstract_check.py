@@ -6,7 +6,7 @@ Each check should inherit from this class.
 from dataclasses import dataclass
 import logging
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic
+from typing import TypeVar, Generic, Optional
 
 from grader.utils.logger import VERBOSE
 from grader.utils.virtual_environment import VirtualEnvironment
@@ -32,10 +32,17 @@ class AbstractCheck(ABC, Generic[T]):
     Each check has a name and a project root path.
     """
 
-    def __init__(self, name: str, project_root: str, is_venv_required: bool = False):
+    def __init__(
+        self,
+        name: str,
+        project_root: str,
+        is_venv_required: bool = False,
+        env_vars: Optional[dict[str, str]] = None,
+    ):
         self._name = name
         self._project_root = project_root
         self._is_venv_required = is_venv_required
+        self._env_vars = env_vars
 
     @abstractmethod
     def run(self) -> CheckResult[T]:
@@ -99,8 +106,15 @@ class ScoredCheck(AbstractCheck[float]):
     Each scored check has a maximum amount of points.
     """
 
-    def __init__(self, name: str, max_points: int, project_root: str, is_venv_requred: bool = False):
-        super().__init__(name, project_root, is_venv_requred)
+    def __init__(
+        self,
+        name: str,
+        max_points: int,
+        project_root: str,
+        is_venv_requred: bool = False,
+        env_vars: Optional[dict[str, str]] = None,
+    ):
+        super().__init__(name, project_root, is_venv_requred, env_vars)
         self._max_points = max_points
 
     @property
@@ -117,8 +131,15 @@ class NonScoredCheck(AbstractCheck[bool]):
     Non-scored checks do not have a maximum amount of points.
     """
 
-    def __init__(self, name: str, project_root: str, is_fatal: bool, is_venv_requred: bool = False):
-        super().__init__(name, project_root, is_venv_requred)
+    def __init__(
+        self,
+        name: str,
+        project_root: str,
+        is_fatal: bool,
+        is_venv_requred: bool = False,
+        env_vars: Optional[dict[str, str]] = None,
+    ):
+        super().__init__(name, project_root, is_venv_requred, env_vars)
         self._is_fatal = is_fatal
 
     @property

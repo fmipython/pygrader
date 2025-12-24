@@ -11,6 +11,7 @@ from grader.checks.structure_check import StructureCheck
 from grader.checks.type_hints_check import TypeHintsCheck
 from grader.checks.run_tests_check import RunTestsCheck
 from grader.utils.config import InvalidConfigError
+from grader.utils.environment import merge_environment_variables
 
 
 NAME_TO_CHECK: dict[str, type[AbstractCheck]] = {
@@ -41,12 +42,14 @@ def create_checks(config: dict, project_root: str) -> tuple[list[AbstractCheck],
 
     checks: list[dict] = config["checks"]
 
+    global_env = config.get("environment", {}).get("variables", {})
+
     non_venv_checks = []
     venv_checks = []
 
     expected_keys = {"name", "is_venv_required"}
     for check in checks:
-        created_check = __create_check(project_root, expected_keys, check)
+        created_check = __create_check(project_root, expected_keys, check, global_env)
 
         is_venv = check.get("is_venv_required", False)
         if is_venv:
@@ -57,7 +60,7 @@ def create_checks(config: dict, project_root: str) -> tuple[list[AbstractCheck],
     return non_venv_checks, venv_checks
 
 
-def __create_check(project_root: str, expected_keys: set[str], check: dict) -> AbstractCheck:
+def __create_check(project_root: str, expected_keys: set[str], check: dict, global_env: dict) -> AbstractCheck:
     if any(key not in check for key in expected_keys):
         raise InvalidConfigError("Invalid check configuration")
 
@@ -66,8 +69,17 @@ def __create_check(project_root: str, expected_keys: set[str], check: dict) -> A
     if name not in NAME_TO_CHECK:
         raise InvalidCheckError(f"Unknown check name: {name}")
 
+    check_env = check.get("environment", {}).get("variables", {})
+
+    merged_env = merge_environment_variables(global_env, check_env)
+
     other_args = {**check}
     del other_args["name"]
+
+    if "environment" in other_args:
+        del other_args["environment"]
+
+    other_args["env_vars"] = merged_env
 
     check_class = NAME_TO_CHECK[name]
     created_check = check_class(name, project_root, **other_args)

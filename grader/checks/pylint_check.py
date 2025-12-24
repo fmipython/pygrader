@@ -1,5 +1,4 @@
-"""
-Module containing the pylint check.
+"""Module containing the pylint check.
 It uses the pylint python library directly to run the check.
 """
 
@@ -33,8 +32,9 @@ class PylintCheck(ScoredCheck):
         max_points: int,
         is_venv_required: bool,
         pylintrc_path: Optional[str] = None,
+        env_vars: Optional[dict[str, str]] = None,
     ):
-        super().__init__(name, max_points, project_root, is_venv_required)
+        super().__init__(name, max_points, project_root, is_venv_required, env_vars)
         self.__pylint_max_score = 10
         self.__pylintrc_path = pylintrc_path or const.PYLINTRC
 
@@ -63,7 +63,7 @@ class PylintCheck(ScoredCheck):
 
         command = [const.PYLINT_PATH] + pylint_args  # Current working directory is set in the process.run method
         try:
-            results = process.run(command, current_directory=self._project_root)
+            results = process.run(command, current_directory=self._project_root, env_vars=self._env_vars)
         except (OSError, ValueError) as error:
             logger.error("Error while running pylint: %s", error)
             raise CheckError("Error while running pylint") from error

@@ -8,6 +8,7 @@ import os
 
 from grader.checks.abstract_check import ScoredCheck, ScoredCheckResult
 from grader.utils.constants import REQUIREMENTS_FILENAME
+from typing import Optional
 
 logger = logging.getLogger("grader")
 
@@ -17,8 +18,15 @@ class RequirementsCheck(ScoredCheck):
     The requirements.txt check class.
     """
 
-    def __init__(self, name: str, project_root: str, max_points: int, is_venv_required: bool):
-        super().__init__(name, max_points, project_root, is_venv_required)
+    def __init__(
+        self,
+        name: str,
+        project_root: str,
+        max_points: int,
+        is_venv_required: bool,
+        env_vars: Optional[dict[str, str]] = None,
+    ):
+        super().__init__(name, max_points, project_root, is_venv_required, env_vars)
 
         self.__requirements_path = os.path.join(self._project_root, REQUIREMENTS_FILENAME)
 

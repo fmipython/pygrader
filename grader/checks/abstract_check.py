@@ -63,6 +63,16 @@ class AbstractCheck(ABC, Generic[T]):
         """
         return self._name
 
+    @property
+    def env_vars(self) -> Optional[dict[str, str]]:
+        """
+        Get the environment variables for the check.
+
+        :returns: The environment variables for the check.
+        :rtype: Optional[dict[str, str]]
+        """
+        return self._env_vars
+
     @staticmethod
     def is_running_within_venv() -> bool:
         """

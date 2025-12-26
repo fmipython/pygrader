@@ -85,7 +85,7 @@ class CoverageCheck(ScoredCheck):
         command = [self.__coverage_full_path] + COVERAGE_RUN_ARGS + COVERAGE_RUN_PYTEST_ARGS
 
         try:
-            output = run(command, current_directory=self._project_root, env_vars=self._env_vars)
+            output = run(command, current_directory=self._project_root, env_vars=self.env_vars)
         except (OSError, ValueError) as e:
             logger.error("Coverage run failed: %s", e)
             raise CheckError("Coverage run failed") from e
@@ -102,14 +102,14 @@ class CoverageCheck(ScoredCheck):
 
         try:
             command = [self.__coverage_full_path] + COVERAGE_REPORT_ARGS_NO_FORMAT + source_files
-            _ = run(command, current_directory=self._project_root, env_vars=self._env_vars)
+            _ = run(command, current_directory=self._project_root, env_vars=self.env_vars)
         except (OSError, ValueError) as e:
             logger.error("Coverage report (no format) failed: %s", e)
             raise CheckError("Coverage report (no format) failed") from e
 
         try:
             command = [self.__coverage_full_path] + COVERAGE_REPORT_ARGS + source_files
-            output = run(command, current_directory=self._project_root, env_vars=self._env_vars)
+            output = run(command, current_directory=self._project_root, env_vars=self.env_vars)
         except (OSError, ValueError) as e:
             logger.error("Coverage report (with format) failed: %s", e)
             raise CheckError("Coverage report (with format) failed") from e

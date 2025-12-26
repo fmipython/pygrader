@@ -5,6 +5,7 @@ Unit tests for the environment module in the grader.utils package.
 import os
 import unittest
 
+from unittest.mock import patch, MagicMock
 from grader.utils.environment import merge_environment_variables
 
 
@@ -25,23 +26,27 @@ class TestEnvironmentMerging(unittest.TestCase):
 
     def test_01_both_none_returns_none(self) -> None:
         """
-        Test that merging None and None returns None.
+        Test that merging None and None returns an empty dict.
         """
         # Act
         result = merge_environment_variables(None, None)
 
         # Assert
-        self.assertIsNone(result)
+        self.assertEqual(result, {})
 
-    def test_02_both_empty_returns_none(self) -> None:
+    @patch("os.environ")
+    def test_02_both_empty_returns_none(self, existing_env: MagicMock) -> None:
         """
-        Test that merging empty dicts returns None.
+        Test that merging empty dicts returns an empty dict.
         """
+        # Arrange
+        existing_env.return_value = {}
+
         # Act
         result = merge_environment_variables({}, {})
 
         # Assert
-        self.assertIsNone(result)
+        self.assertEqual(result, {})
 
     def test_03_global_only(self) -> None:
         """

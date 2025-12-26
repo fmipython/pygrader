@@ -63,7 +63,7 @@ class PylintCheck(ScoredCheck):
 
         command = [const.PYLINT_PATH] + pylint_args  # Current working directory is set in the process.run method
         try:
-            results = process.run(command, current_directory=self._project_root, env_vars=self._env_vars)
+            results = process.run(command, current_directory=self._project_root, env_vars=self.env_vars)
         except (OSError, ValueError) as error:
             logger.error("Error while running pylint: %s", error)
             raise CheckError("Error while running pylint") from error

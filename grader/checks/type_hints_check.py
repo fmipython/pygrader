@@ -61,7 +61,7 @@ class TypeHintsCheck(ScoredCheck):
             _ = process.run(
                 command,
                 current_directory=self._project_root,
-                env_vars=self._env_vars,
+                env_vars=self.env_vars,
             )
         except (OSError, ValueError) as error:
             logger.error("Error while running mypy: %s", error)

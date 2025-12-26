@@ -101,8 +101,8 @@ class RunTestsCheck(ScoredCheck):
 
         pythonpath_env = process.extend_env_variable("PYTHONPATH", self._project_root)
 
-        if self._env_vars is not None:
-            merged_env = {**self._env_vars, **pythonpath_env}
+        if self.env_vars is not None:
+            merged_env = {**self.env_vars, **pythonpath_env}
         else:
             merged_env = pythonpath_env
 

@@ -131,9 +131,12 @@ class TestChecksFactory(unittest.TestCase):
         # Assert
         self.assertEqual(len(non_venv_checks), 1)
         check = non_venv_checks[0]
-        self.assertIsNotNone(check._env_vars)
-        self.assertIn("GLOBAL_VAR", check._env_vars)
-        self.assertEqual(check._env_vars["GLOBAL_VAR"], "global_value")
+        self.assertIsNotNone(check.env_vars)
+
+        # To keep the linter happy
+        if check.env_vars is not None:
+            self.assertIn("GLOBAL_VAR", check.env_vars)
+            self.assertEqual(check.env_vars["GLOBAL_VAR"], "global_value")
 
     def test_10_environment_variables_check_specific(self) -> None:
         """
@@ -158,9 +161,12 @@ class TestChecksFactory(unittest.TestCase):
         # Assert
         self.assertEqual(len(non_venv_checks), 1)
         check = non_venv_checks[0]
-        self.assertIsNotNone(check._env_vars)
-        self.assertIn("CHECK_VAR", check._env_vars)
-        self.assertEqual(check._env_vars["CHECK_VAR"], "check_value")
+        self.assertIsNotNone(check.env_vars)
+
+        # To keep the linter happy
+        if check.env_vars is not None:
+            self.assertIn("CHECK_VAR", check.env_vars)
+            self.assertEqual(check.env_vars["CHECK_VAR"], "check_value")
 
     def test_11_environment_variables_merge_priority(self) -> None:
         """
@@ -186,13 +192,16 @@ class TestChecksFactory(unittest.TestCase):
         # Assert
         self.assertEqual(len(non_venv_checks), 1)
         check = non_venv_checks[0]
-        self.assertIsNotNone(check._env_vars)
-        # Check that check-specific API_KEY overrides global
-        self.assertEqual(check._env_vars["API_KEY"], "check_key")
-        # Check that global variable is still present
-        self.assertEqual(check._env_vars["GLOBAL_VAR"], "global_value")
-        # Check that check-specific variable is present
-        self.assertEqual(check._env_vars["CHECK_VAR"], "check_value")
+        self.assertIsNotNone(check.env_vars)
+
+        # To keep the linter happy
+        if check.env_vars is not None:
+            # Check that check-specific API_KEY overrides global
+            self.assertEqual(check.env_vars["API_KEY"], "check_key")
+            # Check that global variable is still present
+            self.assertEqual(check.env_vars["GLOBAL_VAR"], "global_value")
+            # Check that check-specific variable is present
+            self.assertEqual(check.env_vars["CHECK_VAR"], "check_value")
 
     def test_12_environment_variables_none_when_not_defined(self) -> None:
         """
@@ -208,4 +217,4 @@ class TestChecksFactory(unittest.TestCase):
         # Assert
         self.assertEqual(len(non_venv_checks), 1)
         check = non_venv_checks[0]
-        self.assertIsNone(check._env_vars)
+        self.assertIsNone(check.env_vars)

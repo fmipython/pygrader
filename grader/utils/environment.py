@@ -9,7 +9,7 @@ from typing import Optional
 def merge_environment_variables(
     global_env: Optional[dict[str, str]],
     check_env: Optional[dict[str, str]],
-) -> Optional[dict[str, str]]:
+) -> dict[str, str]:
     """
     Merge environment variables with the following priority (highest to lowest):
     1. Check-specific environment variables
@@ -21,7 +21,7 @@ def merge_environment_variables(
     :return: Merged environment variables, or None if both inputs are empty/None.
     """
     if global_env is None and check_env is None:
-        return None
+        return {}
 
     merged = dict(os.environ)
 

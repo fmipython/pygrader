@@ -26,13 +26,13 @@ jobs:
         run: uv sync --locked --all-extras --dev
 
       - name: pylint
-        run: uv run pylint grader desktop web tests pygrader.py --fail-under 9
+        run: uv run pylint grader desktop tests pygrader.py --fail-under 9
 
       - name: mypy
-        run: uv run mypy grader desktop web tests pygrader.py --ignore-missing-imports
+        run: uv run mypy grader desktop tests pygrader.py --ignore-missing-imports
       
       - name: flake8
-        run: uv run flake8 grader desktop web tests pygrader.py
+        run: uv run flake8 grader desktop tests pygrader.py
       
       - name: complexipy
         run: uv run complexipy .

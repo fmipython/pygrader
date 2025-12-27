@@ -66,25 +66,19 @@ class VirtualEnvironment:
         # Install project as package
         # note: we haven't shown them `setup.py` so we shouldn't look for it?
         # only support `pyproject.toml` configuration for now
-        if os.path.exists(os.path.join(self._project_path, "pyproject.toml")):
+        if os.path.exists(os.path.join(self._project_path, const.PYPROJECT_FILENAME)):
             logger.log(VERBOSE, "Installing project as package")
-            VirtualEnvironment.__install_project_as_package(
-                self._venv_path, self._project_path
-            )
+            VirtualEnvironment.__install_project_as_package(self._venv_path, self._project_path)
         else:
             # if it is not a packaged project, check for requirements.txt and install them
-            requirements_path = os.path.join(
-                self._project_path, const.REQUIREMENTS_FILENAME
-            )
+            requirements_path = os.path.join(self._project_path, const.REQUIREMENTS_FILENAME)
 
             does_requirements_exist = os.path.exists(requirements_path)
             if not does_requirements_exist:
                 logger.debug("No requirements.txt file found in the project directory")
             else:
                 logger.log(VERBOSE, "Installing requirements")
-                VirtualEnvironment.__install_requirements(
-                    self._venv_path, requirements_path
-                )
+                VirtualEnvironment.__install_requirements(self._venv_path, requirements_path)
 
         # Install grader dependencies
         logger.log(VERBOSE, "Installing grader dependencies")
@@ -96,6 +90,7 @@ class VirtualEnvironment:
         """
         Delete the virtual environment.
         """
+        logger.debug(self.__keep_venv)
         if not self.__keep_venv:
             shutil.rmtree(self._venv_path)
 
@@ -139,9 +134,7 @@ class VirtualEnvironment:
 
         if output.returncode != 0:
             logger.error("Failed to install project from %s", project_path)
-            raise VirtualEnvironmentError(
-                f"Failed to install project from {project_path}"
-            )
+            raise VirtualEnvironmentError(f"Failed to install project from {project_path}")
 
 
 class VirtualEnvironmentError(Exception):

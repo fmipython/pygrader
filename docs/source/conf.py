@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.abspath("../.."))  # Adjust path as needed
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = "PythonProjectGrader"
+project = "pygrader"
 copyright = "2025, Lyuboslav Karev"
 author = "Lyuboslav Karev"
 release = "1.0.0"

@@ -1,5 +1,19 @@
 # pygrader
 
+## 1.7.0
+
+- Pylintrc can now be part of the config
+- Add total score and max score to JSON, CSV, and PlainText result displays
+- Environment variables can now be passed from the config
+
+## 1.6.0
+
+- Pygrader now accepts zip archieves as input
+
+## 1.5.3
+
+- Add pyproject.toml install support
+
 ## 1.5.2
 
 - Float comparison caused issues when there are failing tests
@@ -13,7 +27,6 @@
 
 - Structure check files are now in JSON format.
 - Configs accept template parameters
-
 
 ## 1.4.0
 

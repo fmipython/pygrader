@@ -1,14 +1,18 @@
-FROM python:3.12-slim
+FROM ghcr.io/astral-sh/uv:python3.13-slim
 
 RUN mkdir /app
 RUN mkdir /assets
 WORKDIR /app
 
-COPY requirements-prod.txt .
-RUN pip install -r requirements-prod.txt
+# COPY uv.lock .
+# COPY pyproject.toml .
+# RUN uv sync --locked --no-install-project --no-dev
 
 COPY . .
 
+RUN uv sync --locked --no-dev
+
 VOLUME ["/project"]
 
-ENTRYPOINT ["python", "pygrader.py", "--config", "https://api.github.com/repos/fmipython/PythonCourse2025/contents/homeworks/homework3/pygrader_config_public_web.json", "/project"]
+ENTRYPOINT ["uv", "run", "--no-dev", "pygrader.py", "--config", "https://api.github.com/repos/fmipython/PythonCourse2025/contents/homeworks/homework3/pygrader_config_public_web.json", "/project"]
+

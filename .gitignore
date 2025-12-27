@@ -182,3 +182,5 @@ docs/diagrams/out
 *.env
 .private
 *.zip
+
+**/.DS_Store

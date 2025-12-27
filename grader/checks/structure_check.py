@@ -11,6 +11,7 @@ from grader.checks.abstract_check import NonScoredCheck, CheckError, NonScoredCh
 from grader.utils.external_resources import is_resource_remote, download_file_from_url
 from grader.utils.logger import VERBOSE
 from grader.utils.structure_validator import StructureValidator
+from typing import Optional
 
 logger = logging.getLogger("grader")
 
@@ -20,8 +21,16 @@ class StructureCheck(NonScoredCheck):
     The Structure check class.
     """
 
-    def __init__(self, name: str, project_root: str, structure_file: str, is_venv_required: bool = False):
-        super().__init__(name, project_root, is_venv_required)
+    def __init__(
+        self,
+        name: str,
+        project_root: str,
+        structure_file: str,
+        is_fatal: bool = False,
+        is_venv_required: bool = False,
+        env_vars: Optional[dict[str, str]] = None,
+    ):
+        super().__init__(name, project_root, is_fatal, is_venv_required, env_vars)
         self.__structure_file = structure_file
 
     def run(self) -> NonScoredCheckResult:

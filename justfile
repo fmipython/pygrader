@@ -1,8 +1,5 @@
-packages := "grader,desktop,web"
-project_content := "grader desktop web tests pygrader.py"
-
-venv:
-    . .venv/bin/activate
+packages := "grader,desktop"
+project_content := "grader desktop tests pygrader.py"
 
 init:
     python3 -m venv .venv
@@ -10,39 +7,29 @@ init:
     pip install -r requirements.txt
 
 # Linting
-lint: venv
-    python3 -m pylint {{project_content}} --fail-under 9
-    mypy {{project_content}} --ignore-missing-imports
-    flake8 {{project_content}}
-    complexipy .
-
-lint_file file: venv
-    python3 -m pylint {{file}} --fail-under 9
-    mypy {{file}} --ignore-missing-imports
+lint:
+    uv run pylint {{project_content}} --fail-under 9
+    uv run mypy {{project_content}} --ignore-missing-imports
+    uv run flake8 {{project_content}}
+    uv run complexipy .
 
 # Tests
 test: unit_tests functional_tests
 
-unit_tests: venv
-    find tests -type f -name "test_*.py" -not -name "test_functional.py" -not -path "*sample_project*" | xargs python3 -m unittest -v
+unit_tests:
+    find tests -type f -name "test_*.py" -not -name "test_functional.py" -not -path "*sample_project*" | xargs uv run -m unittest -v
 
-functional_tests: venv
-    python3 -m unittest discover -s tests -p "test_functional.py"
+functional_tests:
+    uv run -m unittest discover -s tests -p "test_functional.py"
 
-coverage: venv
-    find tests -type f -name "test_*.py" -not -name "test_functional.py" | xargs coverage run --source={{packages}} -m unittest
-    coverage lcov -o lcov.info
-    coverage report -m --fail-under 85 --sort=cover
+coverage:
+    find tests -type f -name "test_*.py" -not -name "test_functional.py" | xargs uv run coverage run --source={{packages}} -m unittest
+    uv run coverage lcov -o lcov.info
+    uv run coverage report -m --fail-under 85 --sort=cover
 
-push: venv lint test
-    git push
-
-run: venv
-    python3 src/pygrader.py
-
-docs: venv
-    sphinx-apidoc -o docs/source grader
-    sphinx-build -b html docs/source docs/build
+docs:
+    uv run sphinx-apidoc -o docs/source grader
+    uv run sphinx-build -b html docs/source docs/build
 
 # Cleaning
 clean: clean_logs
@@ -71,13 +58,7 @@ clean_sample_project:
 build_diagrams:
     java -jar ~/plantuml-1.2025.4.jar ./docs/diagrams/*.puml -o out
 
-
-# Web via Docker
-build_docker_web:
-    docker build -f Dockerfile.web -t pygrader_web:latest .
-
-run_docker_web:
-    docker run --rm -p 8501:8501 pygrader_web:latest
-
 build_docker:
+    uv sync
+    uv lock
     docker build -f Dockerfile -t pygrader:latest .

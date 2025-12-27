@@ -5,7 +5,9 @@ Module for functional tests of the grader.
 import os
 import shutil
 import unittest
+import zipfile
 
+from pathlib import Path
 from typing import Optional
 
 import grader.utils.constants as const
@@ -18,7 +20,7 @@ class BaseFunctionalTestWithGrader(unittest.TestCase):
     """
 
     repo_url = "https://github.com/fmipython/pygrader"
-    clone_path = "/tmp/pygrader"
+    clone_path = "/tmp/pygrader-cloned"
 
     def setUp(self) -> None:
         if os.path.exists(self.clone_path):
@@ -258,7 +260,11 @@ class TestFunctionalBadWeatherWithGrader(BaseFunctionalTestWithGrader):
         # Arrange
         command = build_command(project_path=self.clone_path)
 
-        os.remove(os.path.join(self.clone_path, "requirements.txt"))
+        if os.path.exists(os.path.join(self.clone_path, "requirements.txt")):
+            os.remove(os.path.join(self.clone_path, "requirements.txt"))
+
+        if os.path.exists(os.path.join(self.clone_path, "pyproject.toml")):
+            os.remove(os.path.join(self.clone_path, "pyproject.toml"))
 
         # Act
         run_result = run(command)
@@ -504,6 +510,33 @@ class TestRemoteTests(BaseFunctionalTestWithSampleProject):
         # Assert
         self.assertEqual(run_result.returncode, 0, run_result.stdout)
         self.assertTrue(is_score_correct(expected_score=13.5, target_check="tests", grader_output=run_result.stdout))
+
+
+class TestZipFileOnSampleProject(BaseFunctionalTestWithSampleProject):
+    def test_01_zip_archive_passed(self) -> None:
+        """
+        Verify that when passing a zip version of the project, it is graded.
+        """
+        # Arrange
+        folder_path = Path(self.clone_path)
+        zip_path = folder_path / "project.zip"
+
+        with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zip_file:
+            for entry in folder_path.rglob("*"):
+                if entry.is_file():
+                    zip_file.write(entry, entry.relative_to(folder_path))
+
+        command = build_command(project_path=str(zip_path), config_file="only_pylint.json")
+
+        # Act
+        run_result = run(command)
+
+        # Assert
+        self.assertEqual(run_result.returncode, 0, run_result.stdout)
+        self.assertTrue(
+            is_score_correct(expected_score=1, target_check="pylint", grader_output=run_result.stdout),
+            "Pylint check did not have the expected score of 1",
+        )
 
 
 def build_command(

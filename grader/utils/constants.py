@@ -3,14 +3,18 @@ Module containing the constants
 """
 
 import os
+from importlib.metadata import version
 
-VERSION = "1.5.2"
+VERSION = version("pygrader")
+
 
 # Directories
 ROOT_DIR = os.path.dirname(os.path.realpath(__name__))
 REPORTS_TEMP_DIR = os.path.join(ROOT_DIR, "reports")
 CONFIG_DIR = os.path.join(ROOT_DIR, "config")
-TEMP_FILES_DIR = os.path.join(ROOT_DIR, "temp_files")
+TEMP_FILES_DIR = os.path.join(ROOT_DIR, "temp_files")  # TODO - Change this to be under WORK_DIR ?
+
+WORK_DIR = os.path.join("/tmp", "pygrader")
 
 # Python
 PYTHON_BIN_WINDOWS = "python.exe"
@@ -21,6 +25,7 @@ PYTHON_BIN = PYTHON_BIN_WINDOWS if os.name == "nt" else PYTHON_BIN_UNIX
 
 # Virtual environment constants
 REQUIREMENTS_FILENAME = "requirements.txt"
+PYPROJECT_FILENAME = "pyproject.toml"
 VENV_NAME = ".venv"
 POSSIBLE_VENV_DIRS = ["venv", ".venv"]
 PIP_PATH_WINDOWS = os.path.join("Scripts", "pip.exe")

@@ -31,6 +31,7 @@ class RunTestsCheck(ScoredCheck):
         tests_path: list[str],
         default_test_score: float = 0.0,
         test_score_mapping: Optional[dict[str, float]] = None,
+        env_vars: Optional[dict[str, str]] = None,
     ):
         """
         Initialize the TestsCheck class.
@@ -43,7 +44,7 @@ class RunTestsCheck(ScoredCheck):
         :param default_test_score: The default score for tests not explicitly mapped.
         :param test_score_mapping: A mapping of test names to their respective scores.
         """
-        super().__init__(name, max_points, project_root, is_venv_required)
+        super().__init__(name, max_points, project_root, is_venv_required, env_vars)
         self.__default_test_score = default_test_score
         self.__test_score_mapping = defaultdict(lambda: default_test_score)
 
@@ -98,11 +99,18 @@ class RunTestsCheck(ScoredCheck):
             pytest_root_dir = PYTEST_ROOT_DIR_ARG.format(os.path.join(os.getcwd(), self._project_root))
         command = [PYTEST_PATH] + PYTEST_ARGS + [pytest_root_dir] + self.__tests_path
 
+        pythonpath_env = process.extend_env_variable("PYTHONPATH", self._project_root)
+
+        if self.env_vars is not None:
+            merged_env = {**self.env_vars, **pythonpath_env}
+        else:
+            merged_env = pythonpath_env
+
         try:
             output = process.run(
                 command,
                 current_directory=self._project_root,
-                env_vars=process.extend_env_variable("PYTHONPATH", self._project_root),
+                env_vars=merged_env,
             )
         except (OSError, ValueError) as e:
             logger.error("Tests run failed: %s", e)

@@ -3,6 +3,8 @@ Unit tests for the checks_factory module in the grader package.
 """
 
 import unittest
+
+from unittest.mock import patch, MagicMock
 from grader.checks.checks_factory import create_checks, InvalidCheckError
 from grader.utils.config import InvalidConfigError
 
@@ -113,3 +115,110 @@ class TestChecksFactory(unittest.TestCase):
         # Act
         with self.assertRaises(InvalidConfigError):
             _ = create_checks(config, project_root)
+
+    def test_09_environment_variables_global_only(self) -> None:
+        """
+        Test that global environment variables are passed to checks.
+        """
+        # Arrange
+        config = {
+            "environment": {"variables": {"GLOBAL_VAR": "global_value"}},
+            "checks": [{"name": "coverage", "max_points": 10, "is_venv_required": False}],
+        }
+        project_root = "test_project"
+
+        # Act
+        non_venv_checks, _ = create_checks(config, project_root)
+
+        # Assert
+        self.assertEqual(len(non_venv_checks), 1)
+        check = non_venv_checks[0]
+        self.assertIsNotNone(check.env_vars)
+
+        # To keep the linter happy
+        if check.env_vars is not None:
+            self.assertIn("GLOBAL_VAR", check.env_vars)
+            self.assertEqual(check.env_vars["GLOBAL_VAR"], "global_value")
+
+    def test_10_environment_variables_check_specific(self) -> None:
+        """
+        Test that check-specific environment variables are passed to checks.
+        """
+        # Arrange
+        config = {
+            "checks": [
+                {
+                    "name": "coverage",
+                    "max_points": 10,
+                    "is_venv_required": False,
+                    "environment": {"variables": {"CHECK_VAR": "check_value"}},
+                }
+            ]
+        }
+        project_root = "test_project"
+
+        # Act
+        non_venv_checks, _ = create_checks(config, project_root)
+
+        # Assert
+        self.assertEqual(len(non_venv_checks), 1)
+        check = non_venv_checks[0]
+        self.assertIsNotNone(check.env_vars)
+
+        # To keep the linter happy
+        if check.env_vars is not None:
+            self.assertIn("CHECK_VAR", check.env_vars)
+            self.assertEqual(check.env_vars["CHECK_VAR"], "check_value")
+
+    def test_11_environment_variables_merge_priority(self) -> None:
+        """
+        Test that check-specific environment variables override global ones.
+        """
+        # Arrange
+        config = {
+            "environment": {"variables": {"API_KEY": "global_key", "GLOBAL_VAR": "global_value"}},
+            "checks": [
+                {
+                    "name": "coverage",
+                    "max_points": 10,
+                    "is_venv_required": False,
+                    "environment": {"variables": {"API_KEY": "check_key", "CHECK_VAR": "check_value"}},
+                }
+            ],
+        }
+        project_root = "test_project"
+
+        # Act
+        non_venv_checks, _ = create_checks(config, project_root)
+
+        # Assert
+        self.assertEqual(len(non_venv_checks), 1)
+        check = non_venv_checks[0]
+        self.assertIsNotNone(check.env_vars)
+
+        # To keep the linter happy
+        if check.env_vars is not None:
+            # Check that check-specific API_KEY overrides global
+            self.assertEqual(check.env_vars["API_KEY"], "check_key")
+            # Check that global variable is still present
+            self.assertEqual(check.env_vars["GLOBAL_VAR"], "global_value")
+            # Check that check-specific variable is present
+            self.assertEqual(check.env_vars["CHECK_VAR"], "check_value")
+
+    @patch("os.environ")
+    def test_12_environment_variables_none_when_not_defined(self, existing_env: MagicMock) -> None:
+        """
+        Test that env_vars is None when no environment variables are defined.
+        """
+        # Arrange
+        existing_env.return_value = {}
+        config = {"checks": [{"name": "coverage", "max_points": 10, "is_venv_required": False}]}
+        project_root = "test_project"
+
+        # Act
+        non_venv_checks, _ = create_checks(config, project_root)
+
+        # Assert
+        self.assertEqual(len(non_venv_checks), 1)
+        check = non_venv_checks[0]
+        self.assertEqual(check.env_vars, {})

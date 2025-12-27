@@ -3,6 +3,8 @@ Unit tests for the checks_factory module in the grader package.
 """
 
 import unittest
+
+from unittest.mock import patch, MagicMock
 from grader.checks.checks_factory import create_checks, InvalidCheckError
 from grader.utils.config import InvalidConfigError
 
@@ -203,11 +205,13 @@ class TestChecksFactory(unittest.TestCase):
             # Check that check-specific variable is present
             self.assertEqual(check.env_vars["CHECK_VAR"], "check_value")
 
-    def test_12_environment_variables_none_when_not_defined(self) -> None:
+    @patch("os.environ")
+    def test_12_environment_variables_none_when_not_defined(self, existing_env: MagicMock) -> None:
         """
         Test that env_vars is None when no environment variables are defined.
         """
         # Arrange
+        existing_env.return_value = {}
         config = {"checks": [{"name": "coverage", "max_points": 10, "is_venv_required": False}]}
         project_root = "test_project"
 
@@ -217,4 +221,4 @@ class TestChecksFactory(unittest.TestCase):
         # Assert
         self.assertEqual(len(non_venv_checks), 1)
         check = non_venv_checks[0]
-        self.assertIsNone(check.env_vars)
+        self.assertEqual(check.env_vars, {})

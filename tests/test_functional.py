@@ -260,7 +260,11 @@ class TestFunctionalBadWeatherWithGrader(BaseFunctionalTestWithGrader):
         # Arrange
         command = build_command(project_path=self.clone_path)
 
-        os.remove(os.path.join(self.clone_path, "requirements.txt"))
+        if os.path.exists(os.path.join(self.clone_path, "requirements.txt")):
+            os.remove(os.path.join(self.clone_path, "requirements.txt"))
+
+        if os.path.exists(os.path.join(self.clone_path, "pyproject.toml")):
+            os.remove(os.path.join(self.clone_path, "pyproject.toml"))
 
         # Act
         run_result = run(command)

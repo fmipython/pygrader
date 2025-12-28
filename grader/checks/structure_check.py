@@ -57,9 +57,9 @@ class StructureCheck(NonScoredCheck):
             logger.log(VERBOSE, "Is %s structure valid ? %s", element.name, is_element_valid)
 
             if element.required and not is_element_valid:
-                return NonScoredCheckResult(self.name, False, "", "")
+                return NonScoredCheckResult(self.name, False, f"Structure for '{element.name}' is invalid.", "")
 
-        return NonScoredCheckResult(self.name, True, "", "")
+        return NonScoredCheckResult(self.name, True, "Structure is valid", "")
 
     @staticmethod
     def __load_structure_file(filepath: str) -> list[StructureValidator]:

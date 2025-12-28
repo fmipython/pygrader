@@ -3,6 +3,7 @@ Module containing the check for running tests against the submitted code.
 """
 
 from collections import defaultdict
+from dataclasses import dataclass
 from typing import Optional
 import logging
 import os
@@ -14,6 +15,18 @@ from grader.utils.logger import VERBOSE
 from grader.utils import process
 
 logger = logging.getLogger("grader")
+
+
+@dataclass
+class TestId:
+    class_name: str
+    test_name: str
+
+    def __str__(self) -> str:
+        return f"{self.class_name}::{self.test_name}"
+
+    def pretty(self, is_passing: bool) -> str:
+        return f"Test {str(self)} {'passed' if is_passing else 'failed'}."
 
 
 class RunTestsCheck(ScoredCheck):
@@ -83,7 +96,11 @@ class RunTestsCheck(ScoredCheck):
         logger.log(VERBOSE, "Passed tests: %d/%d", len(passed), total_amount)
         logger.log(VERBOSE, "Failed tests: %d/%d", len(failed), total_amount)
 
-        return ScoredCheckResult(self.name, passed_tests_score, "", "", self.max_points)
+        tests_info = []
+        tests_info += [test.pretty(True) for test in passed]
+        tests_info += [test.pretty(False) for test in failed]
+
+        return ScoredCheckResult(self.name, passed_tests_score, "\n".join(tests_info), "", self.max_points)
 
     def __pytest_run(self) -> str:
         """
@@ -122,7 +139,7 @@ class RunTestsCheck(ScoredCheck):
 
         return output.stdout
 
-    def __parse_pytest_output(self, output: str) -> tuple[list[tuple[str, str]], list[tuple[str, str]]]:
+    def __parse_pytest_output(self, output: str) -> tuple[list[TestId], list[TestId]]:
         """
         Parse the output from pytest to determine passed and failed tests.
 
@@ -139,12 +156,13 @@ class RunTestsCheck(ScoredCheck):
             if line.startswith("PASSED"):
                 class_name = items[-2]
                 test_name = items[-1]
-                passed_tests.append((class_name, test_name))
+                passed_tests.append(TestId(class_name, test_name))
             elif line.startswith("FAILED"):
                 class_name = items[-2]
                 test_name = items[-1].split(" ")[0]  # test_06_str_method - AssertionError: ...
-                logger.log(VERBOSE, f"Test {class_name}::{test_name} failed")
-                failed_tests.append((class_name, test_name))
+                test_id = TestId(class_name, test_name)
+                logger.log(VERBOSE, "Test %s failed", test_id)
+                failed_tests.append(test_id)
 
         return passed_tests, failed_tests
 
@@ -155,9 +173,7 @@ class RunTestsCheck(ScoredCheck):
             path if not is_resource_remote(path) else download_file_from_url(path) for path in self.__tests_path
         ]
 
-    def __calculate_score(
-        self, passed_tests: list[tuple[str, str]], failed_tests: list[tuple[str, str]]
-    ) -> tuple[float, float, float]:
+    def __calculate_score(self, passed_tests: list[TestId], failed_tests: list[TestId]) -> tuple[float, float, float]:
         """
         Calculate the total score based on passed and failed tests.
 
@@ -167,21 +183,15 @@ class RunTestsCheck(ScoredCheck):
         :rtype: float
         """
 
-        passed_tests_score = sum(
-            self.__score_test(passed_test_class, passed_test_name)
-            for passed_test_class, passed_test_name in passed_tests
-        )
+        passed_tests_score = sum(self.__score_test(passed_test) for passed_test in passed_tests)
 
-        failed_tests_score = sum(
-            self.__score_test(failed_test_class, failed_test_name)
-            for failed_test_class, failed_test_name in failed_tests
-        )
+        failed_tests_score = sum(self.__score_test(failed_test) for failed_test in failed_tests)
 
         total_score = passed_tests_score + failed_tests_score
 
         return passed_tests_score, failed_tests_score, total_score
 
-    def __score_test(self, test_class: str, test_name: str) -> float:
+    def __score_test(self, test: TestId) -> float:
         """
         Score an individual test based on its class and name.
 
@@ -194,6 +204,8 @@ class RunTestsCheck(ScoredCheck):
         :param test_name: The name of the test.
         :return: The score for the test.
         """
+        test_class = test.class_name
+        test_name = test.test_name
 
         if test_class in self.__test_score_mapping and test_name in self.__test_score_mapping:
             score = self.__test_score_mapping[test_name]

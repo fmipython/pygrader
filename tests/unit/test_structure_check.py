@@ -33,7 +33,7 @@ class TestStructureCheck(unittest.TestCase):
         mock_element.is_structure_valid.return_value = True
         mock_element.required = True
         mock_load_structure_file.return_value = [mock_element]
-        expected = NonScoredCheckResult(self.structure_check.name, True, "", "")
+        expected = NonScoredCheckResult(self.structure_check.name, True, "Structure is valid", "")
 
         # Act
         result = self.structure_check.run()
@@ -48,10 +48,14 @@ class TestStructureCheck(unittest.TestCase):
         """
         # Arrange
         mock_element = MagicMock()
+        expected_element_name = "foo"
+        mock_element.name = expected_element_name
         mock_element.is_structure_valid.return_value = False
         mock_element.required = True
         mock_load_structure_file.return_value = [mock_element]
-        expected = NonScoredCheckResult(self.structure_check.name, False, "", "")
+
+        expected_info = f"Structure for '{expected_element_name}' is invalid."
+        expected = NonScoredCheckResult(self.structure_check.name, False, expected_info, "")
 
         # Act
         result = self.structure_check.run()
@@ -69,7 +73,8 @@ class TestStructureCheck(unittest.TestCase):
         mock_element.is_structure_valid.return_value = False
         mock_element.required = False
         mock_load_structure_file.return_value = [mock_element]
-        expected = NonScoredCheckResult(self.structure_check.name, True, "", "")
+
+        expected = NonScoredCheckResult(self.structure_check.name, True, "Structure is valid", "")
 
         # Act
         result = self.structure_check.run()
@@ -84,7 +89,7 @@ class TestStructureCheck(unittest.TestCase):
         """
         # Arrange
         mock_load_structure_file.return_value = []
-        expected = NonScoredCheckResult(self.structure_check.name, True, "", "")
+        expected = NonScoredCheckResult(self.structure_check.name, True, "Structure is valid", "")
 
         # Act
         result = self.structure_check.run()
@@ -139,7 +144,7 @@ class TestStructureCheck(unittest.TestCase):
         mock_element2.required = False
 
         mock_load_structure_file.return_value = [mock_element1, mock_element2]
-        expected = NonScoredCheckResult(self.structure_check.name, True, "", "")
+        expected = NonScoredCheckResult(self.structure_check.name, True, "Structure is valid", "")
 
         # Act
         result = self.structure_check.run()
@@ -158,11 +163,14 @@ class TestStructureCheck(unittest.TestCase):
         mock_element1.required = True
 
         mock_element2 = MagicMock()
+        expected_element_name = "bar"
+        mock_element2.name = expected_element_name
+        expected_info = f"Structure for '{expected_element_name}' is invalid."
         mock_element2.is_structure_valid.return_value = False
         mock_element2.required = True
 
         mock_load_structure_file.return_value = [mock_element1, mock_element2]
-        expected = NonScoredCheckResult(self.structure_check.name, False, "", "")
+        expected = NonScoredCheckResult(self.structure_check.name, False, expected_info, "")
 
         # Act
         result = self.structure_check.run()
@@ -185,7 +193,7 @@ class TestStructureCheck(unittest.TestCase):
         mock_element2.required = False
 
         mock_load_structure_file.return_value = [mock_element1, mock_element2]
-        expected = NonScoredCheckResult(self.structure_check.name, True, "", "")
+        expected = NonScoredCheckResult(self.structure_check.name, True, "Structure is valid", "")
 
         # Act
         result = self.structure_check.run()
@@ -200,15 +208,21 @@ class TestStructureCheck(unittest.TestCase):
         """
         # Arrange
         mock_element1 = MagicMock()
+        expected_element1_name = "foo"
+        mock_element1.name = expected_element1_name
         mock_element1.is_structure_valid.return_value = False
         mock_element1.required = True
 
         mock_element2 = MagicMock()
+        expected_element2_name = "bar"
+        mock_element2.name = expected_element2_name
         mock_element2.is_structure_valid.return_value = False
         mock_element2.required = False
 
         mock_load_structure_file.return_value = [mock_element1, mock_element2]
-        expected = NonScoredCheckResult(self.structure_check.name, False, "", "")
+
+        expected_info = f"Structure for '{expected_element1_name}' is invalid."
+        expected = NonScoredCheckResult(self.structure_check.name, False, expected_info, "")
 
         # Act
         result = self.structure_check.run()

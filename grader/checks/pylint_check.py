@@ -76,7 +76,9 @@ class PylintCheck(ScoredCheck):
         logger.debug("Pylint score: %s", pylint_score)
         score = self.__translate_score(pylint_score)
 
-        return ScoredCheckResult(self.name, score, "", "", self.max_points)
+        short_output = self.__summarize_output(results.stdout)
+
+        return ScoredCheckResult(self.name, score, short_output, "", self.max_points)
 
     def __translate_score(self, pylint_score: float) -> float:
         """
@@ -122,6 +124,25 @@ class PylintCheck(ScoredCheck):
 
         logger.error("Pylint score not found")
         raise CheckError("Pylint score not found")
+
+    def __summarize_output(self, pylint_output: str) -> str:
+        """
+        Summarize the pylint output to only include the messages.
+
+        :param pylint_output: The output from the pylint check
+        :return: The summarized output
+        """
+        summarized_output = []
+        for line in pylint_output.strip().split("\n"):
+            parts = line.split(":")
+
+            if len(parts) < 6:
+                continue
+
+            code, message = parts[4], parts[5]
+            summarized_output.append(f"{code.strip()}: {message.strip()}")
+
+        return "\n".join(summarized_output)
 
 
 class PylintCustomReporter(TextReporter):

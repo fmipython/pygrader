@@ -25,6 +25,8 @@ class CheckResult(Generic[T]):
 
     name: str
     result: T
+    info: str
+    error: str
 
 
 class AbstractCheck(ABC, Generic[T]):

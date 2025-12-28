@@ -83,7 +83,7 @@ class RunTestsCheck(ScoredCheck):
         logger.log(VERBOSE, "Passed tests: %d/%d", len(passed), total_amount)
         logger.log(VERBOSE, "Failed tests: %d/%d", len(failed), total_amount)
 
-        return ScoredCheckResult(self.name, passed_tests_score, self.max_points)
+        return ScoredCheckResult(self.name, passed_tests_score, "", "", self.max_points)
 
     def __pytest_run(self) -> str:
         """

@@ -80,12 +80,12 @@ class TypeHintsCheck(ScoredCheck):
 
         if int(lines_total) == 0:
             logger.error("Mypy linecount report is empty")
-            return ScoredCheckResult(self.name, 0, self.max_points)
+            return ScoredCheckResult(self.name, 0, "", "", self.max_points)
 
         # Calculate score
         score = self.__translate_score(int(lines_with_type_annotations) / int(lines_total))
 
-        return ScoredCheckResult(self.name, score, self.max_points)
+        return ScoredCheckResult(self.name, score, "", "", self.max_points)
 
     def __translate_score(self, mypy_score: float) -> float:
         """

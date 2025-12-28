@@ -44,7 +44,7 @@ class TestTestsCheck(unittest.TestCase):
         """
         # Arrange
         mock_pytest_run.return_value = "PASSED ::test_1::test_1\nPASSED ::test_2::test_2"
-        expected_score = ScoredCheckResult(self.name, 50.0, self.max_points)
+        expected_score = ScoredCheckResult(self.name, 50.0, "", "", self.max_points)
 
         # Act
         score = self.tests_check.run()
@@ -59,7 +59,7 @@ class TestTestsCheck(unittest.TestCase):
         """
         # Arrange
         mock_pytest_run.return_value = "PASSED ::test_1::test_1\nFAILED ::test_2::test_2"
-        expected_score = ScoredCheckResult(self.name, 20.0, self.max_points)
+        expected_score = ScoredCheckResult(self.name, 20.0, "", "", self.max_points)
 
         # Act
         score = self.tests_check.run()
@@ -114,7 +114,7 @@ class TestTestsCheck(unittest.TestCase):
         """
         # Arrange
         mock_pytest_run.return_value = ""
-        expected_score = ScoredCheckResult(self.name, 0.0, self.max_points)
+        expected_score = ScoredCheckResult(self.name, 0.0, "", "", self.max_points)
 
         # Act
         score = self.tests_check.run()
@@ -129,7 +129,7 @@ class TestTestsCheck(unittest.TestCase):
         """
         # Arrange
         mock_pytest_run.return_value = "INVALID OUTPUT"
-        expected_score = ScoredCheckResult(self.name, 0.0, self.max_points)
+        expected_score = ScoredCheckResult(self.name, 0.0, "", "", self.max_points)
 
         # Act
         score = self.tests_check.run()
@@ -180,7 +180,7 @@ class TestTestsCheck(unittest.TestCase):
         """
         # Arrange
         mock_pytest_run.return_value = "PASSED ::ClassB::test_1\nPASSED ::ClassB::test_2\nPASSED ::ClassA::test_3"
-        expected_score = ScoredCheckResult(self.name, 65.0, self.max_points)
+        expected_score = ScoredCheckResult(self.name, 65.0, "", "", self.max_points)
 
         # Act
         score = self.tests_check.run()
@@ -195,7 +195,7 @@ class TestTestsCheck(unittest.TestCase):
         """
         # Arrange
         mock_pytest_run.return_value = "PASSED ::ClassB::test_1\nPASSED ::ClassB::test_2\nPASSED ::ClassA::test_3"
-        expected_score = ScoredCheckResult(self.name, 100.0, self.max_points)
+        expected_score = ScoredCheckResult(self.name, 100.0, "", "", self.max_points)
 
         tests_check = RunTestsCheck(
             self.name,
@@ -219,7 +219,7 @@ class TestTestsCheck(unittest.TestCase):
         """
         # Arrange
         mock_pytest_run.return_value = "PASSED ::ClassB::test_1\nPASSED ::ClassB::test_2\nPASSED ::ClassA::test_3"
-        expected_score = ScoredCheckResult(self.name, 60.0, self.max_points)
+        expected_score = ScoredCheckResult(self.name, 60.0, "", "", self.max_points)
 
         tests_check = RunTestsCheck(
             self.name,

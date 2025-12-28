@@ -33,7 +33,7 @@ class TestStructureCheck(unittest.TestCase):
         mock_element.is_structure_valid.return_value = True
         mock_element.required = True
         mock_load_structure_file.return_value = [mock_element]
-        expected = NonScoredCheckResult(self.structure_check.name, True)
+        expected = NonScoredCheckResult(self.structure_check.name, True, "", "")
 
         # Act
         result = self.structure_check.run()
@@ -51,7 +51,7 @@ class TestStructureCheck(unittest.TestCase):
         mock_element.is_structure_valid.return_value = False
         mock_element.required = True
         mock_load_structure_file.return_value = [mock_element]
-        expected = NonScoredCheckResult(self.structure_check.name, False)
+        expected = NonScoredCheckResult(self.structure_check.name, False, "", "")
 
         # Act
         result = self.structure_check.run()
@@ -69,7 +69,7 @@ class TestStructureCheck(unittest.TestCase):
         mock_element.is_structure_valid.return_value = False
         mock_element.required = False
         mock_load_structure_file.return_value = [mock_element]
-        expected = NonScoredCheckResult(self.structure_check.name, True)
+        expected = NonScoredCheckResult(self.structure_check.name, True, "", "")
 
         # Act
         result = self.structure_check.run()
@@ -84,7 +84,7 @@ class TestStructureCheck(unittest.TestCase):
         """
         # Arrange
         mock_load_structure_file.return_value = []
-        expected = NonScoredCheckResult(self.structure_check.name, True)
+        expected = NonScoredCheckResult(self.structure_check.name, True, "", "")
 
         # Act
         result = self.structure_check.run()
@@ -139,7 +139,7 @@ class TestStructureCheck(unittest.TestCase):
         mock_element2.required = False
 
         mock_load_structure_file.return_value = [mock_element1, mock_element2]
-        expected = NonScoredCheckResult(self.structure_check.name, True)
+        expected = NonScoredCheckResult(self.structure_check.name, True, "", "")
 
         # Act
         result = self.structure_check.run()
@@ -162,7 +162,7 @@ class TestStructureCheck(unittest.TestCase):
         mock_element2.required = True
 
         mock_load_structure_file.return_value = [mock_element1, mock_element2]
-        expected = NonScoredCheckResult(self.structure_check.name, False)
+        expected = NonScoredCheckResult(self.structure_check.name, False, "", "")
 
         # Act
         result = self.structure_check.run()
@@ -185,7 +185,7 @@ class TestStructureCheck(unittest.TestCase):
         mock_element2.required = False
 
         mock_load_structure_file.return_value = [mock_element1, mock_element2]
-        expected = NonScoredCheckResult(self.structure_check.name, True)
+        expected = NonScoredCheckResult(self.structure_check.name, True, "", "")
 
         # Act
         result = self.structure_check.run()
@@ -208,7 +208,7 @@ class TestStructureCheck(unittest.TestCase):
         mock_element2.required = False
 
         mock_load_structure_file.return_value = [mock_element1, mock_element2]
-        expected = NonScoredCheckResult(self.structure_check.name, False)
+        expected = NonScoredCheckResult(self.structure_check.name, False, "", "")
 
         # Act
         result = self.structure_check.run()

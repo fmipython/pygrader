@@ -46,4 +46,4 @@ class RequirementsCheck(ScoredCheck):
 
         score = int(is_one_of_files_present) * self.max_points
 
-        return ScoredCheckResult(self.name, score, self.max_points)
+        return ScoredCheckResult(self.name, score, "", "", self.max_points)

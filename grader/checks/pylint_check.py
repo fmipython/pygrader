@@ -76,7 +76,7 @@ class PylintCheck(ScoredCheck):
         logger.debug("Pylint score: %s", pylint_score)
         score = self.__translate_score(pylint_score)
 
-        return ScoredCheckResult(self.name, score, self.max_points)
+        return ScoredCheckResult(self.name, score, "", "", self.max_points)
 
     def __translate_score(self, pylint_score: float) -> float:
         """

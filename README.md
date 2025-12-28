@@ -1,18 +1,20 @@
-# PythonProjectGrader
+# pygrader
 
 <img src="https://raw.githubusercontent.com/fmipython/PythonProjectGrader/refs/heads/main/logo.png" alt="Logo" width="200" height="200">
 
-[![Tests](https://github.com/fmipython/PythonProjectGrader/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/fmipython/PythonProjectGrader/actions/workflows/tests.yml)[![GPL-3.0](https://img.shields.io/badge/license-GPL_3.0-blue.svg)](https://github.com/lyubolp/slightly-better-cut/blob/main/LICENSE)
+[![pygrader CI&CD](https://github.com/fmipython/pygrader/actions/workflows/cicd.yml/badge.svg)](https://github.com/fmipython/pygrader/actions/workflows/cicd.yml)[![GPL-3.0](https://img.shields.io/badge/license-GPL_3.0-blue.svg)](https://github.com/lyubolp/slightly-better-cut/blob/main/LICENSE)
 
 A grader for Python projects, used in the ["Programming with Python"](https://github.com/fmipython) course at Sofia University "St. Kliment Ohridski", Faculty of Mathematics and Informatics.
 
 Automatically grader Python projects based on a set of checks.
 Current supported set of checks are:
 
-- If the project has a requirements.txt file
+- Project structure
 - Pylint
 - Type hints (via mypy)
 - Code coverage (via pytest & coverage)
+- Run the code against certain tests
+- If the project has a requirements.txt/pyproject.toml file
 
 The tool supports configuration files, where you can specify the score for each check.
 
@@ -37,8 +39,8 @@ Replace `<path_to_Python_project>` with the path to your project directory. This
 1. Clone the repository and create a virtual environment:
 
 ```bash
-git clone https://github.com/fmipython/PythonProjectGrader
-cd PythonProjectGrader
+git clone https://github.com/fmipython/pygrader
+cd pygrader
 python3 -m venv .venv
 ```
 
@@ -59,26 +61,26 @@ python3 -m venv .venv
 3. Install the dependencies:
 
 ```bash
-pip install -r requirements.txt
+pip install .
 ```
 
 ## Usage
 
 ```bash
-python3 pygrader.py -c ./config/2024.json PROJECT_PATH
+python3 pygrader.py -c CONFIG_PATH PROJECT_PATH
 ```
 
-Where `PROJECT_PATH` is the path to the project you want to grade.
+Where `PROJECT_PATH` is the path to the project you want to grade and `CONFIG_PATH` is the path to the configuration you want to use.
 
 ## Configuration
 
 The grader supports configuration files in JSON format.
 The configuration specifies which checks to run, their maximum score, as well as other requirements.
-Refer to the [documentation](https://fmipython.github.io/PythonProjectGrader/config.html) for more information.
+Refer to the [documentation](https://fmipython.github.io/pygrader//config.html) for more information.
 
 ## Documentation
 
-Link to the documentation [here](https://fmipython.github.io/PythonProjectGrader/)
+Link to the documentation [here](https://fmipython.github.io/pygrader/)
 
 ## Contributing
 

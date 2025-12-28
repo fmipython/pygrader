@@ -1,5 +1,9 @@
 # pygrader
 
+## 1.7.1
+
+- Subpackages are now properly exported
+
 ## 1.7.0
 
 - Pylintrc can now be part of the config

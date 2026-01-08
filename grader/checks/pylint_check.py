@@ -136,12 +136,11 @@ class PylintCheck(ScoredCheck):
         for line in pylint_output.strip().split("\n"):
             parts = line.split(":")
 
-            if len(parts) < 6:
+            if len(parts) < 2:
                 continue
 
-            code, message = parts[4], parts[5]
-            summarized_output.append(f"{code.strip()}: {message.strip()}")
-
+            file, message = parts[0], parts[-1]
+            summarized_output.append(f"{file.strip()}: {message.strip()}")
         return "\n".join(summarized_output)
 
 

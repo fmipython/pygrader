@@ -72,17 +72,16 @@ def result_to_json(check_result: CheckResult) -> dict:
     :rtype: dict
     """
     match check_result:
-        case ScoredCheckResult(name, score, max_score):
+        case ScoredCheckResult(name, score, info, error, max_score):
             return {
                 "name": name,
                 "score": score,
+                "info": info,
+                "error": error,
                 "max_score": max_score,
             }
-        case NonScoredCheckResult(name, result):
-            return {
-                "name": name,
-                "result": result,
-            }
+        case NonScoredCheckResult(name, result, info, error):
+            return {"name": name, "result": result, "info": info, "error": error}
         case _:
             raise ValueError("Unknown CheckResult type")
 
@@ -116,10 +115,10 @@ def result_to_csv(check_result: CheckResult) -> str:
     :rtype: str
     """
     match check_result:
-        case ScoredCheckResult(name, score, max_score):
-            return f"{name},{score},{max_score}"
-        case NonScoredCheckResult(name, result):
-            return f"{name},{result},NaN"
+        case ScoredCheckResult(name, score, info, error, max_score):
+            return f"{name},{score},{info},{error},{max_score}"
+        case NonScoredCheckResult(name, result, info, error):
+            return f"{name},{result},{info},{error},NaN"
         case _:
             raise ValueError("Unknown CheckResult type")
 
@@ -151,9 +150,9 @@ def result_to_plain_text(check_result: CheckResult) -> str:
     :rtype: str
     """
     match check_result:
-        case ScoredCheckResult(name, score, max_score):
-            return f"Check: {name}, Score: {score}/{max_score}"
-        case NonScoredCheckResult(name, result):
-            return f"Check: {name}, Result: {result}"
+        case ScoredCheckResult(name, score, info, error, max_score):
+            return f"Check: {name}, Score: {score}/{max_score}, Info: {info}"
+        case NonScoredCheckResult(name, result, info, error):
+            return f"Check: {name}, Result: {result}, Info: {info}"
         case _:
             raise ValueError(f"Unknown CheckResult type ({type(check_result)}) for check {check_result.name}")

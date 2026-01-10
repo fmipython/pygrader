@@ -83,9 +83,12 @@ class TypeHintsCheck(ScoredCheck):
             return ScoredCheckResult(self.name, 0, "", "", self.max_points)
 
         # Calculate score
-        score = self.__translate_score(int(lines_with_type_annotations) / int(lines_total))
+        covered_lines_percentage = int(lines_with_type_annotations) / int(lines_total)
+        score = self.__translate_score(covered_lines_percentage)
 
-        return ScoredCheckResult(self.name, score, "", "", self.max_points)
+        return ScoredCheckResult(
+            self.name, score, f"{covered_lines_percentage}% of the functions have type hints", "", self.max_points
+        )
 
     def __translate_score(self, mypy_score: float) -> float:
         """

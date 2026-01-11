@@ -94,7 +94,7 @@ class CoverageCheck(ScoredCheck):
 
         if output.returncode != 0:
             logger.error("Coverage run failed. stdout: %s. stderr: %s", output.stdout, output.stderr)
-            raise CheckError("Coverage run failed")
+            raise CheckError(f"Coverage run failed: {output.stdout}")
 
     def __coverage_report(self) -> int:
         """

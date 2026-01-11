@@ -58,9 +58,10 @@ def run_grader() -> None:
     checks_results = grader.grade()
 
     reporter = build_reporter(args["report_format"])
+    verbose = args["verbosity"] >= 1
 
     # TODO - Add output to a file
-    reporter.display(checks_results)
+    reporter.display(checks_results, verbose=verbose)
 
     if os.path.exists(const.WORK_DIR):
         shutil.rmtree(const.WORK_DIR)

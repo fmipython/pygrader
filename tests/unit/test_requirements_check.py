@@ -43,7 +43,13 @@ class TestRequirementsCheck(unittest.TestCase):
         """
         # Arrange
         mocked_exists.return_value = False
-        expected_score = ScoredCheckResult(self.requirements_check.name, 0, "", "", self.requirements_check.max_points)
+        expected_score = ScoredCheckResult(
+            self.requirements_check.name,
+            0,
+            "requirements.txt or pyproject.toml not found",
+            "",
+            self.requirements_check.max_points,
+        )
 
         # Act
         actual_score = self.requirements_check.run()

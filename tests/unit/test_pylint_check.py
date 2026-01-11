@@ -8,7 +8,7 @@ from unittest.mock import patch, MagicMock
 
 import grader.utils.constants as const
 from grader.checks.pylint_check import PylintCheck
-from grader.checks.abstract_check import CheckError, ScoredCheckResult
+from grader.checks.abstract_check import CheckError
 
 
 class TestPylintCheck(unittest.TestCase):
@@ -111,14 +111,16 @@ class TestPylintCheck(unittest.TestCase):
         :type mocked_pylint: MagicMock
         """
         # Arrange
-        mocked_pylint.return_value = CompletedProcess("pylint", 0, self.__create_sample_pylint_output(0))
-        expected_score = ScoredCheckResult(self.pylint_check.name, 0, "", "", self.pylint_check.max_points)
+        pylint_output = self.__create_sample_pylint_output(5)
+        mocked_pylint.return_value = CompletedProcess("pylint", 0, pylint_output)
 
         # Act
         actual_score = self.pylint_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        self.assertEqual(1, actual_score.result)
+        self.assertEqual(self.pylint_check.name, actual_score.name)
+        self.assertEqual(self.pylint_check.max_points, actual_score.max_score)
 
     @patch("grader.utils.process.run")
     def test_05_translate_score_inside_first_range(self, mocked_pylint: MagicMock) -> None:
@@ -129,14 +131,16 @@ class TestPylintCheck(unittest.TestCase):
         :type mocked_pylint: MagicMock
         """
         # Arrange
-        mocked_pylint.return_value = CompletedProcess("pylint", 0, self.__create_sample_pylint_output(2.2))
-        expected_score = ScoredCheckResult(self.pylint_check.name, 0, "", "", self.pylint_check.max_points)
+        pylint_output = self.__create_sample_pylint_output(2.2)
+        mocked_pylint.return_value = CompletedProcess("pylint", 0, pylint_output)
 
         # Act
         actual_score = self.pylint_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        self.assertEqual(0, actual_score.result)
+        self.assertEqual(self.pylint_check.name, actual_score.name)
+        self.assertEqual(self.pylint_check.max_points, actual_score.max_score)
 
     @patch("grader.utils.process.run")
     def test_06_translate_score_right_bound_first_range(self, mocked_pylint: MagicMock) -> None:
@@ -149,13 +153,14 @@ class TestPylintCheck(unittest.TestCase):
         # Arrange
         mocked_pylint_stdout = self.__create_sample_pylint_output(10 / 3)
         mocked_pylint.return_value = CompletedProcess("pylint", 0, mocked_pylint_stdout)
-        expected_score = ScoredCheckResult(self.pylint_check.name, 1, "", "", self.pylint_check.max_points)
 
         # Act
         actual_score = self.pylint_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        self.assertEqual(1, actual_score.result)
+        self.assertEqual(self.pylint_check.name, actual_score.name)
+        self.assertEqual(self.pylint_check.max_points, actual_score.max_score)
 
     @patch("grader.utils.process.run")
     def test_07_translate_score_left_bound_second_range(self, mocked_pylint: MagicMock) -> None:
@@ -166,14 +171,16 @@ class TestPylintCheck(unittest.TestCase):
         :type mocked_pylint: MagicMock
         """
         # Arrange
-        mocked_pylint.return_value = CompletedProcess("pylint", 0, self.__create_sample_pylint_output(10 / 3 + 0.1))
-        expected_score = ScoredCheckResult(self.pylint_check.name, 1, "", "", self.pylint_check.max_points)
+        pylint_output = self.__create_sample_pylint_output(10 / 3 + 0.1)
+        mocked_pylint.return_value = CompletedProcess("pylint", 0, pylint_output)
 
         # Act
         actual_score = self.pylint_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        self.assertEqual(1, actual_score.result)
+        self.assertEqual(self.pylint_check.name, actual_score.name)
+        self.assertEqual(self.pylint_check.max_points, actual_score.max_score)
 
     @patch("grader.utils.process.run")
     def test_08_translate_score_inside_bound_second_range(self, mocked_pylint: MagicMock) -> None:
@@ -184,14 +191,16 @@ class TestPylintCheck(unittest.TestCase):
         :type mocked_pylint: MagicMock
         """
         # Arrange
-        mocked_pylint.return_value = CompletedProcess("pylint", 0, self.__create_sample_pylint_output(5))
-        expected_score = ScoredCheckResult(self.pylint_check.name, 1, "", "", self.pylint_check.max_points)
+        pylint_output = self.__create_sample_pylint_output(5)
+        mocked_pylint.return_value = CompletedProcess("pylint", 0, pylint_output)
 
         # Act
         actual_score = self.pylint_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        self.assertEqual(1, actual_score.result)
+        self.assertEqual(self.pylint_check.name, actual_score.name)
+        self.assertEqual(self.pylint_check.max_points, actual_score.max_score)
 
     @patch("grader.utils.process.run")
     def test_09_translate_score_right_bound_second_range(self, mocked_pylint: MagicMock) -> None:
@@ -202,14 +211,16 @@ class TestPylintCheck(unittest.TestCase):
         :type mocked_pylint: MagicMock
         """
         # Arrange
-        mocked_pylint.return_value = CompletedProcess("pylint", 0, self.__create_sample_pylint_output(10 / 3 * 2))
-        expected_score = ScoredCheckResult(self.pylint_check.name, 2, "", "", self.pylint_check.max_points)
+        pylint_output = self.__create_sample_pylint_output(10 / 3 * 2)
+        mocked_pylint.return_value = CompletedProcess("pylint", 0, pylint_output)
 
         # Act
         actual_score = self.pylint_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        self.assertEqual(2, actual_score.result)
+        self.assertEqual(self.pylint_check.name, actual_score.name)
+        self.assertEqual(self.pylint_check.max_points, actual_score.max_score)
 
     @patch("grader.utils.process.run")
     def test_10_translate_score_inside_bound_third_range(self, mocked_pylint: MagicMock) -> None:
@@ -220,14 +231,16 @@ class TestPylintCheck(unittest.TestCase):
         :type mocked_pylint: MagicMock
         """
         # Arrange
-        mocked_pylint.return_value = CompletedProcess("pylint", 0, self.__create_sample_pylint_output(7.5))
-        expected_score = ScoredCheckResult(self.pylint_check.name, 2, "", "", self.pylint_check.max_points)
+        pylint_output = self.__create_sample_pylint_output(7.5)
+        mocked_pylint.return_value = CompletedProcess("pylint", 0, pylint_output)
 
         # Act
         actual_score = self.pylint_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        self.assertEqual(2, actual_score.result)
+        self.assertEqual(self.pylint_check.name, actual_score.name)
+        self.assertEqual(self.pylint_check.max_points, actual_score.max_score)
 
     @patch("grader.utils.process.run")
     def test_11_translate_score_max(self, mocked_pylint: MagicMock) -> None:
@@ -238,14 +251,16 @@ class TestPylintCheck(unittest.TestCase):
         :type mocked_pylint: MagicMock
         """
         # Arrange
-        mocked_pylint.return_value = CompletedProcess("pylint", 0, self.__create_sample_pylint_output(10))
-        expected_score = ScoredCheckResult(self.pylint_check.name, 2, "", "", self.pylint_check.max_points)
+        pylint_output = self.__create_sample_pylint_output(10)
+        mocked_pylint.return_value = CompletedProcess("pylint", 0, pylint_output)
 
         # Act
         actual_score = self.pylint_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        self.assertEqual(2, actual_score.result)
+        self.assertEqual(self.pylint_check.name, actual_score.name)
+        self.assertEqual(self.pylint_check.max_points, actual_score.max_score)
 
     @patch("grader.utils.files.find_all_python_files")
     def test_12_find_all_python_files_raises_os_error(self, mocked_find: MagicMock) -> None:

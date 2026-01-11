@@ -151,8 +151,8 @@ def result_to_plain_text(check_result: CheckResult) -> str:
     """
     match check_result:
         case ScoredCheckResult(name, score, info, error, max_score):
-            return f"Check: {name}, Score: {score}/{max_score}, Info: {info}"
+            return f"Check: {name}, Score: {score}/{max_score}, Info: {info}. Error: {error}"
         case NonScoredCheckResult(name, result, info, error):
-            return f"Check: {name}, Result: {result}, Info: {info}"
+            return f"Check: {name}, Result: {result}, Info: {info}. Error: {error}"
         case _:
             raise ValueError(f"Unknown CheckResult type ({type(check_result)}) for check {check_result.name}")

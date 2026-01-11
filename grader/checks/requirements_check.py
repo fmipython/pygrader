@@ -54,4 +54,8 @@ class RequirementsCheck(ScoredCheck):
         if pyproject.exists():
             pass
 
-        return ScoredCheckResult(self.name, score, "", "", self.max_points)
+        info = ""
+        if not is_one_of_files_present:
+            info = "requirements.txt or pyproject.toml not found"
+
+        return ScoredCheckResult(self.name, score, info, "", self.max_points)

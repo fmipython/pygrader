@@ -92,7 +92,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         with open(const.MYPY_LINE_COUNT_REPORT, "w", encoding="utf-8") as report_file:
             report_file.write("0 0 0 100 0")
 
-        expected_score = ScoredCheckResult("type_hints", 0, "", "", 2)
+        expected_score = ScoredCheckResult("type_hints", 0, "0.00% of the functions have type hints", "", 2)
 
         # Act
         actual_score = self.type_hints_check.run()
@@ -113,7 +113,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         with open(const.MYPY_LINE_COUNT_REPORT, "w", encoding="utf-8") as report_file:
             report_file.write("0 0 20 100 0")
 
-        expected_score = ScoredCheckResult("type_hints", 0, "", "", 2)
+        expected_score = ScoredCheckResult("type_hints", 0, "20.00% of the functions have type hints", "", 2)
 
         # Act
         actual_score = self.type_hints_check.run()
@@ -134,7 +134,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         with open(const.MYPY_LINE_COUNT_REPORT, "w", encoding="utf-8") as report_file:
             report_file.write("0 0 1 3 0")
 
-        expected_score = ScoredCheckResult("type_hints", 1, "", "", 2)
+        expected_score = ScoredCheckResult("type_hints", 1, "33.33% of the functions have type hints", "", 2)
 
         # Act
         actual_score = self.type_hints_check.run()
@@ -155,7 +155,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         with open(const.MYPY_LINE_COUNT_REPORT, "w", encoding="utf-8") as report_file:
             report_file.write("0 0 11 30 0")
 
-        expected_score = ScoredCheckResult("type_hints", 1, "", "", 2)
+        expected_score = ScoredCheckResult("type_hints", 1, "36.67% of the functions have type hints", "", 2)
 
         # Act
         actual_score = self.type_hints_check.run()
@@ -176,7 +176,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         with open(const.MYPY_LINE_COUNT_REPORT, "w", encoding="utf-8") as report_file:
             report_file.write("0 0 15 30 0")
 
-        expected_score = ScoredCheckResult("type_hints", 1, "", "", 2)
+        expected_score = ScoredCheckResult("type_hints", 1, "50.00% of the functions have type hints", "", 2)
 
         # Act
         actual_score = self.type_hints_check.run()
@@ -197,7 +197,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         with open(const.MYPY_LINE_COUNT_REPORT, "w", encoding="utf-8") as report_file:
             report_file.write("0 0 22 33 0")
 
-        expected_score = ScoredCheckResult("type_hints", 2, "", "", 2)
+        expected_score = ScoredCheckResult("type_hints", 2, "66.67% of the functions have type hints", "", 2)
 
         # Act
         actual_score = self.type_hints_check.run()
@@ -218,7 +218,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         with open(const.MYPY_LINE_COUNT_REPORT, "w", encoding="utf-8") as report_file:
             report_file.write("0 0 35 40 0")
 
-        expected_score = ScoredCheckResult("type_hints", 2, "", "", 2)
+        expected_score = ScoredCheckResult("type_hints", 2, "87.50% of the functions have type hints", "", 2)
 
         # Act
         actual_score = self.type_hints_check.run()
@@ -239,7 +239,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         with open(const.MYPY_LINE_COUNT_REPORT, "w", encoding="utf-8") as report_file:
             report_file.write("1290 1805 107 107 total")
 
-        expected_score = ScoredCheckResult("type_hints", 2, "", "", 2)
+        expected_score = ScoredCheckResult("type_hints", 2, "100.00% of the functions have type hints", "", 2)
 
         # Act
         actual_score = self.type_hints_check.run()

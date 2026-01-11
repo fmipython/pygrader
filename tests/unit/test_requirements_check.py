@@ -21,7 +21,7 @@ class TestRequirementsCheck(unittest.TestCase):
         self.requirements_check = RequirementsCheck("requirements", "sample_dir", 1, is_venv_required=False)
         return super().setUp()
 
-    @patch("os.path.exists")
+    @patch("pathlib.Path.exists")
     def test_01_requirements_exist(self, mocked_exists: MagicMock) -> None:
         """
         Test that the requirements file exists.
@@ -36,7 +36,7 @@ class TestRequirementsCheck(unittest.TestCase):
         # Assert
         self.assertEqual(expected_score, actual_score)
 
-    @patch("os.path.exists")
+    @patch("pathlib.Path.exists")
     def test_02_requirements_does_not_exist(self, mocked_exists: MagicMock) -> None:
         """
         Test that the requirements file does not exist.

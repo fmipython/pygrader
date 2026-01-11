@@ -39,6 +39,9 @@ clean: clean_logs
     rm -rf docs/build
     rm -f lcov.info
     rm -rf "pygrader-sample-project"
+    rm -rf __pycache__
+    rm -rf .complexipy_cache
+    rm -rf pygrader.egg-info
 
 clean_logs:
     rm -rf *.log.*

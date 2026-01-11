@@ -52,7 +52,7 @@ PYLINT_BIN_WINDOWS = os.path.join("Scripts", "pylint.exe")
 PYLINT_BIN_UNIX = os.path.join("bin", "pylint")
 PYLINT_BIN = PYLINT_BIN_WINDOWS if os.name == "nt" else PYLINT_BIN_UNIX
 PYLINT_PATH = os.path.join(VENV_NAME, PYLINT_BIN)
-PYLINTRC = os.path.join(CONFIG_DIR, "2025-hw3.pylintrc")
+PYLINTRC = os.path.join(CONFIG_DIR, "2024.pylintrc")
 
 # Pytest constants
 PYTEST_BIN_WINDOWS = "pytest.exe"

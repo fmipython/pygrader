@@ -1,5 +1,9 @@
 # pygrader
 
+## 1.8.0
+
+- Check results now show useful info and error messages
+
 ## 1.7.1
 
 - Subpackages are now properly exported

@@ -98,9 +98,9 @@ class Grader:
             # TODO - Pass the information from the exception
             match check:
                 case ScoredCheck():
-                    check_result = ScoredCheckResult(check.name, 0, "", "", check.max_points)
+                    check_result = ScoredCheckResult(check.name, 0, "", str(error), check.max_points)
                 case NonScoredCheck():
-                    check_result = NonScoredCheckResult(check.name, False, "", "")
+                    check_result = NonScoredCheckResult(check.name, False, "", str(error))
                 case _:
                     raise TypeError(f"Unknown check type: {type(check)}") from error
 

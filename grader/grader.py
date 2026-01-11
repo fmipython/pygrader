@@ -95,6 +95,7 @@ class Grader:
         except CheckError as error:
             self.__logger.error("Check failed: %s", error)
 
+            # TODO - Pass the information from the exception
             match check:
                 case ScoredCheck():
                     check_result = ScoredCheckResult(check.name, 0, "", "", check.max_points)

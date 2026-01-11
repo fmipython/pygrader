@@ -53,7 +53,9 @@ class CoverageCheck(ScoredCheck):
             raise CheckError("Coverage report generation failed")
 
         score = self.__translate_score(coverage_report_result)
-        return ScoredCheckResult(self.name, score, f"Tests cover {score}% of the code", "", self.max_points)
+        return ScoredCheckResult(
+            self.name, score, f"Tests cover {coverage_report_result:.2f}% of the code", "", self.max_points
+        )
 
     def __translate_score(self, coverage_score: float) -> float:
         """

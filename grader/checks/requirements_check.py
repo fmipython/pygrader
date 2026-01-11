@@ -6,6 +6,8 @@ It checks if requirements.txt exists in the project root.
 import logging
 import os
 
+from pathlib import Path
+
 from grader.checks.abstract_check import ScoredCheck, ScoredCheckResult
 from grader.utils.constants import REQUIREMENTS_FILENAME, PYPROJECT_FILENAME
 from typing import Optional
@@ -40,10 +42,16 @@ class RequirementsCheck(ScoredCheck):
         """
         self._pre_run()
 
-        files_to_search = [self.__requirements_path, self.__pyproject_path]
+        requirements = Path(self.__requirements_path)
+        pyproject = Path(self.__pyproject_path)
 
-        is_one_of_files_present = any(os.path.exists(file_path) for file_path in files_to_search)
+        files_to_search = [requirements, pyproject]
+
+        is_one_of_files_present = any(file_path.exists() for file_path in files_to_search)
 
         score = int(is_one_of_files_present) * self.max_points
+
+        if pyproject.exists():
+            pass
 
         return ScoredCheckResult(self.name, score, "", "", self.max_points)

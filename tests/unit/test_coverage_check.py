@@ -36,7 +36,7 @@ class TestCoverageCheck(unittest.TestCase):
         with self.assertLogs("grader", level="ERROR") as log:
             with self.assertRaises(CheckError):
                 self.coverage_check.run()
-            is_message_logged = "ERROR:grader:Coverage run failed" in log.output
+            is_message_logged = "ERROR:grader:Coverage run failed. stdout:" in log.output[0]
 
         # Assert
         self.assertTrue(is_message_logged)
@@ -74,7 +74,7 @@ class TestCoverageCheck(unittest.TestCase):
         # Arrange
         mocked_run.return_value = True
         mocked_report.return_value = 0
-        expected_score = ScoredCheckResult("Coverage", 0, "", "", 2)
+        expected_score = ScoredCheckResult("Coverage", 0, "Tests cover 0.00% of the code", "", 2)
 
         # Act
         actual_score = self.coverage_check.run()
@@ -91,7 +91,7 @@ class TestCoverageCheck(unittest.TestCase):
         # Arrange
         mocked_run.return_value = True
         mocked_report.return_value = 22
-        expected_score = ScoredCheckResult("Coverage", 0, "", "", 2)
+        expected_score = ScoredCheckResult("Coverage", 0, "Tests cover 22.00% of the code", "", 2)
 
         # Act
         actual_score = self.coverage_check.run()
@@ -108,7 +108,7 @@ class TestCoverageCheck(unittest.TestCase):
         # Arrange
         mocked_run.return_value = True
         mocked_report.return_value = 100 / 3
-        expected_score = ScoredCheckResult("Coverage", 1, "", "", 2)
+        expected_score = ScoredCheckResult("Coverage", 1, "Tests cover 33.33% of the code", "", 2)
 
         # Act
         actual_score = self.coverage_check.run()
@@ -125,7 +125,7 @@ class TestCoverageCheck(unittest.TestCase):
         # Arrange
         mocked_run.return_value = True
         mocked_report.return_value = 100 / 3 + 1
-        expected_score = ScoredCheckResult("Coverage", 1, "", "", 2)
+        expected_score = ScoredCheckResult("Coverage", 1, "Tests cover 34.33% of the code", "", 2)
 
         # Act
         actual_score = self.coverage_check.run()
@@ -144,7 +144,7 @@ class TestCoverageCheck(unittest.TestCase):
         # Arrange
         mocked_run.return_value = True
         mocked_report.return_value = 50
-        expected_score = ScoredCheckResult("Coverage", 1, "", "", 2)
+        expected_score = ScoredCheckResult("Coverage", 1, "Tests cover 50.00% of the code", "", 2)
 
         # Act
         actual_score = self.coverage_check.run()
@@ -163,7 +163,7 @@ class TestCoverageCheck(unittest.TestCase):
         # Arrange
         mocked_run.return_value = True
         mocked_report.return_value = 100 / 3 * 2
-        expected_score = ScoredCheckResult("Coverage", 2, "", "", 2)
+        expected_score = ScoredCheckResult("Coverage", 2, "Tests cover 66.67% of the code", "", 2)
 
         # Act
         actual_score = self.coverage_check.run()
@@ -182,7 +182,7 @@ class TestCoverageCheck(unittest.TestCase):
         # Arrange
         mocked_run.return_value = True
         mocked_report.return_value = 75
-        expected_score = ScoredCheckResult("Coverage", 2, "", "", 2)
+        expected_score = ScoredCheckResult("Coverage", 2, "Tests cover 75.00% of the code", "", 2)
 
         # Act
         actual_score = self.coverage_check.run()
@@ -199,7 +199,7 @@ class TestCoverageCheck(unittest.TestCase):
         # Arrange
         mocked_run.return_value = True
         mocked_report.return_value = 100
-        expected_score = ScoredCheckResult("Coverage", 2, "", "", 2)
+        expected_score = ScoredCheckResult("Coverage", 2, "Tests cover 100.00% of the code", "", 2)
 
         # Act
         actual_score = self.coverage_check.run()
@@ -226,4 +226,4 @@ class TestCoverageCheck(unittest.TestCase):
         result = self.coverage_check.run()
 
         # Assert
-        self.assertEqual(ScoredCheckResult("Coverage", 2, "", "", 2), result)
+        self.assertEqual(ScoredCheckResult("Coverage", 2, "Tests cover 100.00% of the code", "", 2), result)

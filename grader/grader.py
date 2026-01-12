@@ -43,6 +43,7 @@ class Grader:
         self.__is_skipping_venv_creation = is_skipping_venv_creation
         try:
             self.__config = load_config(config_path)
+            self.__logger.debug(f"Config contents: {self.__config}")
         except InvalidConfigError as exc:
             self.__logger.error("Error with the configuration file")
             self.__logger.exception(exc)
@@ -75,7 +76,9 @@ class Grader:
         if self.__is_skipping_venv_creation or len(venv_checks) == 0:
             return scores
 
-        with VirtualEnvironment(self.__project_root, self.__is_keeping_venv):
+        venv_config = self.__config.get("venv", {})
+
+        with VirtualEnvironment(self.__project_root, self.__is_keeping_venv, **venv_config):
             scores += [self.__run_check(check) for check in venv_checks]
 
         self.__cleanup()

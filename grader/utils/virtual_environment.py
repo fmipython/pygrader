@@ -22,10 +22,18 @@ class VirtualEnvironment:
 
     is_initialized = False
 
-    def __init__(self, project_path: str, keep_venv: bool = False):
+    def __init__(
+        self,
+        project_path: str,
+        is_keep_venv_after_run: bool = False,
+        is_keeping_existing_venv: bool = False,
+        name: str = const.VENV_NAME,
+    ):
         self._project_path = project_path
-        self._venv_path = os.path.join(project_path, const.VENV_NAME)
-        self.__keep_venv = keep_venv
+        # TODO - To fully allow for a custom venv name, we need to rethink how we handle paths in the constants
+        self._venv_path = os.path.join(project_path, name)
+        self.__is_keeping_venv_after_run = is_keep_venv_after_run
+        self.__is_keeping_existing_venv = is_keeping_existing_venv
 
     def __enter__(self) -> VirtualEnvironment:
         self.setup()
@@ -46,12 +54,8 @@ class VirtualEnvironment:
         Install the grader dependencies as well.
         """
         # Check for existing venv
-        possible_venv_paths = [os.path.join(self._project_path, venv_path) for venv_path in const.POSSIBLE_VENV_DIRS]
-
-        for path in possible_venv_paths:
-            if os.path.exists(path):
-                logger.log(VERBOSE, "Found existing venv at %s", path)
-                shutil.rmtree(path)
+        if not self.__is_keeping_existing_venv:
+            self.__remove_existing_venv()
 
         # Check for requirements.txt
 
@@ -86,12 +90,23 @@ class VirtualEnvironment:
         grader_requirements_path = const.GRADER_REQUIREMENTS
         VirtualEnvironment.__install_requirements(self._venv_path, grader_requirements_path)
 
+    def __remove_existing_venv(self) -> None:
+        """
+        Remove any existing virtual environment in the project directory.
+        """
+        possible_venv_paths = [os.path.join(self._project_path, venv_path) for venv_path in const.POSSIBLE_VENV_DIRS]
+
+        for path in possible_venv_paths:
+            if os.path.exists(path):
+                logger.log(VERBOSE, "Found existing venv at %s", path)
+                shutil.rmtree(path)
+
     def teardown(self) -> None:
         """
         Delete the virtual environment.
         """
-        logger.debug(self.__keep_venv)
-        if not self.__keep_venv:
+        logger.debug(self.__is_keeping_venv_after_run)
+        if not self.__is_keeping_venv_after_run:
             shutil.rmtree(self._venv_path)
 
     @staticmethod

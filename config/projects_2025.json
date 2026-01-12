@@ -20,5 +20,8 @@
             "max_points": 5,
             "is_venv_required": true
         }
-    ]
+    ],
+    "venv": {
+        "is_keeping_existing_venv": true
+    }
 }

@@ -92,6 +92,7 @@ IGNORE_DIRS = [
     "__pycache__",
     ".pytest_cache",
     "_MACOSX",
+    "__MACOSX",
     os.path.join("build", "lib"),
     *POSSIBLE_VENV_DIRS,
 ]

@@ -6,6 +6,7 @@
 - The venv created by pygrader is now with a non-standard name
 - Deleting existing venv is now optional
 - If a zip contains only the project as a subdirectory, use the subdir instead
+- Requirements check can now check for project installation
 
 ## 1.7.1
 

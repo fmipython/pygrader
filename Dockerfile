@@ -4,10 +4,6 @@ RUN mkdir /app
 RUN mkdir /assets
 WORKDIR /app
 
-# COPY uv.lock .
-# COPY pyproject.toml .
-# RUN uv sync --locked --no-install-project --no-dev
-
 COPY . .
 
 RUN uv sync --locked --no-dev

@@ -75,28 +75,60 @@ def result_to_json(check_result: CheckResult, verbose: bool) -> dict:
     :rtype: dict
     """
     match check_result:
-        case ScoredCheckResult(name, score, info, error, max_score):
-            result_dict = {
-                "name": name,
-                "score": score,
-                "max_score": max_score,
-            }
-            if verbose:
-                if info:
-                    result_dict["info"] = info
-                if error:
-                    result_dict["error"] = error
-            return result_dict
-        case NonScoredCheckResult(name, result, info, error):
-            result_dict = {"name": name, "result": result}
-            if verbose:
-                if info:
-                    result_dict["info"] = info
-                if error:
-                    result_dict["error"] = error
-            return result_dict
+        case ScoredCheckResult():
+            return scored_result_to_dict(check_result, verbose)
+        case NonScoredCheckResult():
+            return non_scored_result_to_dict(check_result, verbose)
         case _:
             raise ValueError("Unknown CheckResult type")
+
+
+def non_scored_result_to_dict(scored_result: NonScoredCheckResult, verbose: bool) -> dict:
+    """
+    Convert a NonScoredCheckResult to a dictionary.
+    :param name: The name of the check.
+    :type name: str
+    :param result: The result of the check.
+    :type result: str
+    :param info: Additional info about the check.
+    :type info: str
+    :param error: Error message if any.
+    :type error: str
+    :return: A dictionary representation of the NonScoredCheckResult.
+    :rtype: dict
+    """
+
+    result_dict = {"name": scored_result.name, "result": scored_result.result}
+    if verbose:
+        if scored_result.info:
+            result_dict["info"] = scored_result.info
+        if scored_result.error:
+            result_dict["error"] = scored_result.error
+    return result_dict
+
+
+def scored_result_to_dict(scored_result: ScoredCheckResult, verbose: bool) -> dict:
+    """
+    Convert a ScoredCheckResult to a dictionary.
+
+    :param scored_result: The ScoredCheckResult to convert.
+    :type scored_result: ScoredCheckResult
+    :param verbose: Whether to include info and error fields.
+    :type verbose: bool
+    :return: A dictionary representation of the ScoredCheckResult.
+    :rtype: dict
+    """
+    result_dict = {
+        "name": scored_result.name,
+        "score": scored_result.result,
+        "max_score": scored_result.max_score,
+    }
+    if verbose:
+        if scored_result.info:
+            result_dict["info"] = scored_result.info
+        if scored_result.error:
+            result_dict["error"] = scored_result.error
+    return result_dict
 
 
 class CSVResultsReporter(ResultsReporter):
@@ -174,21 +206,47 @@ def result_to_plain_text(check_result: CheckResult, verbose: bool) -> str:
     :rtype: str
     """
     match check_result:
-        case ScoredCheckResult(name, score, info, error, max_score):
-            parts = [f"Check: {name}, Score: {score}/{max_score}"]
-            if verbose:
-                if info:
-                    parts.append(f"Info: {info}")
-                if error:
-                    parts.append(f"Error: {error}")
-            return ". ".join(parts)
-        case NonScoredCheckResult(name, result, info, error):
-            parts = [f"Check: {name}, Result: {result}"]
-            if verbose:
-                if info:
-                    parts.append(f"Info: {info}")
-                if error:
-                    parts.append(f"Error: {error}")
-            return ". ".join(parts)
+        case ScoredCheckResult():
+            return scored_result_to_text(check_result, verbose)
+        case NonScoredCheckResult():
+            return non_scored_result_to_text(check_result, verbose)
         case _:
             raise ValueError(f"Unknown CheckResult type ({type(check_result)}) for check {check_result.name}")
+
+
+def scored_result_to_text(scored_result: ScoredCheckResult, verbose: bool) -> str:
+    """
+    Convert a ScoredCheckResult to a plain text string.
+    :param scored_result: The ScoredCheckResult to convert.
+    :type scored_result: ScoredCheckResult
+    :param verbose: Whether to include info and error fields.
+    :type verbose: bool
+    :return: A plain text string representation of the ScoredCheckResult.
+    :rtype: str
+    """
+    parts = [f"Check: {scored_result.name}, Score: {scored_result.result}/{scored_result.max_score}"]
+    if verbose:
+        if scored_result.info:
+            parts.append(f"Info: {scored_result.info}")
+        if scored_result.error:
+            parts.append(f"Error: {scored_result.error}")
+    return ". ".join(parts)
+
+
+def non_scored_result_to_text(non_scored_result: NonScoredCheckResult, verbose: bool) -> str:
+    """
+    Convert a NonScoredCheckResult to a plain text string.
+    :param non_scored_result: The NonScoredCheckResult to convert.
+    :type non_scored_result: NonScoredCheckResult
+    :param verbose: Whether to include info and error fields.
+    :type verbose: bool
+    :return: A plain text string representation of the NonScoredCheckResult.
+    :rtype: str
+    """
+    parts = [f"Check: {non_scored_result.name}, Result: {non_scored_result.result}"]
+    if verbose:
+        if non_scored_result.info:
+            parts.append(f"Info: {non_scored_result.info}")
+        if non_scored_result.error:
+            parts.append(f"Error: {non_scored_result.error}")
+    return ". ".join(parts)

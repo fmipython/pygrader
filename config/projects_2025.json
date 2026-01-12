@@ -3,7 +3,8 @@
         {
             "name": "requirements",
             "max_points": 2,
-            "is_venv_required": false
+            "is_venv_required": false,
+            "is_checking_install": true
         },
         {
             "name": "pylint",

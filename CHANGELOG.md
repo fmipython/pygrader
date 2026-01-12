@@ -3,6 +3,8 @@
 ## 1.8.0
 
 - Check results now show useful info and error messages
+- The venv created by pygrader is now with a non-standard name
+- Deleting existing venv is now optional
 
 ## 1.7.1
 

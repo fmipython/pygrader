@@ -1,4 +1,4 @@
-FROM ghcr.io/astral-sh/uv:python3.13-slim
+FROM ghcr.io/astral-sh/uv:python3.13-trixie-slim
 
 RUN mkdir /app
 RUN mkdir /assets
@@ -8,7 +8,10 @@ COPY . .
 
 RUN uv sync --locked --no-dev
 
-VOLUME ["/project"]
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
-ENTRYPOINT ["uv", "run", "--no-dev", "pygrader.py", "--config", "https://api.github.com/repos/fmipython/PythonCourse2025/contents/homeworks/homework3/pygrader_config_public_web.json", "/project"]
+VOLUME ["/project", "/tmp/project_bind"]
+
+ENTRYPOINT ["/app/entrypoint.sh"]
 

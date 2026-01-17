@@ -28,7 +28,7 @@ class TestAbstractCheck(unittest.TestCase):
                 Run the dummy check.
                 """
                 super()._pre_run()
-                return CheckResult("dummy", 0)
+                return CheckResult("dummy", 0, "", "")
 
         check = DummyCheck("dummy", "dummy", is_venv_required=True)
 

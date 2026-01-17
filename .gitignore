@@ -184,3 +184,5 @@ docs/diagrams/out
 *.zip
 
 **/.DS_Store
+
+.complexipy_cache

@@ -41,7 +41,7 @@ class BaseFunctionalTestWithGrader(unittest.TestCase):
             raise RuntimeError(f"Failed to checkout branch {current_branch}: {checkout_result.stderr}")
 
         # Remove the functional tests from the repo, as they cause issues and time loss.
-        functional_tests_path = os.path.join(self.clone_path, "tests", "test_functional.py")
+        functional_tests_path = os.path.join(self.clone_path, "tests", "functional", "test_functional.py")
         if os.path.exists(functional_tests_path):
             os.remove(functional_tests_path)
 

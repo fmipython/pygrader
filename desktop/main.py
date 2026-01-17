@@ -4,6 +4,7 @@ Calls all the checks, and stores their results
 """
 
 import os
+from pathlib import Path
 import shutil
 
 import grader.utils.constants as const
@@ -48,6 +49,17 @@ def run_grader() -> None:
 
     if is_path_zip(args["project_root"]):
         project_root = unzip_archive(args["project_root"])
+
+        # If the unzipped folder contains only one subfolder (except MACOS subdirectories), use that as the project root
+        project_root_dir = Path(project_root)
+        subdirs = [
+            directory
+            for directory in project_root_dir.iterdir()
+            if directory.is_dir() and directory.name not in const.IGNORE_DIRS
+        ]
+
+        if len(subdirs) == 1:
+            project_root = str(subdirs[0])
     else:
         project_root = str(args["project_root"])  # type safety
 
@@ -58,9 +70,10 @@ def run_grader() -> None:
     checks_results = grader.grade()
 
     reporter = build_reporter(args["report_format"])
+    verbose = args["verbosity"] >= 1
 
     # TODO - Add output to a file
-    reporter.display(checks_results)
+    reporter.display(checks_results, verbose=verbose)
 
     if os.path.exists(const.WORK_DIR):
         shutil.rmtree(const.WORK_DIR)

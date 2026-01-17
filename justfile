@@ -17,13 +17,13 @@ lint:
 test: unit_tests functional_tests
 
 unit_tests:
-    find tests -type f -name "test_*.py" -not -name "test_functional.py" -not -path "*sample_project*" | xargs uv run -m unittest -v
+    uv run -m unittest discover -s tests/unit -p "test_*.py" -v
 
 functional_tests:
-    uv run -m unittest discover -s tests -p "test_functional.py"
+    uv run -m unittest discover -s tests/functional -p "test_*.py"
 
 coverage:
-    find tests -type f -name "test_*.py" -not -name "test_functional.py" | xargs uv run coverage run --source={{packages}} -m unittest
+    uv run coverage run --source={{packages}} -m unittest discover -s tests/unit -p "test_*.py"
     uv run coverage lcov -o lcov.info
     uv run coverage report -m --fail-under 85 --sort=cover
 
@@ -39,6 +39,9 @@ clean: clean_logs
     rm -rf docs/build
     rm -f lcov.info
     rm -rf "pygrader-sample-project"
+    rm -rf __pycache__
+    rm -rf .complexipy_cache
+    rm -rf pygrader.egg-info
 
 clean_logs:
     rm -rf *.log.*

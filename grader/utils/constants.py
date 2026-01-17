@@ -26,8 +26,8 @@ PYTHON_BIN = PYTHON_BIN_WINDOWS if os.name == "nt" else PYTHON_BIN_UNIX
 # Virtual environment constants
 REQUIREMENTS_FILENAME = "requirements.txt"
 PYPROJECT_FILENAME = "pyproject.toml"
-VENV_NAME = ".venv"
-POSSIBLE_VENV_DIRS = ["venv", ".venv"]
+VENV_NAME = ".venv-pygrader"
+POSSIBLE_VENV_DIRS = ["venv", ".venv", ".venv-pygrader"]
 PIP_PATH_WINDOWS = os.path.join("Scripts", "pip.exe")
 PIP_PATH_UNIX = os.path.join("bin", "pip")
 
@@ -52,7 +52,7 @@ PYLINT_BIN_WINDOWS = os.path.join("Scripts", "pylint.exe")
 PYLINT_BIN_UNIX = os.path.join("bin", "pylint")
 PYLINT_BIN = PYLINT_BIN_WINDOWS if os.name == "nt" else PYLINT_BIN_UNIX
 PYLINT_PATH = os.path.join(VENV_NAME, PYLINT_BIN)
-PYLINTRC = os.path.join(CONFIG_DIR, "2025-hw3.pylintrc")
+PYLINTRC = os.path.join(CONFIG_DIR, "2024.pylintrc")
 
 # Pytest constants
 PYTEST_BIN_WINDOWS = "pytest.exe"
@@ -92,6 +92,7 @@ IGNORE_DIRS = [
     "__pycache__",
     ".pytest_cache",
     "_MACOSX",
+    "__MACOSX",
     os.path.join("build", "lib"),
     *POSSIBLE_VENV_DIRS,
 ]

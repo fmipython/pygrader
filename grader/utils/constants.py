@@ -27,7 +27,7 @@ PYTHON_BIN = PYTHON_BIN_WINDOWS if os.name == "nt" else PYTHON_BIN_UNIX
 REQUIREMENTS_FILENAME = "requirements.txt"
 PYPROJECT_FILENAME = "pyproject.toml"
 VENV_NAME = ".venv-pygrader"
-POSSIBLE_VENV_DIRS = ["venv", ".venv"]
+POSSIBLE_VENV_DIRS = ["venv", ".venv", ".venv-pygrader"]
 PIP_PATH_WINDOWS = os.path.join("Scripts", "pip.exe")
 PIP_PATH_UNIX = os.path.join("bin", "pip")
 

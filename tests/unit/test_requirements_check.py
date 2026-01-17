@@ -70,6 +70,8 @@ class TestRequirementsCheck(unittest.TestCase):
         # Arrange
         mocked_exists.return_value = True
         mocked_venv_instance = MagicMock()
+        mocked_venv_instance.__enter__ = MagicMock(return_value=mocked_venv_instance)
+        mocked_venv_instance.__exit__ = MagicMock(return_value=False)
         mocked_venv_class.return_value = mocked_venv_instance
 
         requirements_check = RequirementsCheck(
@@ -83,8 +85,8 @@ class TestRequirementsCheck(unittest.TestCase):
         # Assert
         self.assertEqual(expected_score, actual_score)
         mocked_venv_class.assert_called_once_with("sample_dir", is_keeping_existing_venv=True)
-        mocked_venv_instance.setup.assert_called_once()
-        mocked_venv_instance.teardown.assert_called_once()
+        mocked_venv_instance.__enter__.assert_called_once()
+        mocked_venv_instance.__exit__.assert_called_once()
 
     @patch("grader.checks.requirements_check.VirtualEnvironment")
     @patch("pathlib.Path.exists")
@@ -99,7 +101,8 @@ class TestRequirementsCheck(unittest.TestCase):
         mocked_exists.return_value = True
         error_message = "Failed to install dependencies"
         mocked_venv_instance = MagicMock()
-        mocked_venv_instance.setup.side_effect = VirtualEnvironmentError(error_message)
+        mocked_venv_instance.__enter__ = MagicMock(side_effect=VirtualEnvironmentError(error_message))
+        mocked_venv_instance.__exit__ = MagicMock(return_value=False)
         mocked_venv_class.return_value = mocked_venv_instance
 
         requirements_check = RequirementsCheck(
@@ -115,8 +118,8 @@ class TestRequirementsCheck(unittest.TestCase):
         # Assert
         self.assertEqual(expected_score, actual_score)
         mocked_venv_class.assert_called_once_with("sample_dir", is_keeping_existing_venv=True)
-        mocked_venv_instance.setup.assert_called_once()
-        mocked_venv_instance.teardown.assert_not_called()
+        mocked_venv_instance.__enter__.assert_called_once()
+        mocked_venv_instance.__exit__.assert_not_called()
 
     @patch("grader.checks.requirements_check.VirtualEnvironment")
     @patch("pathlib.Path.exists")

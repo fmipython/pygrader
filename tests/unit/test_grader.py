@@ -195,7 +195,7 @@ class TestGrader(unittest.TestCase):
         # Assert
         mock_venv_check1.run.assert_called_once()
         mock_venv_check2.run.assert_called_once()
-        mock_virtualenv.assert_called_once_with(sample_project_path, False)
+        mock_virtualenv.assert_called_once_with(sample_project_path, is_keeping_venv_after_run=False)
 
     @patch("grader.grader.VirtualEnvironment")
     @patch("grader.grader.create_checks")

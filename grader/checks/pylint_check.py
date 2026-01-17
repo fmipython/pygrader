@@ -132,6 +132,8 @@ class PylintCheck(ScoredCheck):
         :param pylint_output: The output from the pylint check
         :return: The summarized output
         """
+        # TODO: Improve parsing to handle Windows paths (C:\path) and complex pylint output format
+        # Current implementation may break with multiple colons in paths or line:column:code:message format
         summarized_output = []
         for line in pylint_output.strip().split("\n"):
             parts = line.split(":")

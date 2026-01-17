@@ -83,27 +83,24 @@ def result_to_json(check_result: CheckResult, verbose: bool) -> dict:
             raise ValueError("Unknown CheckResult type")
 
 
-def non_scored_result_to_dict(scored_result: NonScoredCheckResult, verbose: bool) -> dict:
+def non_scored_result_to_dict(non_scored_result: NonScoredCheckResult, verbose: bool) -> dict:
     """
     Convert a NonScoredCheckResult to a dictionary.
-    :param name: The name of the check.
-    :type name: str
-    :param result: The result of the check.
-    :type result: str
-    :param info: Additional info about the check.
-    :type info: str
-    :param error: Error message if any.
-    :type error: str
+
+    :param non_scored_result: The NonScoredCheckResult to convert.
+    :type non_scored_result: NonScoredCheckResult
+    :param verbose: Whether to include info and error fields.
+    :type verbose: bool
     :return: A dictionary representation of the NonScoredCheckResult.
     :rtype: dict
     """
 
-    result_dict = {"name": scored_result.name, "result": scored_result.result}
+    result_dict = {"name": non_scored_result.name, "result": non_scored_result.result}
     if verbose:
-        if scored_result.info:
-            result_dict["info"] = scored_result.info
-        if scored_result.error:
-            result_dict["error"] = scored_result.error
+        if non_scored_result.info:
+            result_dict["info"] = non_scored_result.info
+        if non_scored_result.error:
+            result_dict["error"] = non_scored_result.error
     return result_dict
 
 

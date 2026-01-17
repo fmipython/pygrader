@@ -78,7 +78,7 @@ class Grader:
 
         venv_config = self.__config.get("venv", {})
 
-        with VirtualEnvironment(self.__project_root, self.__is_keeping_venv, **venv_config):
+        with VirtualEnvironment(self.__project_root, is_keeping_venv_after_run=self.__is_keeping_venv, **venv_config):
             scores += [self.__run_check(check) for check in venv_checks]
 
         self.__cleanup()

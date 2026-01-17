@@ -59,11 +59,10 @@ class RequirementsCheck(ScoredCheck):
             info = "requirements.txt or pyproject.toml not found"
 
         if self.__is_checking_install and is_one_of_files_present:
-            # TODO - Performance impact
             try:
-                venv = VirtualEnvironment(self._project_root, is_keeping_existing_venv=True)
-                venv.setup()
-                venv.teardown()
+                with VirtualEnvironment(self._project_root, is_keeping_existing_venv=True):
+                    # Context manager automatically handles setup() and teardown()
+                    pass
             except VirtualEnvironmentError as e:
                 return ScoredCheckResult(self.name, 0, "", str(e), self.max_points)
 

@@ -75,11 +75,34 @@ The grading system is built around **checks** - independent validation modules:
 - Supports templates via `json_with_templates.py`
 - Defines which checks to run and their scoring weights
 - Example configs: `2024.json`, `projects_2025.json`, `full.json`
+- **Virtual Environment Configuration**: Optional `venv` key for customizing venv behavior:
+  ```json
+  {
+    "venv": {
+      "is_keeping_existing_venv": true,  // Keep existing .venv/.venv-pygrader
+      "name": ".venv-custom"             // Custom venv directory name
+    }
+  }
+  ```
+- **Configuration Validation**: Currently NO schema validation
+  - Unknown keys in config are silently ignored
+  - Typos in venv config keys will cause defaults to be used
+  - Consider adding validation for production use
 
 ### 3. Virtual Environment Management
 - Each project is graded in an isolated virtual environment
 - Managed by `VirtualEnvironment` class (`utils/virtual_environment.py`)
 - Handles dependency installation from `requirements.txt` or `pyproject.toml`
+- **Configuration Options**:
+  - `is_keeping_venv_after_run`: Keep venv after grading (default: False)
+    - Set via CLI: `--keep-venv` flag
+    - Useful for debugging and inspecting installed packages
+  - `is_keeping_existing_venv`: Don't delete existing .venv directories (default: False)
+    - Set via config file `venv.is_keeping_existing_venv`
+    - Speeds up repeated grading runs
+  - `name`: Custom venv directory name (default: `.venv-pygrader`)
+    - Set via config file `venv.name`
+    - Prevents conflicts with student's own .venv
 
 ### 4. Grader Orchestration
 The `Grader` class (`grader/grader.py`) orchestrates:
@@ -149,9 +172,20 @@ just init                             # Create venv and install dependencies
 # Run grader on a project
 python pygrader.py --project-root <path_to_project> --config <config_file>
 
+# Run with verbose mode to see info/error fields from checks
+python pygrader.py --project-root <path_to_project> --config <config_file> -v
+
 # Or with uv
 uv run python pygrader.py --project-root <path_to_project> --config <config_file>
 ```
+
+**Verbose Mode** (`-v` or `--verbosity` flag):
+- Displays additional `info` and `error` fields from check results
+- Shows detailed feedback like coverage percentages, pylint messages, test results
+- Works with all output formats (text, JSON, CSV)
+- Example output difference:
+  - Normal: `Check: pylint, Score: 2/2`
+  - Verbose: `Check: pylint, Score: 2/2. Info: main.py: Missing module docstring. Info: utils.py: Line too long`
 
 #### Using Docker
 ```bash

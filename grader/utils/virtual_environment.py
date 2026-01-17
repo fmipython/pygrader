@@ -25,14 +25,14 @@ class VirtualEnvironment:
     def __init__(
         self,
         project_path: str,
-        is_keep_venv_after_run: bool = False,
+        is_keeping_venv_after_run: bool = False,
         is_keeping_existing_venv: bool = False,
         name: str = const.VENV_NAME,
     ):
         self._project_path = project_path
         # TODO - To fully allow for a custom venv name, we need to rethink how we handle paths in the constants
         self._venv_path = os.path.join(project_path, name)
-        self.__is_keeping_venv_after_run = is_keep_venv_after_run
+        self.__is_keeping_venv_after_run = is_keeping_venv_after_run
         self.__is_keeping_existing_venv = is_keeping_existing_venv
 
     def __enter__(self) -> VirtualEnvironment:

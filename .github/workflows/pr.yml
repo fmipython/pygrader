@@ -24,18 +24,13 @@ jobs:
 
       - name: Install the project
         run: uv sync --locked --all-extras --dev
-
-      - name: pylint
-        run: uv run pylint grader desktop tests pygrader.py --fail-under 9
-
-      - name: mypy
-        run: uv run mypy grader desktop tests pygrader.py --ignore-missing-imports
       
-      - name: flake8
-        run: uv run flake8 grader desktop tests pygrader.py
-      
-      - name: complexipy
-        run: uv run complexipy .
+      - name: Install just
+        run: apt install just
+
+      - name: Lint code
+        run: just lint
+
   test:
     runs-on: ubuntu-latest
     needs: lint
@@ -52,16 +47,15 @@ jobs:
 
       - name: Install the project
         run: uv sync --locked --all-extras --dev
+      
+      - name: Install just
+        run: apt install just
 
       - name: Run the unit tests
-        run: |
-          find tests -type f -name "test_*.py" -not -name "test_functional.py" -not -path "*sample_project*" | xargs uv run -m unittest -v
-        shell: bash
+        run: just unit_tests
 
       - name: Run the functional tests
-        run: |
-          uv run -m unittest discover -s tests -p "test_functional.py"
-        shell: bash
+        run: just functional_tests
 
   changelog-and-version:
     runs-on: ubuntu-latest

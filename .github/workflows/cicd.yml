@@ -33,7 +33,7 @@ jobs:
         run: uv sync --locked --all-extras --dev
 
       - name: Install just
-        run: apt install just
+        run: sudo apt install just
 
       - name: Lint code
         run: just lint
@@ -55,7 +55,7 @@ jobs:
         run: uv sync --locked --all-extras --dev
 
       - name: Install just
-        run: apt install just
+        run: sudo apt install just
 
       - name: Run the unit tests
         run: just unit_tests
@@ -139,7 +139,38 @@ jobs:
   #   # needs: test
   #   runs-on: ubuntu-latest
   #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: ./.github/actions/docs
+  # steps:
+  #   - uses: actions/checkout@v3
+  #   - name: Set up Python 3.10
+  #     uses: actions/setup-python@v3
+  #     with:
+  #       python-version: "3.10"
+
+  #   - name: Install dependencies
+  #     run: |
+  #       pip install sphinx sphinx_rtd_theme sphinx_rtd_theme_ext_color_contrast pylint
+  #     shell: bash
+
+  #   - name: plantuml
+  #     id: plantuml
+  #     uses: grassedge/generate-plantuml-action@v1.5
+  #     with:
+  #       path: "./docs/diagrams/out"
+  #       message: "Render PlantUML files"
+  #     env:
+  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  #   - name: Build Sphinx documentation
+  #     run: |
+  #       sphinx-build docs/source _build  # Adjust 'docs' if your Sphinx files are located elsewhere
+  #     shell: bash
+
+  #   - name: Deploy to GitHub Pages
+  #     uses: peaceiris/actions-gh-pages@v3
+  #     with:
+  #       github_token: ${{ inputs.GITHUB_TOKEN }}
+  #       publish_dir: _build/
+  #       force_orphan: true
+
   #       with:
   #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

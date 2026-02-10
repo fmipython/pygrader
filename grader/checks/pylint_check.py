@@ -57,6 +57,7 @@ class PylintCheck(ScoredCheck):
 
         logger.debug("Running pylint check on files: %s", pylint_args)
         pylint_args.append("--fail-under=0")
+        pylint_args.append("--extension-pkg-whitelist=pygame")
 
         if os.path.exists(self.__pylintrc_path):
             pylint_args.extend(["--rcfile", self.__pylintrc_path])

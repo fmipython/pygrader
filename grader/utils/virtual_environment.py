@@ -145,7 +145,8 @@ class VirtualEnvironment:
 
         pip_path = os.path.join(venv_path, const.PIP_PATH)
 
-        output = run([pip_path, "install", project_path])
+        # Editable install fixes issues with directory structure renaming in pyproject.toml
+        output = run([pip_path, "install", "-e", project_path])
 
         if output.returncode != 0:
             logger.error("Failed to install project from %s", project_path)

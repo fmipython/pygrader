@@ -77,8 +77,8 @@ COVERAGE_PATH_UNIX = os.path.join(VENV_NAME, "bin", COVERAGE_BIN)
 COVERAGE_PATH = COVERAGE_PATH_WINDOWS if os.name == "nt" else COVERAGE_PATH_UNIX
 COVERAGE_RUN_ARGS = ["run", "-m"]
 COVERAGE_RUN_PYTEST_ARGS = ["pytest"]
-COVERAGE_REPORT_ARGS = ["report", "--format=total"]
-COVERAGE_REPORT_ARGS_NO_FORMAT = ["report"]
+COVERAGE_REPORT_ARGS = ["report", "--format=total", "--no-skip-covered"]
+COVERAGE_REPORT_ARGS_NO_FORMAT = ["report", "--no-skip-covered"]
 
 COVERAGE_FILE = ".coverage"
 

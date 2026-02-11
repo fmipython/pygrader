@@ -1,5 +1,11 @@
 # pygrader
 
+## 1.8.1
+
+- When installing from pyproject.toml, use editable install to fix directory structure issues
+- Add pygame to pylint extension package whitelist
+- Update coverage report arguments
+
 ## 1.8.0
 
 - Check results now show useful info and error messages

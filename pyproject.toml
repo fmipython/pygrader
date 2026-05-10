@@ -3,8 +3,9 @@ name = "pygrader"
 version = "1.8.1"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 dependencies = [
+    "py-cove",
     "pylint>=4.0.2",
     "python-dotenv>=1.2.1",
     "requests>=2.32.5",
@@ -29,6 +30,9 @@ details = "low"
 
 [tool.complexipy.output]
 json = true
+
+[tool.uv.sources]
+py-cove = { git = "https://github.com/lyubolp/py-cove", rev = "main" }
 
 [dependency-groups]
 dev = [

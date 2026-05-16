@@ -4,8 +4,9 @@ Unit tests for the config module
 
 import unittest
 import unittest.mock
-from unittest.mock import patch, MagicMock
-from grader.utils.config import load_config, InvalidConfigError
+from unittest.mock import MagicMock, patch
+
+from grader.utils.config import InvalidConfigError, load_config_from_path
 from grader.utils.external_resources import ExternalResourceError
 
 
@@ -16,7 +17,9 @@ class TestConfig(unittest.TestCase):
 
     @patch("grader.utils.config.is_resource_remote")
     @patch("grader.utils.config.download_file_from_url")
-    def test_01_remote_resource_downloaded(self, mock_download: MagicMock, mock_is_remote: MagicMock) -> None:
+    def test_01_remote_resource_downloaded(
+        self, mock_download: MagicMock, mock_is_remote: MagicMock
+    ) -> None:
         """
         Test if a remote resource is downloaded successfully.
         """
@@ -28,7 +31,7 @@ class TestConfig(unittest.TestCase):
 
         # Act
         try:
-            load_config(sample_config_path)
+            load_config_from_path(sample_config_path)
         except InvalidConfigError:
             pass
 
@@ -51,11 +54,17 @@ class TestConfig(unittest.TestCase):
 
         # Act & Assert
         with self.assertRaises(InvalidConfigError):
-            load_config(sample_config_path)
+            load_config_from_path(sample_config_path)
 
-    @patch("builtins.open", new_callable=unittest.mock.mock_open, read_data='{"key": "value"}')
+    @patch(
+        "builtins.open",
+        new_callable=unittest.mock.mock_open,
+        read_data='{"key": "value"}',
+    )
     @patch("grader.utils.config.is_resource_remote")
-    def test_03_local_file_loaded_successfully(self, mock_is_remote: MagicMock, mock_open: MagicMock) -> None:
+    def test_03_local_file_loaded_successfully(
+        self, mock_is_remote: MagicMock, mock_open: MagicMock
+    ) -> None:
         """
         Test if a local file is loaded successfully.
         """
@@ -65,7 +74,7 @@ class TestConfig(unittest.TestCase):
         sample_config_path = "config.json"
 
         # Act
-        config = load_config(sample_config_path)
+        config = load_config_from_path(sample_config_path)
 
         # Assert
         self.assertEqual(config, {"key": "value"})
@@ -73,7 +82,9 @@ class TestConfig(unittest.TestCase):
 
     @patch("builtins.open", new_callable=unittest.mock.mock_open)
     @patch("grader.utils.config.is_resource_remote")
-    def test_04_local_file_not_found(self, mock_is_remote: MagicMock, mock_open: MagicMock) -> None:
+    def test_04_local_file_not_found(
+        self, mock_is_remote: MagicMock, mock_open: MagicMock
+    ) -> None:
         """
         Test if a FileNotFoundError for a local file is handled properly.
         """
@@ -85,11 +96,17 @@ class TestConfig(unittest.TestCase):
 
         # Act & Assert
         with self.assertRaises(InvalidConfigError):
-            load_config(sample_config_path)
+            load_config_from_path(sample_config_path)
 
-    @patch("builtins.open", new_callable=unittest.mock.mock_open, read_data='{"key": "value"')
+    @patch(
+        "builtins.open",
+        new_callable=unittest.mock.mock_open,
+        read_data='{"key": "value"',
+    )
     @patch("grader.utils.config.is_resource_remote")
-    def test_05_local_file_invalid_json(self, mock_is_remote: MagicMock, _: MagicMock) -> None:
+    def test_05_local_file_invalid_json(
+        self, mock_is_remote: MagicMock, _: MagicMock
+    ) -> None:
         """
         Test if invalid JSON in a local file is handled properly.
         """
@@ -101,4 +118,4 @@ class TestConfig(unittest.TestCase):
 
         # Act & Assert
         with self.assertRaises(InvalidConfigError):
-            load_config(sample_config_path)
+            load_config_from_path(sample_config_path)

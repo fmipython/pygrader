@@ -1,7 +1,16 @@
+import json
+
 from cove_sdk import CoveClient
 
-with CoveClient(base_url="http://127.0.0.1:8001") as client:
-    client.login("pygrader", "1234")
+from grader.utils.cove_config import CoveConfig
+
+cc = CoveConfig(
+    base_url="http://127.0.0.1:8001", api_key="9b256764-fc22-458b-bc69-3a52a6bb2877"
+)
+
+
+with CoveClient(**cc.to_dict()) as client:
+    # client.login("pygrader", "1234")
 
     projects = client.projects.list()
 
@@ -20,6 +29,13 @@ with CoveClient(base_url="http://127.0.0.1:8001") as client:
 
     print(f"Project ID: {project.id}")
 
-    client.json_items.create(
-        project_id=project.id,
-        name="config",)
+    with open("config/full_single_point.json", "r") as f:
+        value = json.load(f)
+
+    config = client.json_items.get(project_id=project.id, key="config")
+    if config is None:
+        print("Creating JSON item 'config' for project pygrader-test")
+        client.json_items.create(project_id=project.id, key="config", value=value)
+    else:
+        print("JSON item 'config' already exists for project pygrader-test")
+        print(config.json_value)

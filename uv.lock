@@ -607,8 +607,8 @@ wheels = [
 
 [[package]]
 name = "py-cove"
-version = "1.1.0"
-source = { git = "https://github.com/lyubolp/py-cove?rev=main#2cc1a2d00bdbe5dd257ffe3dbe5c950ae994d579" }
+version = "1.1.1"
+source = { git = "https://github.com/lyubolp/py-cove?rev=v1.1.1#6d54292f584974411b0faae12d831c4afcd6ba55" }
 dependencies = [
     { name = "httpx" },
     { name = "pydantic" },
@@ -733,7 +733,7 @@ wheels = [
 
 [[package]]
 name = "pygrader"
-version = "1.8.1"
+version = "1.9.0"
 source = { editable = "." }
 dependencies = [
     { name = "py-cove" },
@@ -758,7 +758,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "py-cove", git = "https://github.com/lyubolp/py-cove?rev=main" },
+    { name = "py-cove", git = "https://github.com/lyubolp/py-cove?rev=v1.1.1" },
     { name = "pylint", specifier = ">=4.0.2" },
     { name = "python-dotenv", specifier = ">=1.2.1" },
     { name = "requests", specifier = ">=2.32.5" },

@@ -2,23 +2,24 @@
 Module containing the Grader class.
 """
 
-from logging import Logger
 import os
 import shutil
-import grader.utils.constants as const
+from logging import Logger
+from typing import Optional
 
+import grader.utils.constants as const
 from grader.checks.abstract_check import (
     AbstractCheck,
     CheckError,
-    NonScoredCheckResult,
     CheckResult,
-    ScoredCheckResult,
-    ScoredCheck,
     NonScoredCheck,
+    NonScoredCheckResult,
+    ScoredCheck,
+    ScoredCheckResult,
 )
-
 from grader.checks.checks_factory import create_checks
-from grader.utils.config import load_config, InvalidConfigError
+from grader.utils.config import InvalidConfigError, load_config_from_path
+from grader.utils.cove_config import CoveConfig
 from grader.utils.virtual_environment import VirtualEnvironment
 
 
@@ -35,6 +36,7 @@ class Grader:
         logger: Logger,
         is_keeping_venv: bool = False,
         is_skipping_venv_creation: bool = False,
+        cove_config: Optional[CoveConfig] = None,
     ):
         self.__logger = logger
 
@@ -42,7 +44,7 @@ class Grader:
         self.__is_keeping_venv = is_keeping_venv
         self.__is_skipping_venv_creation = is_skipping_venv_creation
         try:
-            self.__config = load_config(config_path)
+            self.__config = load_config_from_path(config_path)
             self.__logger.debug(f"Config contents: {self.__config}")
         except InvalidConfigError as exc:
             self.__logger.error("Error with the configuration file")
@@ -55,7 +57,9 @@ class Grader:
         self.__logger.debug("Project root: %s", project_root)
         self.__logger.debug("Configuration file: %s", config_path)
         self.__logger.debug("Keeping virtual environment: %s", is_keeping_venv)
-        self.__logger.debug("Skipping virtual environment creation: %s", is_skipping_venv_creation)
+        self.__logger.debug(
+            "Skipping virtual environment creation: %s", is_skipping_venv_creation
+        )
         self.__logger.debug("PYTHONPATH: %s", os.environ.get("PYTHONPATH", "Not set"))
 
         self.__project_root = project_root
@@ -78,7 +82,11 @@ class Grader:
 
         venv_config = self.__config.get("venv", {})
 
-        with VirtualEnvironment(self.__project_root, is_keeping_venv_after_run=self.__is_keeping_venv, **venv_config):
+        with VirtualEnvironment(
+            self.__project_root,
+            is_keeping_venv_after_run=self.__is_keeping_venv,
+            **venv_config,
+        ):
             scores += [self.__run_check(check) for check in venv_checks]
 
         self.__cleanup()
@@ -101,9 +109,13 @@ class Grader:
             # TODO - Pass the information from the exception
             match check:
                 case ScoredCheck():
-                    check_result = ScoredCheckResult(check.name, 0, "", str(error), check.max_points)
+                    check_result = ScoredCheckResult(
+                        check.name, 0, "", str(error), check.max_points
+                    )
                 case NonScoredCheck():
-                    check_result = NonScoredCheckResult(check.name, False, "", str(error))
+                    check_result = NonScoredCheckResult(
+                        check.name, False, "", str(error)
+                    )
                 case _:
                     raise TypeError(f"Unknown check type: {type(check)}") from error
 
@@ -120,7 +132,9 @@ class Grader:
         coverage_file_full_path = os.path.join(self.__project_root, const.COVERAGE_FILE)
         if os.path.exists(coverage_file_full_path):
             os.remove(coverage_file_full_path)
-        shutil.rmtree(os.path.join(self.__project_root, const.PYTEST_CACHE), ignore_errors=True)
+        shutil.rmtree(
+            os.path.join(self.__project_root, const.PYTEST_CACHE), ignore_errors=True
+        )
 
 
 class GraderError(Exception):

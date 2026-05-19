@@ -10,7 +10,7 @@ import shutil
 import grader.utils.constants as const
 
 from desktop.cli import get_args
-from desktop.results_reporter import (
+from grader.utils.results_reporter import (
     JSONResultsReporter,
     CSVResultsReporter,
     PlainTextResultsReporter,

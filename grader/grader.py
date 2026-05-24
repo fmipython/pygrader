@@ -18,7 +18,11 @@ from grader.checks.abstract_check import (
     ScoredCheckResult,
 )
 from grader.checks.checks_factory import create_checks
-from grader.utils.config import InvalidConfigError, load_config_from_path
+from grader.utils.config import (
+    InvalidConfigError,
+    load_config_from_cove,
+    load_config_from_path,
+)
 from grader.utils.cove_config import CoveConfig
 from grader.utils.virtual_environment import VirtualEnvironment
 
@@ -32,8 +36,8 @@ class Grader:
         self,
         student_id: str,
         project_root: str,
-        config_path: str,
         logger: Logger,
+        config_path: Optional[str] = None,
         is_keeping_venv: bool = False,
         is_skipping_venv_creation: bool = False,
         cove_config: Optional[CoveConfig] = None,
@@ -44,7 +48,15 @@ class Grader:
         self.__is_keeping_venv = is_keeping_venv
         self.__is_skipping_venv_creation = is_skipping_venv_creation
         try:
-            self.__config = load_config_from_path(config_path)
+            if config_path is not None:
+                self.__logger.info("Loading configuration from file: %s", config_path)
+                self.__config = load_config_from_path(config_path)
+            elif cove_config is not None:
+                self.__logger.info("Loading configuration from Cove project")
+                self.__config = load_config_from_cove(cove_config)
+            else:
+                raise InvalidConfigError("No configuration source provided")
+
             self.__logger.debug(f"Config contents: {self.__config}")
         except InvalidConfigError as exc:
             self.__logger.error("Error with the configuration file")

@@ -50,22 +50,18 @@ def load_config_from_cove(cove_config: CoveConfig) -> dict:
     with CoveClient(
         base_url=cove_config.base_url, api_key=cove_config.api_key
     ) as client:
-        projects = client.projects.list()
-
-        project = next(
-            (p for p in projects if p.name == cove_config.project_name), None
-        )
+        project = client.projects.get(cove_config.project_id)
 
         if project is None:
             raise InvalidConfigError(
-                f"Project '{cove_config.project_name}' not found in Cove at {cove_config.base_url}"
+                f"Project '{cove_config.project_id}' not found in Cove at {cove_config.base_url}"
             )
 
         config = client.json_items.get(project_id=project.id, key="config")
 
         if config is None:
             raise InvalidConfigError(
-                f"JSON item 'config' not found in project '{cove_config.project_name}' in Cove at {cove_config.base_url}"
+                f"JSON item 'config' not found in project '{cove_config.project_id}' in Cove at {cove_config.base_url}"
             )
 
         return config.json_value

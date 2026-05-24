@@ -4,21 +4,23 @@ Calls all the checks, and stores their results
 """
 
 import os
-from pathlib import Path
 import shutil
+from pathlib import Path
+
+import dotenv
 
 import grader.utils.constants as const
-
 from desktop.cli import get_args
 from desktop.results_reporter import (
-    JSONResultsReporter,
     CSVResultsReporter,
+    JSONResultsReporter,
     PlainTextResultsReporter,
     ResultsReporter,
 )
-from grader.utils.logger import setup_logger
-from grader.utils.files import is_path_zip, unzip_archive
 from grader.grader import Grader
+from grader.utils.cove_config import CoveConfig
+from grader.utils.files import is_path_zip, unzip_archive
+from grader.utils.logger import setup_logger
 
 
 def build_reporter(report_format: str) -> ResultsReporter:
@@ -44,8 +46,16 @@ def run_grader() -> None:
     Run the grader application.
     """
     args = get_args()
-    is_suppressing_info = args["report_format"] == "json" or args["report_format"] == "csv" or args["suppress_info"]
-    log = setup_logger(args["student_id"], verbosity=args["verbosity"], suppress_info=is_suppressing_info)
+    is_suppressing_info = (
+        args["report_format"] == "json"
+        or args["report_format"] == "csv"
+        or args["suppress_info"]
+    )
+    log = setup_logger(
+        args["student_id"],
+        verbosity=args["verbosity"],
+        suppress_info=is_suppressing_info,
+    )
 
     if is_path_zip(args["project_root"]):
         project_root = unzip_archive(args["project_root"])
@@ -63,8 +73,29 @@ def run_grader() -> None:
     else:
         project_root = str(args["project_root"])  # type safety
 
+    cove_config = None
+    if args["config"] is None:
+        dotenv.load_dotenv()
+
+        if (
+            "COVE_URL" in os.environ
+            and "COVE_API_KEY" in os.environ
+            and "COVE_PROJECT_NAME" in os.environ
+        ):
+            cove_config = CoveConfig(
+                base_url=os.environ["COVE_URL"],
+                api_key=os.environ["COVE_API_KEY"],
+                project_id=os.environ["COVE_PROJECT_NAME"],
+            )
+
     grader = Grader(
-        args["student_id"], project_root, args["config"], log, args["keep_venv"], args["skip_venv_creation"]
+        args["student_id"],
+        project_root,
+        log,
+        is_keeping_venv=args["keep_venv"],
+        is_skipping_venv_creation=args["skip_venv_creation"],
+        config_path=args["config"],
+        cove_config=cove_config,
     )
 
     checks_results = grader.grade()

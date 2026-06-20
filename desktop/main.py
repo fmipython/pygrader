@@ -73,21 +73,6 @@ def run_grader() -> None:
     else:
         project_root = str(args["project_root"])  # type safety
 
-    cove_config = None
-    if args["config"] is None:
-        dotenv.load_dotenv()
-
-        if (
-            "COVE_URL" in os.environ
-            and "COVE_API_KEY" in os.environ
-            and "COVE_PROJECT_NAME" in os.environ
-        ):
-            cove_config = CoveConfig(
-                base_url=os.environ["COVE_URL"],
-                api_key=os.environ["COVE_API_KEY"],
-                project_id=os.environ["COVE_PROJECT_NAME"],
-            )
-
     grader = Grader(
         args["student_id"],
         project_root,
@@ -95,7 +80,6 @@ def run_grader() -> None:
         is_keeping_venv=args["keep_venv"],
         is_skipping_venv_creation=args["skip_venv_creation"],
         config_path=args["config"],
-        cove_config=cove_config,
     )
 
     checks_results = grader.grade()

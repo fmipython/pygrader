@@ -40,7 +40,6 @@ class Grader:
         config_path: Optional[str] = None,
         is_keeping_venv: bool = False,
         is_skipping_venv_creation: bool = False,
-        cove_config: Optional[CoveConfig] = None,
     ):
         self.__logger = logger
 
@@ -51,9 +50,6 @@ class Grader:
             if config_path is not None:
                 self.__logger.info("Loading configuration from file: %s", config_path)
                 self.__config = load_config_from_path(config_path)
-            elif cove_config is not None:
-                self.__logger.info("Loading configuration from Cove project")
-                self.__config = load_config_from_cove(cove_config)
             else:
                 raise InvalidConfigError("No configuration source provided")
 

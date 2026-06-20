@@ -4,13 +4,13 @@ from cove_sdk import CoveClient
 
 from grader.utils.cove_config import CoveConfig
 
-cc = CoveConfig(
-    base_url="http://127.0.0.1:8001", api_key="9b256764-fc22-458b-bc69-3a52a6bb2877"
-)
+# cc = CoveConfig(
+#     base_url="http://127.0.0.1:8001", api_key="9b256764-fc22-458b-bc69-3a52a6bb2877"
+# )
 
 
-with CoveClient(**cc.to_dict()) as client:
-    # client.login("pygrader", "1234")
+with CoveClient(base_url="http://localhost:8001") as client:
+    client.login("pygrader", "1234")
 
     projects = client.projects.list()
 
@@ -39,3 +39,15 @@ with CoveClient(**cc.to_dict()) as client:
     else:
         print("JSON item 'config' already exists for project pygrader-test")
         print(config.json_value)
+
+    api_keys = [api_key.access_for_project_id for api_key in client.api_keys.list()]
+
+    if project.id in api_keys:
+        print(
+            "API key for project pygrader-test already exists. Using existing API key."
+        )
+    else:
+        print("Creating API key for project pygrader-test")
+        result = client.api_keys.create(project_id=project.id)
+
+        print(f"Created API key {result.key}")

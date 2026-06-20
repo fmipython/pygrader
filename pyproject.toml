@@ -33,7 +33,7 @@ details = "low"
 json = true
 
 [tool.uv.sources]
-py-cove = { git = "https://github.com/lyubolp/py-cove", rev = "v1.1.1" }
+py-cove = { git = "https://github.com/lyubolp/py-cove", rev = "v1.2.0" }
 
 [dependency-groups]
 dev = [

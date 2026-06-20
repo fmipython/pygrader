@@ -3,25 +3,30 @@ Module for loading the configuration file.
 """
 
 import json
+import os
 from pathlib import Path
 
-from cove_sdk import CoveClient
+from cove_sdk import JSONItem, KeyValueItem, PythonItem, fetch_uri
+from cove_sdk.exceptions import CoveAPIError, URIParseError
 
-from grader.utils.cove_config import CoveConfig
 from grader.utils.external_resources import (
     ExternalResourceError,
     download_file_from_url,
+    is_resource_cove,
     is_resource_remote,
 )
 from grader.utils.json_with_templates import load_with_values
 
 
-def load_config_from_path(config_path: str) -> dict:
+def load_config(config_path: str) -> dict:
     """
     Load the configuration file.
-    :param config_path: Path or URL to the configuration file.
+    :param config_path: Path, URL or Cove URI to the configuration file.
     :return: The configuration as a dictionary.
     """
+
+    if is_resource_cove(config_path):
+        return load_from_cove(config_path)
 
     if is_resource_remote(config_path):
         try:
@@ -31,6 +36,18 @@ def load_config_from_path(config_path: str) -> dict:
                 f"Could not load configuration from {config_path}"
             ) from exc
 
+    config = read_from_file(config_path)
+
+    return config
+
+
+def read_from_file(config_path: str) -> dict:
+    """
+    Read the configuration from a file
+
+    :param config_path: File path to the configuration file
+    :return: The configuration as a dictionary
+    """
     config_dir = str(Path(config_path).parent.absolute())
     try:
         config = load_with_values(config_path, config_dir=config_dir)
@@ -46,25 +63,31 @@ def load_config_from_path(config_path: str) -> dict:
     return config
 
 
-def load_config_from_cove(cove_config: CoveConfig) -> dict:
-    with CoveClient(
-        base_url=cove_config.base_url, api_key=cove_config.api_key
-    ) as client:
-        project = client.projects.get(cove_config.project_id)
+def load_from_cove(cove_uri: str) -> dict:
+    """
+    Load the configuration from a Cove URI.
 
-        if project is None:
-            raise InvalidConfigError(
-                f"Project '{cove_config.project_id}' not found in Cove at {cove_config.base_url}"
-            )
+    :param cove_uri: The Cove URI to load the configuration from
+    :return: The configuration as a dictionary
+    """
+    if "COVE_API_KEY" not in os.environ:
+        raise InvalidConfigError(
+            "COVE_API_KEY environment variable is not set, required to fetch Cove resources"
+        )
 
-        config = client.json_items.get(project_id=project.id, key="config")
+    try:
+        result = fetch_uri(cove_uri, api_key=os.environ["COVE_API_KEY"])
+    except (CoveAPIError, URIParseError) as exc:
+        raise InvalidConfigError(f"Error parsing Cove URI: {cove_uri}") from exc
 
-        if config is None:
-            raise InvalidConfigError(
-                f"JSON item 'config' not found in project '{cove_config.project_id}' in Cove at {cove_config.base_url}"
-            )
+    if result is None:
+        raise InvalidConfigError(f"Cove resource not found: {cove_uri}")
 
-        return config.json_value
+    if not isinstance(result, JSONItem):
+        raise InvalidConfigError(f"Cove resource is not a JSON item: {cove_uri}")
+
+    print(result.json_value)
+    return result.json_value
 
 
 class InvalidConfigError(Exception):

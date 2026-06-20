@@ -9,11 +9,13 @@ from typing import Optional
 from urllib.parse import urlparse
 
 import requests
+
+# from cove_sdk._uri import is_cove_uri
+from cove_sdk import is_cove_uri
 from dotenv import load_dotenv
 
 from grader.utils.constants import TEMP_FILES_DIR
 from grader.utils.logger import VERBOSE
-
 
 logger = logging.getLogger("grader")
 load_dotenv()
@@ -30,7 +32,19 @@ def is_resource_remote(resource_path: str) -> bool:
     return parsed_url.scheme in ["http", "https", "ftp"]
 
 
-def download_file_from_url(url: str, filename: Optional[str] = None, is_json: bool = False) -> str:
+def is_resource_cove(resource_path: str) -> bool:
+    """
+    Check if a file is a Cove resource.
+
+    :param resource_path: The path to the resource
+    :return: True if the resource is a Cove resource, False otherwise
+    """
+    return is_cove_uri(resource_path)
+
+
+def download_file_from_url(
+    url: str, filename: Optional[str] = None, is_json: bool = False
+) -> str:
     """
     Download a file from a URL and save it in temp_files under the pygrader root directory.
 
@@ -49,7 +63,10 @@ def download_file_from_url(url: str, filename: Optional[str] = None, is_json: bo
     token = os.getenv("github_token")
 
     if token is not None:
-        headers = {"Authorization": f"token {token}", "Accept": "application/vnd.github.v3.raw"}
+        headers = {
+            "Authorization": f"token {token}",
+            "Accept": "application/vnd.github.v3.raw",
+        }
     else:
         headers = {}
 

@@ -6,7 +6,7 @@ import unittest
 import unittest.mock
 from unittest.mock import MagicMock, patch
 
-from grader.utils.config import InvalidConfigError, load_config_from_path
+from grader.utils.config import InvalidConfigError, load_config
 from grader.utils.external_resources import ExternalResourceError
 
 
@@ -31,7 +31,7 @@ class TestConfig(unittest.TestCase):
 
         # Act
         try:
-            load_config_from_path(sample_config_path)
+            load_config(sample_config_path)
         except InvalidConfigError:
             pass
 
@@ -54,7 +54,7 @@ class TestConfig(unittest.TestCase):
 
         # Act & Assert
         with self.assertRaises(InvalidConfigError):
-            load_config_from_path(sample_config_path)
+            load_config(sample_config_path)
 
     @patch(
         "builtins.open",
@@ -74,7 +74,7 @@ class TestConfig(unittest.TestCase):
         sample_config_path = "config.json"
 
         # Act
-        config = load_config_from_path(sample_config_path)
+        config = load_config(sample_config_path)
 
         # Assert
         self.assertEqual(config, {"key": "value"})
@@ -96,7 +96,7 @@ class TestConfig(unittest.TestCase):
 
         # Act & Assert
         with self.assertRaises(InvalidConfigError):
-            load_config_from_path(sample_config_path)
+            load_config(sample_config_path)
 
     @patch(
         "builtins.open",
@@ -118,4 +118,4 @@ class TestConfig(unittest.TestCase):
 
         # Act & Assert
         with self.assertRaises(InvalidConfigError):
-            load_config_from_path(sample_config_path)
+            load_config(sample_config_path)

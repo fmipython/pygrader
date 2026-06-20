@@ -18,12 +18,7 @@ from grader.checks.abstract_check import (
     ScoredCheckResult,
 )
 from grader.checks.checks_factory import create_checks
-from grader.utils.config import (
-    InvalidConfigError,
-    load_config_from_cove,
-    load_config_from_path,
-)
-from grader.utils.cove_config import CoveConfig
+from grader.utils.config import InvalidConfigError, load_config
 from grader.utils.virtual_environment import VirtualEnvironment
 
 
@@ -47,11 +42,11 @@ class Grader:
         self.__is_keeping_venv = is_keeping_venv
         self.__is_skipping_venv_creation = is_skipping_venv_creation
         try:
-            if config_path is not None:
-                self.__logger.info("Loading configuration from file: %s", config_path)
-                self.__config = load_config_from_path(config_path)
-            else:
+            if config_path is None:
                 raise InvalidConfigError("No configuration source provided")
+
+            self.__logger.info("Loading configuration from file: %s", config_path)
+            self.__config = load_config(config_path)
 
             self.__logger.debug(f"Config contents: {self.__config}")
         except InvalidConfigError as exc:

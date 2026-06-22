@@ -3,15 +3,14 @@ Module for loading the configuration file.
 """
 
 import json
-import os
 from pathlib import Path
 
-from cove_sdk import JSONItem, KeyValueItem, PythonItem, fetch_uri
-from cove_sdk.exceptions import CoveAPIError, URIParseError
+from cove_sdk import JSONItem
 
 from grader.utils.external_resources import (
     ExternalResourceError,
     download_file_from_url,
+    fetch_from_cove,
     is_resource_cove,
     is_resource_remote,
 )
@@ -70,23 +69,17 @@ def load_from_cove(cove_uri: str) -> dict:
     :param cove_uri: The Cove URI to load the configuration from
     :return: The configuration as a dictionary
     """
-    if "COVE_API_KEY" not in os.environ:
-        raise InvalidConfigError(
-            "COVE_API_KEY environment variable is not set, required to fetch Cove resources"
-        )
 
     try:
-        result = fetch_uri(cove_uri, api_key=os.environ["COVE_API_KEY"])
-    except (CoveAPIError, URIParseError) as exc:
-        raise InvalidConfigError(f"Error parsing Cove URI: {cove_uri}") from exc
-
-    if result is None:
-        raise InvalidConfigError(f"Cove resource not found: {cove_uri}")
+        result = fetch_from_cove(cove_uri)
+    except ExternalResourceError as exc:
+        raise InvalidConfigError(
+            f"Could not load configuration from Cove URI: {cove_uri}"
+        ) from exc
 
     if not isinstance(result, JSONItem):
         raise InvalidConfigError(f"Cove resource is not a JSON item: {cove_uri}")
 
-    print(result.json_value)
     return result.json_value
 
 

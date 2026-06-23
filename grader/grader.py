@@ -60,9 +60,7 @@ class Grader:
         self.__logger.debug("Project root: %s", project_root)
         self.__logger.debug("Configuration file: %s", config_path)
         self.__logger.debug("Keeping virtual environment: %s", is_keeping_venv)
-        self.__logger.debug(
-            "Skipping virtual environment creation: %s", is_skipping_venv_creation
-        )
+        self.__logger.debug("Skipping virtual environment creation: %s", is_skipping_venv_creation)
         self.__logger.debug("PYTHONPATH: %s", os.environ.get("PYTHONPATH", "Not set"))
 
         self.__project_root = project_root
@@ -112,13 +110,9 @@ class Grader:
             # TODO - Pass the information from the exception
             match check:
                 case ScoredCheck():
-                    check_result = ScoredCheckResult(
-                        check.name, 0, "", str(error), check.max_points
-                    )
+                    check_result = ScoredCheckResult(check.name, 0, "", str(error), check.max_points)
                 case NonScoredCheck():
-                    check_result = NonScoredCheckResult(
-                        check.name, False, "", str(error)
-                    )
+                    check_result = NonScoredCheckResult(check.name, False, "", str(error))
                 case _:
                     raise TypeError(f"Unknown check type: {type(check)}") from error
 
@@ -135,9 +129,7 @@ class Grader:
         coverage_file_full_path = os.path.join(self.__project_root, const.COVERAGE_FILE)
         if os.path.exists(coverage_file_full_path):
             os.remove(coverage_file_full_path)
-        shutil.rmtree(
-            os.path.join(self.__project_root, const.PYTEST_CACHE), ignore_errors=True
-        )
+        shutil.rmtree(os.path.join(self.__project_root, const.PYTEST_CACHE), ignore_errors=True)
 
 
 class GraderError(Exception):

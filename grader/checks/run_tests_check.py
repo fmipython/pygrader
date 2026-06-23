@@ -95,9 +95,7 @@ class RunTestsCheck(ScoredCheck):
         logger.debug("Total score %f", total_score)
 
         if round(total_score, 2) > round(self.max_points, 2):
-            logger.error(
-                "Total score %f exceeds maximum points %f", total_score, self.max_points
-            )
+            logger.error("Total score %f exceeds maximum points %f", total_score, self.max_points)
             raise CheckError("Total score exceeds maximum points")
 
         logger.log(VERBOSE, "Passed tests: %d/%d", len(passed), total_amount)
@@ -107,9 +105,7 @@ class RunTestsCheck(ScoredCheck):
         tests_info += [test.pretty(True) for test in passed]
         tests_info += [test.pretty(False) for test in failed]
 
-        return ScoredCheckResult(
-            self.name, passed_tests_score, "\n".join(tests_info), "", self.max_points
-        )
+        return ScoredCheckResult(self.name, passed_tests_score, "\n".join(tests_info), "", self.max_points)
 
     def __pytest_run(self) -> str:
         """
@@ -122,9 +118,7 @@ class RunTestsCheck(ScoredCheck):
         if os.path.isabs(self._project_root):
             pytest_root_dir = PYTEST_ROOT_DIR_ARG.format(self._project_root)
         else:
-            pytest_root_dir = PYTEST_ROOT_DIR_ARG.format(
-                os.path.join(os.getcwd(), self._project_root)
-            )
+            pytest_root_dir = PYTEST_ROOT_DIR_ARG.format(os.path.join(os.getcwd(), self._project_root))
         command = [PYTEST_PATH] + PYTEST_ARGS + [pytest_root_dir] + self.__tests_path
 
         pythonpath_env = process.extend_env_variable("PYTHONPATH", self._project_root)
@@ -170,9 +164,7 @@ class RunTestsCheck(ScoredCheck):
                 passed_tests.append(TestId(class_name, test_name))
             elif line.startswith("FAILED"):
                 class_name = items[-2]
-                test_name = items[-1].split(" ")[
-                    0
-                ]  # test_06_str_method - AssertionError: ...
+                test_name = items[-1].split(" ")[0]  # test_06_str_method - AssertionError: ...
                 test_id = TestId(class_name, test_name)
                 logger.log(VERBOSE, "Test %s failed", test_id)
                 failed_tests.append(test_id)
@@ -185,13 +177,9 @@ class RunTestsCheck(ScoredCheck):
         # TODO - This will be similar to config.py:load_config
         # A function that handles different types of resources should be introduced.
 
-        self.__tests_path = [
-            RunTestsCheck.__download_test(path) for path in self.__tests_path
-        ]
+        self.__tests_path = [RunTestsCheck.__download_test(path) for path in self.__tests_path]
 
-    def __calculate_score(
-        self, passed_tests: list[TestId], failed_tests: list[TestId]
-    ) -> tuple[float, float, float]:
+    def __calculate_score(self, passed_tests: list[TestId], failed_tests: list[TestId]) -> tuple[float, float, float]:
         """
         Calculate the total score based on passed and failed tests.
 
@@ -201,13 +189,9 @@ class RunTestsCheck(ScoredCheck):
         :rtype: float
         """
 
-        passed_tests_score = sum(
-            self.__score_test(passed_test) for passed_test in passed_tests
-        )
+        passed_tests_score = sum(self.__score_test(passed_test) for passed_test in passed_tests)
 
-        failed_tests_score = sum(
-            self.__score_test(failed_test) for failed_test in failed_tests
-        )
+        failed_tests_score = sum(self.__score_test(failed_test) for failed_test in failed_tests)
 
         total_score = passed_tests_score + failed_tests_score
 
@@ -229,20 +213,11 @@ class RunTestsCheck(ScoredCheck):
         test_class = test.class_name
         test_name = test.test_name
 
-        if (
-            test_class in self.__test_score_mapping
-            and test_name in self.__test_score_mapping
-        ):
+        if test_class in self.__test_score_mapping and test_name in self.__test_score_mapping:
             score = self.__test_score_mapping[test_name]
-        elif (
-            test_class in self.__test_score_mapping
-            and test_name not in self.__test_score_mapping
-        ):
+        elif test_class in self.__test_score_mapping and test_name not in self.__test_score_mapping:
             score = self.__test_score_mapping[test_class]
-        elif (
-            test_class not in self.__test_score_mapping
-            and test_name in self.__test_score_mapping
-        ):
+        elif test_class not in self.__test_score_mapping and test_name in self.__test_score_mapping:
             score = self.__test_score_mapping[test_name]
         else:
             score = self.__default_test_score

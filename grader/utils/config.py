@@ -31,9 +31,7 @@ def load_config(config_path: str) -> dict:
         try:
             config_path = download_file_from_url(config_path, is_json=True)
         except ExternalResourceError as exc:
-            raise InvalidConfigError(
-                f"Could not load configuration from {config_path}"
-            ) from exc
+            raise InvalidConfigError(f"Could not load configuration from {config_path}") from exc
 
     config = read_from_file(config_path)
 
@@ -51,13 +49,9 @@ def read_from_file(config_path: str) -> dict:
     try:
         config = load_with_values(config_path, config_dir=config_dir)
     except FileNotFoundError as exc:
-        raise InvalidConfigError(
-            f"Configuration file not found: {config_path}"
-        ) from exc
+        raise InvalidConfigError(f"Configuration file not found: {config_path}") from exc
     except json.JSONDecodeError as exc:
-        raise InvalidConfigError(
-            f"Error parsing JSON configuration file: {config_path}"
-        ) from exc
+        raise InvalidConfigError(f"Error parsing JSON configuration file: {config_path}") from exc
 
     return config
 
@@ -73,9 +67,7 @@ def load_from_cove(cove_uri: str) -> dict:
     try:
         result = fetch_from_cove(cove_uri)
     except ExternalResourceError as exc:
-        raise InvalidConfigError(
-            f"Could not load configuration from Cove URI: {cove_uri}"
-        ) from exc
+        raise InvalidConfigError(f"Could not load configuration from Cove URI: {cove_uri}") from exc
 
     if not isinstance(result, JSONItem):
         raise InvalidConfigError(f"Cove resource is not a JSON item: {cove_uri}")

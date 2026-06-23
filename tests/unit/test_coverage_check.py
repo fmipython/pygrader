@@ -154,9 +154,7 @@ class TestCoverageCheck(unittest.TestCase):
 
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_run")
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_report")
-    def test_08_translate_score_right_bound_second_range(
-        self, mocked_report: MagicMock, mocked_run: MagicMock
-    ) -> None:
+    def test_08_translate_score_right_bound_second_range(self, mocked_report: MagicMock, mocked_run: MagicMock) -> None:
         """
         Test that a coverage report at the right bound of the second range translates to a score of 2.
         """
@@ -173,9 +171,7 @@ class TestCoverageCheck(unittest.TestCase):
 
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_run")
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_report")
-    def test_09_translate_score_inside_bound_third_range(
-        self, mocked_report: MagicMock, mocked_run: MagicMock
-    ) -> None:
+    def test_09_translate_score_inside_bound_third_range(self, mocked_report: MagicMock, mocked_run: MagicMock) -> None:
         """
         Test that a coverage report inside the third range translates to a score of 2.
         """

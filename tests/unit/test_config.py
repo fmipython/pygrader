@@ -17,9 +17,7 @@ class TestConfig(unittest.TestCase):
 
     @patch("grader.utils.config.is_resource_remote")
     @patch("grader.utils.config.download_file_from_url")
-    def test_01_remote_resource_downloaded(
-        self, mock_download: MagicMock, mock_is_remote: MagicMock
-    ) -> None:
+    def test_01_remote_resource_downloaded(self, mock_download: MagicMock, mock_is_remote: MagicMock) -> None:
         """
         Test if a remote resource is downloaded successfully.
         """
@@ -62,9 +60,7 @@ class TestConfig(unittest.TestCase):
         read_data='{"key": "value"}',
     )
     @patch("grader.utils.config.is_resource_remote")
-    def test_03_local_file_loaded_successfully(
-        self, mock_is_remote: MagicMock, mock_open: MagicMock
-    ) -> None:
+    def test_03_local_file_loaded_successfully(self, mock_is_remote: MagicMock, mock_open: MagicMock) -> None:
         """
         Test if a local file is loaded successfully.
         """
@@ -82,9 +78,7 @@ class TestConfig(unittest.TestCase):
 
     @patch("builtins.open", new_callable=unittest.mock.mock_open)
     @patch("grader.utils.config.is_resource_remote")
-    def test_04_local_file_not_found(
-        self, mock_is_remote: MagicMock, mock_open: MagicMock
-    ) -> None:
+    def test_04_local_file_not_found(self, mock_is_remote: MagicMock, mock_open: MagicMock) -> None:
         """
         Test if a FileNotFoundError for a local file is handled properly.
         """
@@ -104,9 +98,7 @@ class TestConfig(unittest.TestCase):
         read_data='{"key": "value"',
     )
     @patch("grader.utils.config.is_resource_remote")
-    def test_05_local_file_invalid_json(
-        self, mock_is_remote: MagicMock, _: MagicMock
-    ) -> None:
+    def test_05_local_file_invalid_json(self, mock_is_remote: MagicMock, _: MagicMock) -> None:
         """
         Test if invalid JSON in a local file is handled properly.
         """

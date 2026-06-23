@@ -445,9 +445,7 @@ class TestVariousConfigsOnSampleProject(BaseFunctionalTestWithSampleProject):
         # Assert
         self.assertEqual(run_result.returncode, 0, run_result.stdout)
         self.assertTrue(
-            is_non_scored_check_correct(
-                expected_result=True, target_check="structure", grader_output=run_result.stdout
-            )
+            is_non_scored_check_correct(expected_result=True, target_check="structure", grader_output=run_result.stdout)
         )
 
     @unittest.skip("The tests for sample_project are not in the repo")

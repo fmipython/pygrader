@@ -108,9 +108,7 @@ class TestRequirementsCheck(unittest.TestCase):
         requirements_check = RequirementsCheck(
             "requirements", "sample_dir", 1, is_venv_required=False, is_checking_install=True
         )
-        expected_score = ScoredCheckResult(
-            requirements_check.name, 0, "", error_message, requirements_check.max_points
-        )
+        expected_score = ScoredCheckResult(requirements_check.name, 0, "", error_message, requirements_check.max_points)
 
         # Act
         actual_score = requirements_check.run()

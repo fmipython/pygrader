@@ -63,9 +63,7 @@ class TestRunProcess(unittest.TestCase):
         expected_returncode = 0
         expected_stdout = "stdout"
 
-        expected_subprocess_result = subprocess.CompletedProcess(
-            expected_command, expected_returncode, expected_stdout
-        )
+        expected_subprocess_result = subprocess.CompletedProcess(expected_command, expected_returncode, expected_stdout)
 
         expected_line = f"DEBUG:grader:Running command: {expected_command}"
         expected_line += f", from directory: {None}, with environment variables: {None}"

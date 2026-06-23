@@ -7,7 +7,6 @@ import os
 import shutil
 from pathlib import Path
 
-import dotenv
 
 import grader.utils.constants as const
 from desktop.cli import get_args
@@ -18,7 +17,6 @@ from desktop.results_reporter import (
     ResultsReporter,
 )
 from grader.grader import Grader
-from grader.utils.cove_config import CoveConfig
 from grader.utils.files import is_path_zip, unzip_archive
 from grader.utils.logger import setup_logger
 
@@ -46,11 +44,7 @@ def run_grader() -> None:
     Run the grader application.
     """
     args = get_args()
-    is_suppressing_info = (
-        args["report_format"] == "json"
-        or args["report_format"] == "csv"
-        or args["suppress_info"]
-    )
+    is_suppressing_info = args["report_format"] == "json" or args["report_format"] == "csv" or args["suppress_info"]
     log = setup_logger(
         args["student_id"],
         verbosity=args["verbosity"],

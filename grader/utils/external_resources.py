@@ -43,9 +43,7 @@ def is_resource_cove(resource_path: str) -> bool:
     return is_cove_uri(resource_path)
 
 
-def download_file_from_url(
-    url: str, filename: Optional[str] = None, is_json: bool = False
-) -> str:
+def download_file_from_url(url: str, filename: Optional[str] = None, is_json: bool = False) -> str:
     """
     Download a file from a URL and save it in temp_files under the pygrader root directory.
 
@@ -98,9 +96,7 @@ def download_file_from_url(
 
 
 # TODO - This is similar to the download_file_from_url
-def download_python_file_from_cove(
-    cove_uri: str, filename: Optional[str] = None
-) -> str:
+def download_python_file_from_cove(cove_uri: str, filename: Optional[str] = None) -> str:
     """
     Download a file from a Cove URI and save it in temp_files under the pygrader root directory.
 
@@ -135,9 +131,7 @@ def fetch_from_cove(cove_uri: str) -> BaseItem:
     :return: The fetched resource as a BaseItem
     """
     if "COVE_API_KEY" not in os.environ:
-        raise ExternalResourceError(
-            "COVE_API_KEY environment variable is not set, required to fetch Cove resources"
-        )
+        raise ExternalResourceError("COVE_API_KEY environment variable is not set, required to fetch Cove resources")
 
     try:
         result = fetch_uri(cove_uri, api_key=os.environ["COVE_API_KEY"])

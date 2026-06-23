@@ -1,13 +1,7 @@
 import json
 
+import requests
 from cove_sdk import CoveClient
-
-from grader.utils.cove_config import CoveConfig
-
-# cc = CoveConfig(
-#     base_url="http://127.0.0.1:8001", api_key="9b256764-fc22-458b-bc69-3a52a6bb2877"
-# )
-
 
 with CoveClient(base_url="http://localhost:8001") as client:
     client.login("pygrader", "1234")
@@ -29,8 +23,22 @@ with CoveClient(base_url="http://localhost:8001") as client:
 
     print(f"Project ID: {project.id}")
 
-    with open("config/full_single_point.json", "r") as f:
+    test_code = client.python_items.get(project_id=project.id, key="test_code")
+
+    code_value = requests.get(
+        "https://raw.githubusercontent.com/fmipython/pygrader-sample-project/refs/heads/main/tests/test_sample_code.py"
+    ).text
+
+    if test_code is None:
+        print("Creating Python item 'test_code' for project pygrader-test")
+        client.python_items.create(project_id=project.id, key="test_code", code=code_value)
+    else:
+        print("Python item 'test_code' already exists for project pygrader-test")
+
+    with open("config/cove_test.json", "r") as f:
         value = json.load(f)
+
+    value["checks"][2]["tests_path"] = [f"cove://localhost:8001/python_item/{project.id}/test_code"]
 
     config = client.json_items.get(project_id=project.id, key="config")
     if config is None:
@@ -43,9 +51,7 @@ with CoveClient(base_url="http://localhost:8001") as client:
     api_keys = [api_key.access_for_project_id for api_key in client.api_keys.list()]
 
     if project.id in api_keys:
-        print(
-            "API key for project pygrader-test already exists. Using existing API key."
-        )
+        print("API key for project pygrader-test already exists. Using existing API key.")
     else:
         print("Creating API key for project pygrader-test")
         result = client.api_keys.create(project_id=project.id)

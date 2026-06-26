@@ -1,13 +1,11 @@
-"""
-Module for handling the output of results from checks.
-"""
+"""Module for handling the output of results from checks."""
 
 import json
 import sys
 from abc import ABC, abstractmethod
 from typing import TextIO
 
-from grader.checks.abstract_check import ScoredCheckResult, NonScoredCheckResult, CheckResult
+from grader.checks.abstract_check import CheckResult, NonScoredCheckResult, ScoredCheckResult
 
 
 class ResultsReporter(ABC):
@@ -21,6 +19,7 @@ class ResultsReporter(ABC):
     def display(self, results: list[CheckResult], verbose: bool, file_descriptor: TextIO = sys.stdout) -> None:
         """
         Display the results in a specific format.
+
         :param results: A list of CheckResult objects to display.
         :param verbose: Whether to include info and error fields in the output.
         :param file_descriptor: The file descriptor to write the output to, defaults to sys.stdout.
@@ -44,6 +43,13 @@ class JSONResultsReporter(ResultsReporter):
     """
 
     def display(self, results: list[CheckResult], verbose: bool, file_descriptor: TextIO = sys.stdout) -> None:
+        """
+        Display the results in JSON format.
+
+        :param results: A list of CheckResult objects to display.
+        :param verbose: Whether to include info and error fields in the output.
+        :param file_descriptor: The file descriptor to write the output to.
+        """
         scored_results = [result for result in results if isinstance(result, ScoredCheckResult)]
         total_score = sum(scored_result.result for scored_result in scored_results)
         total_max_score = sum(result.max_score for result in scored_results)
@@ -94,7 +100,6 @@ def non_scored_result_to_dict(non_scored_result: NonScoredCheckResult, verbose: 
     :return: A dictionary representation of the NonScoredCheckResult.
     :rtype: dict
     """
-
     result_dict = {"name": non_scored_result.name, "result": non_scored_result.result}
     if verbose:
         if non_scored_result.info:
@@ -135,6 +140,13 @@ class CSVResultsReporter(ResultsReporter):
     """
 
     def display(self, results: list[CheckResult], verbose: bool, file_descriptor: TextIO = sys.stdout) -> None:
+        """
+        Display the results in CSV format.
+
+        :param results: A list of CheckResult objects to display.
+        :param verbose: Whether to include info and error fields in the output.
+        :param file_descriptor: The file descriptor to write the output to.
+        """
         scored_results = [result for result in results if isinstance(result, ScoredCheckResult)]
         total_score = sum(scored_result.result for scored_result in scored_results)
         total_max_score = sum(result.max_score for result in scored_results)
@@ -181,6 +193,13 @@ class PlainTextResultsReporter(ResultsReporter):
     """
 
     def display(self, results: list[CheckResult], verbose: bool, file_descriptor: TextIO = sys.stdout) -> None:
+        """
+        Display the results in plain text format.
+
+        :param results: A list of CheckResult objects to display.
+        :param verbose: Whether to include info and error fields in the output.
+        :param file_descriptor: The file descriptor to write the output to.
+        """
         scored_results = [result for result in results if isinstance(result, ScoredCheckResult)]
         total_score = sum(scored_result.result for scored_result in scored_results)
         total_max_score = sum(result.max_score for result in scored_results)
@@ -214,12 +233,13 @@ def result_to_plain_text(check_result: CheckResult, verbose: bool) -> str:
 def scored_result_to_text(scored_result: ScoredCheckResult, verbose: bool) -> str:
     """
     Convert a ScoredCheckResult to a plain text string.
+
     :param scored_result: The ScoredCheckResult to convert.
     :type scored_result: ScoredCheckResult
     :param verbose: Whether to include info and error fields.
     :type verbose: bool
     :return: A plain text string representation of the ScoredCheckResult.
-    :rtype: str
+    :rtype: str.
     """
     parts = [f"Check: {scored_result.name}, Score: {scored_result.result}/{scored_result.max_score}"]
     if verbose:
@@ -233,12 +253,13 @@ def scored_result_to_text(scored_result: ScoredCheckResult, verbose: bool) -> st
 def non_scored_result_to_text(non_scored_result: NonScoredCheckResult, verbose: bool) -> str:
     """
     Convert a NonScoredCheckResult to a plain text string.
+
     :param non_scored_result: The NonScoredCheckResult to convert.
     :type non_scored_result: NonScoredCheckResult
     :param verbose: Whether to include info and error fields.
     :type verbose: bool
     :return: A plain text string representation of the NonScoredCheckResult.
-    :rtype: str
+    :rtype: str.
     """
     parts = [f"Check: {non_scored_result.name}, Result: {non_scored_result.result}"]
     if verbose:

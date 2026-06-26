@@ -1,23 +1,26 @@
-"""
-Module containing the StructureValidator class.
-"""
+"""Module containing the StructureValidator class."""
 
 from pathlib import Path
 
 
 class StructureValidator:
-    """
-    Class representing the structure information.
-    """
+    """Class representing the structure information."""
 
     def __init__(self, name: str, required: bool, patterns: list[str]):
+        """
+        Initialize the structure validator.
+
+        :param name: The name of the structure.
+        :param required: Whether the structure is required.
+        :param patterns: List of glob patterns to match.
+        """
         self.name = name
         self.required = required
         self.patterns = patterns
 
     def is_structure_valid(self, project_root: str) -> bool:
         """
-        A structure is valid if all patterns match at least one file in the project.
+        Check if all patterns match at least one file in the project.
 
         :param project_root: The root directory of the project
         :type project_root: str

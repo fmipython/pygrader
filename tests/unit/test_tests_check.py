@@ -1,24 +1,18 @@
-"""
-Unit tests for the TestsCheck class.
-"""
+"""Unit tests for the TestsCheck class."""
 
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-from grader.checks.run_tests_check import RunTestsCheck
 from grader.checks.abstract_check import CheckError, ScoredCheckResult
+from grader.checks.run_tests_check import RunTestsCheck
 from grader.utils.logger import VERBOSE
 
 
 class TestTestsCheck(unittest.TestCase):
-    """
-    Test cases for the TestsCheck class.
-    """
+    """Test cases for the TestsCheck class."""
 
     def setUp(self) -> None:
-        """
-        Set up the test environment.
-        """
+        """Set up the test environment."""
         self.name = "Test Check"
         self.project_root = "/path/to/project"
         self.max_points = 100
@@ -39,9 +33,7 @@ class TestTestsCheck(unittest.TestCase):
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
     def test_01_all_tests_pass(self, mock_pytest_run: MagicMock) -> None:
-        """
-        Verify run calculates the correct score when all tests pass.
-        """
+        """Verify run calculates the correct score when all tests pass."""
         # Arrange
         expected_info = "Test test_1::test_1 passed.\nTest test_2::test_2 passed."
         mock_pytest_run.return_value = "PASSED ::test_1::test_1\nPASSED ::test_2::test_2"
@@ -55,9 +47,7 @@ class TestTestsCheck(unittest.TestCase):
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
     def test_02_some_tests_fail(self, mock_pytest_run: MagicMock) -> None:
-        """
-        Verify run calculates the correct score when some tests fail.
-        """
+        """Verify run calculates the correct score when some tests fail."""
         # Arrange
         expected_info = "Test test_1::test_1 passed.\nTest test_2::test_2 failed."
         mock_pytest_run.return_value = "PASSED ::test_1::test_1\nFAILED ::test_2::test_2"
@@ -71,9 +61,7 @@ class TestTestsCheck(unittest.TestCase):
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
     def test_03_score_exceeds_max_points(self, mock_pytest_run: MagicMock) -> None:
-        """
-        Verify run raises CheckError when total score exceeds max_points.
-        """
+        """Verify run raises CheckError when total score exceeds max_points."""
         # Arrange
         test_score_mapping = {"test_1": 20.0, "test_2": 30.0, "test_3": 60.0}
 
@@ -95,9 +83,7 @@ class TestTestsCheck(unittest.TestCase):
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
     def test_04_logs_correct_passed_and_failed_counts(self, mock_pytest_run: MagicMock) -> None:
-        """
-        Verify run logs the correct number of passed and failed tests.
-        """
+        """Verify run logs the correct number of passed and failed tests."""
         # Arrange
         mock_pytest_run.return_value = "PASSED ::test_1::test_1\nFAILED ::test_2::test_2"
 
@@ -111,9 +97,7 @@ class TestTestsCheck(unittest.TestCase):
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
     def test_05_empty_test_results(self, mock_pytest_run: MagicMock) -> None:
-        """
-        Verify run handles empty test results gracefully.
-        """
+        """Verify run handles empty test results gracefully."""
         # Arrange
         mock_pytest_run.return_value = ""
         expected_score = ScoredCheckResult(self.name, 0.0, "", "", self.max_points)
@@ -126,9 +110,7 @@ class TestTestsCheck(unittest.TestCase):
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
     def test_06_invalid_pytest_output(self, mock_pytest_run: MagicMock) -> None:
-        """
-        Verify run handles invalid pytest output gracefully.
-        """
+        """Verify run handles invalid pytest output gracefully."""
         # Arrange
         mock_pytest_run.return_value = "INVALID OUTPUT"
         expected_score = ScoredCheckResult(self.name, 0.0, "", "", self.max_points)
@@ -141,9 +123,7 @@ class TestTestsCheck(unittest.TestCase):
 
     @patch("grader.utils.process.run")
     def test_07_pytest_raises_os_error(self, mock_run: MagicMock) -> None:
-        """
-        Verify run raises CheckError when pytest raises OSError.
-        """
+        """Verify run raises CheckError when pytest raises OSError."""
         # Arrange
         mock_run.side_effect = OSError("Test error")
 
@@ -153,9 +133,7 @@ class TestTestsCheck(unittest.TestCase):
 
     @patch("grader.utils.process.run")
     def test_08_pytest_raises_value_error(self, mock_run: MagicMock) -> None:
-        """
-        Verify run raises CheckError when pytest raises ValueError.
-        """
+        """Verify run raises CheckError when pytest raises ValueError."""
         # Arrange
         mock_run.side_effect = ValueError("Test error")
 
@@ -165,9 +143,7 @@ class TestTestsCheck(unittest.TestCase):
 
     @patch("grader.utils.process.run")
     def test_09_pytest_returncode_greater_than_2(self, mock_run: MagicMock) -> None:
-        """
-        Verify run raises CheckError when pytest returncode is greater than 2.
-        """
+        """Verify run raises CheckError when pytest returncode is greater than 2."""
         # Arrange
         mock_run.return_value.returncode = 3
 
@@ -177,9 +153,7 @@ class TestTestsCheck(unittest.TestCase):
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
     def test_10_class_scored(self, mock_pytest_run: MagicMock) -> None:
-        """
-        Verify run calculates the correct score when there is class-based scoring.
-        """
+        """Verify run calculates the correct score when there is class-based scoring."""
         # Arrange
         mock_pytest_run.return_value = "PASSED ::ClassB::test_1\nPASSED ::ClassB::test_2\nPASSED ::ClassA::test_3"
         expected_info = "Test ClassB::test_1 passed.\nTest ClassB::test_2 passed.\nTest ClassA::test_3 passed."
@@ -194,9 +168,7 @@ class TestTestsCheck(unittest.TestCase):
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
     def test_11_test_scored_both_name_and_class(self, mock_pytest_run: MagicMock) -> None:
-        """
-        Verify run calculates the correct score when there is name and class-based scoring.
-        """
+        """Verify run calculates the correct score when there is name and class-based scoring."""
         # Arrange
         mock_pytest_run.return_value = "PASSED ::ClassB::test_1\nPASSED ::ClassB::test_2\nPASSED ::ClassA::test_3"
         expected_info = "Test ClassB::test_1 passed.\nTest ClassB::test_2 passed.\nTest ClassA::test_3 passed."
@@ -220,9 +192,7 @@ class TestTestsCheck(unittest.TestCase):
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
     def test_12_test_default_scored(self, mock_pytest_run: MagicMock) -> None:
-        """
-        Verify run calculates the correct score when there is name and class-based scoring.
-        """
+        """Verify run calculates the correct score when there is name and class-based scoring."""
         # Arrange
         mock_pytest_run.return_value = "PASSED ::ClassB::test_1\nPASSED ::ClassB::test_2\nPASSED ::ClassA::test_3"
         expected_info = "Test ClassB::test_1 passed.\nTest ClassB::test_2 passed.\nTest ClassA::test_3 passed."

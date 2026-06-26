@@ -1,6 +1,4 @@
-"""
-Unit tests for the process module.
-"""
+"""Unit tests for the process module."""
 
 import subprocess
 import unittest
@@ -10,15 +8,14 @@ from grader.utils.process import run
 
 
 class TestRunProcess(unittest.TestCase):
-    """
-    Test cases for the run function in the process module.
-    """
+    """Test cases for the run function in the process module."""
 
     @patch("subprocess.run")
     def test_01_non_zero_return_code(self, mocked_subprocess: MagicMock) -> None:
         """
-        Test that the run function logs the correct messages and returns the expected result
-        when the subprocess returns a non-zero return code.
+        Test that the run function logs the correct messages and returns the expected result.
+
+        Tests when the subprocess returns a non-zero return code.
         """
         # Arrange
         expected_command = "dummy"
@@ -55,8 +52,9 @@ class TestRunProcess(unittest.TestCase):
     @patch("subprocess.run")
     def test_02_zero_return_code(self, mocked_subprocess: MagicMock) -> None:
         """
-        Test that the run function logs the correct messages and returns the expected result
-        when the subprocess returns a zero return code.
+        Test that the run function logs the correct messages and returns the expected result.
+
+        Tests when the subprocess returns a zero return code.
         """
         # Arrange
         expected_command = "dummy"

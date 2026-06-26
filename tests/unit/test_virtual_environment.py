@@ -1,12 +1,9 @@
-"""
-Unit tests for the VirtualEnvironment class.
-"""
+"""Unit tests for the VirtualEnvironment class."""
 
 import os
 import shutil
 import subprocess
 import unittest
-
 from subprocess import CompletedProcess
 from unittest.mock import MagicMock, patch
 
@@ -17,9 +14,7 @@ from grader.utils.virtual_environment import VirtualEnvironment, VirtualEnvironm
 
 # TODO - These tests take some time to run, also aren't exactly unit tests. Consider refactoring
 class TestsVirtualEnvironment(unittest.TestCase):
-    """
-    Test cases for the VirtualEnvironment class.
-    """
+    """Test cases for the VirtualEnvironment class."""
 
     def __init__(self, methodName: str = "runTest") -> None:
         """
@@ -34,26 +29,20 @@ class TestsVirtualEnvironment(unittest.TestCase):
         super().__init__(methodName)
 
     def setUp(self) -> None:
-        """
-        Set up the test environment.
-        """
+        """Set up the test environment."""
         os.makedirs(self.__sample_root_dir_path, exist_ok=True)
 
         return super().setUp()
 
     def tearDown(self) -> None:
-        """
-        Tear down the test environment.
-        """
+        """Tear down the test environment."""
         if os.path.exists(self.__sample_root_dir_path):
             shutil.rmtree(self.__sample_root_dir_path)
 
         return super().tearDown()
 
     def test_01_existing_venv(self) -> None:
-        """
-        Verify that the VirtualEnvironment class cleans pre-existing virtual environments.
-        """
+        """Verify that the VirtualEnvironment class cleans pre-existing virtual environments."""
         # Arrange
         possible_paths = [
             os.path.join(self.__sample_root_dir_path, venv_path) for venv_path in const.POSSIBLE_VENV_DIRS
@@ -70,9 +59,7 @@ class TestsVirtualEnvironment(unittest.TestCase):
         self.assertTrue(not any(do_directories_exist))
 
     def test_03_successful_venv_creation(self) -> None:
-        """
-        Verify that the VirtualEnvironment class can successfully create a virtual environment.
-        """
+        """Verify that the VirtualEnvironment class can successfully create a virtual environment."""
         # Arrange
         unix_path_to_python = os.path.join(self.__sample_root_dir_path, const.VENV_NAME, "bin", const.PYTHON_BIN_UNIX)
         windows_path_to_python = os.path.join(
@@ -96,7 +83,6 @@ class TestsVirtualEnvironment(unittest.TestCase):
         :param patched_run: Mocked subprocess.run function.
         :type patched_run: MagicMock
         """
-
         patched_run.return_value = subprocess.CompletedProcess([], 1)
 
         # Act & Assert
@@ -105,9 +91,7 @@ class TestsVirtualEnvironment(unittest.TestCase):
                 pass
 
     def test_05_install_requirements(self) -> None:
-        """
-        Verify that the VirtualEnvironment class installs the requirements.
-        """
+        """Verify that the VirtualEnvironment class installs the requirements."""
         # Arrange
         requirements_path = os.path.join(self.__sample_root_dir_path, "requirements.txt")
         self.__create_sample_requirements(requirements_path)
@@ -135,7 +119,7 @@ class TestsVirtualEnvironment(unittest.TestCase):
         """
 
         # Arrange
-        def custom_run_behavior(command: list[str], *args: list, **kwargs: dict) -> CompletedProcess:
+        def custom_run_behavior(command: list[str], *args: list, **kwargs: dict) -> CompletedProcess:  # noqa: ARG001
             if "install" in command:
                 return CompletedProcess("", 1)
             return CompletedProcess("", 0)
@@ -148,9 +132,7 @@ class TestsVirtualEnvironment(unittest.TestCase):
                 pass
 
     def test_07_install_grader_requirements(self) -> None:
-        """
-        Verify that the VirtualEnvironment class installs the grader requirements.
-        """
+        """Verify that the VirtualEnvironment class installs the grader requirements."""
         # Arrange
         pip_full_path = os.path.join(self.__sample_root_dir_path, const.VENV_NAME, const.PIP_PATH)
 
@@ -175,7 +157,7 @@ class TestsVirtualEnvironment(unittest.TestCase):
         """
 
         # Arrange
-        def custom_run_behavior(command: list[str], *args: list, **kwargs: dict) -> CompletedProcess:
+        def custom_run_behavior(command: list[str], *args: list, **kwargs: dict) -> CompletedProcess:  # noqa: ARG001
             if "install" in command:
                 return CompletedProcess("", 1)
             return CompletedProcess("", 0)
@@ -188,9 +170,7 @@ class TestsVirtualEnvironment(unittest.TestCase):
                 pass
 
     def test_09_teardown(self) -> None:
-        """
-        Verify that the VirtualEnvironment class removes the virtual environment when the context manager is exited.
-        """
+        """Verify that the VirtualEnvironment class removes the virtual environment when the context manager is exited."""
         # Arrange
         venv_path = os.path.join(self.__sample_root_dir_path, const.VENV_NAME)
 

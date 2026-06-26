@@ -1,16 +1,14 @@
-"""
-Module containing the CLI arguments parser.
-"""
+"""Module containing the CLI arguments parser."""
 
 import argparse
-
 from typing import Any
+
 from grader.utils.constants import VERSION
 
 
 def get_args() -> dict[str, Any]:
     """
-    Create the CLI parser and return the parsed arguments
+    Create the CLI parser and return the parsed arguments.
 
     My personal preference is to return a dictionary, instead of the normal argparse.Namespace object.
     :returns: Dictionary, containing the parsed arguments

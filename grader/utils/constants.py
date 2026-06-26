@@ -1,6 +1,4 @@
-"""
-Module containing the constants
-"""
+"""Module containing the constants."""
 
 import os
 from importlib.metadata import version

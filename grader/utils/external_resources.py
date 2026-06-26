@@ -1,6 +1,4 @@
-"""
-Module for handling external resources
-"""
+"""Module for handling external resources."""
 
 import json
 import logging
@@ -43,7 +41,7 @@ def is_resource_cove(resource_path: str) -> bool:
     return is_cove_uri(resource_path)
 
 
-def download_file_from_url(url: str, filename: Optional[str] = None, is_json: bool = False) -> str:
+def download_file_from_url(url: str, filename: Optional[str] = None) -> str:
     """
     Download a file from a URL and save it in temp_files under the pygrader root directory.
 
@@ -126,6 +124,7 @@ def download_python_file_from_cove(cove_uri: str, filename: Optional[str] = None
 def fetch_from_cove(cove_uri: str) -> BaseItem:
     """
     Fetch a resource from a cove URI.
+
     Handle error cases and return the result as a BaseItem.
 
     :return: The fetched resource as a BaseItem
@@ -145,6 +144,4 @@ def fetch_from_cove(cove_uri: str) -> BaseItem:
 
 
 class ExternalResourceError(Exception):
-    """
-    Custom exception for external resource errors.
-    """
+    """Custom exception for external resource errors."""

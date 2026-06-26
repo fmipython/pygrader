@@ -1,25 +1,19 @@
-"""
-Unit tests for the PylintCheck class.
-"""
+"""Unit tests for the PylintCheck class."""
 
-from subprocess import CompletedProcess
 import unittest
-from unittest.mock import patch, MagicMock
+from subprocess import CompletedProcess
+from unittest.mock import MagicMock, patch
 
 import grader.utils.constants as const
-from grader.checks.pylint_check import PylintCheck
 from grader.checks.abstract_check import CheckError
+from grader.checks.pylint_check import PylintCheck
 
 
 class TestPylintCheck(unittest.TestCase):
-    """
-    Test cases for the PylintCheck class.
-    """
+    """Test cases for the PylintCheck class."""
 
     def setUp(self) -> None:
-        """
-        Set up the test environment.
-        """
+        """Set up the test environment."""
         self.pylint_check = PylintCheck("pylint", "sample_dir", 2, is_venv_required=False)
         # This way, we have 3 ranges: 0-33, 34-66, 67-100
         return super().setUp()
@@ -264,9 +258,7 @@ class TestPylintCheck(unittest.TestCase):
 
     @patch("grader.utils.files.find_all_python_files")
     def test_12_find_all_python_files_raises_os_error(self, mocked_find: MagicMock) -> None:
-        """
-        Test if when finding all Python files an OSError is raised, the check fails with CheckError.
-        """
+        """Test if when finding all Python files an OSError is raised, the check fails with CheckError."""
         # Arrange
         mocked_find.side_effect = OSError("Test error")
 
@@ -276,9 +268,7 @@ class TestPylintCheck(unittest.TestCase):
 
     @patch("grader.utils.process.run")
     def test_13_run_pylint_raises_os_error(self, mocked_run: MagicMock) -> None:
-        """
-        Test if when running pylint an OSError is raised, the check fails with CheckError.
-        """
+        """Test if when running pylint an OSError is raised, the check fails with CheckError."""
         # Arrange
         mocked_run.side_effect = OSError("Test error")
 
@@ -288,9 +278,7 @@ class TestPylintCheck(unittest.TestCase):
 
     @patch("grader.utils.process.run")
     def test_13_run_pylint_exits_with_non_zero(self, mocked_run: MagicMock) -> None:
-        """
-        Test if when running pylint it exits with a non-zero status, the check fails with CheckError.
-        """
+        """Test if when running pylint it exits with a non-zero status, the check fails with CheckError."""
         # Arrange
         mocked_run.return_value = CompletedProcess("pylint", 1)
 
@@ -322,9 +310,7 @@ class TestPylintCheck(unittest.TestCase):
     @patch("grader.utils.process.run")
     @patch("os.path.exists")
     def test_pylint_with_custom_pylintrc(self, mocked_os_path_exists: MagicMock, mocked_pylint: MagicMock) -> None:
-        """
-        Test if pylint is called with the --rcfile argument when a custom pylintrc file is specified and exists.
-        """
+        """Test if pylint is called with the --rcfile argument when a custom pylintrc file is specified and exists."""
         # Arrange
         custom_pylintrc = "custom_rc_file"
         pylint_check = PylintCheck("pylint", "sample_dir", 2, is_venv_required=False, pylintrc_path=custom_pylintrc)
@@ -345,9 +331,7 @@ class TestPylintCheck(unittest.TestCase):
     def test_pylint_with_nonexistent_custom_pylintrc(
         self, mocked_os_path_exists: MagicMock, mocked_pylint: MagicMock
     ) -> None:
-        """
-        Test if pylint is called without the --rcfile argument when a custom pylintrc is specified but does not exist.
-        """
+        """Test if pylint is called without the --rcfile argument when a custom pylintrc is specified but does not exist."""
         # Arrange
         custom_pylintrc = "non_existent_rc_file"
         pylint_check = PylintCheck("pylint", "sample_dir", 2, is_venv_required=False, pylintrc_path=custom_pylintrc)

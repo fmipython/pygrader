@@ -1,28 +1,24 @@
-"""
-Module containing the unit test code coverage check.
-"""
+"""Module containing the unit test code coverage check."""
 
 import logging
+from typing import Optional
 
-from grader.checks.abstract_check import ScoredCheck, CheckError, ScoredCheckResult
+from grader.checks.abstract_check import CheckError, ScoredCheck, ScoredCheckResult
 from grader.utils.constants import (
     COVERAGE_PATH,
-    COVERAGE_RUN_ARGS,
-    COVERAGE_RUN_PYTEST_ARGS,
     COVERAGE_REPORT_ARGS,
     COVERAGE_REPORT_ARGS_NO_FORMAT,
+    COVERAGE_RUN_ARGS,
+    COVERAGE_RUN_PYTEST_ARGS,
 )
 from grader.utils.files import find_all_source_files
 from grader.utils.process import run
-from typing import Optional
 
 logger = logging.getLogger("grader")
 
 
 class CoverageCheck(ScoredCheck):
-    """
-    The Coverage check class.
-    """
+    """The Coverage check class."""
 
     def __init__(
         self,
@@ -32,6 +28,15 @@ class CoverageCheck(ScoredCheck):
         is_venv_required: bool,
         env_vars: Optional[dict[str, str]] = None,
     ):
+        """
+        Initialize the coverage check.
+
+        :param name: The name of the check.
+        :param project_root: The root directory of the project.
+        :param max_points: The maximum points this check can award.
+        :param is_venv_required: Whether a virtual environment is required.
+        :param env_vars: Optional environment variables for the check.
+        """
         super().__init__(name, max_points, project_root, is_venv_required, env_vars)
 
         self.__coverage_full_path = COVERAGE_PATH
@@ -60,12 +65,12 @@ class CoverageCheck(ScoredCheck):
     def __translate_score(self, coverage_score: float) -> float:
         """
         Split the coverage score into regions and assign a score based on the region.
+
         The amount of regions depends on the max points for the criteria.
 
         :param coverage_score: The score from pylint to be translated
         :return: The translated score
         """
-
         if self._max_points == -1:
             raise CheckError("Max points for coverage check is set to -1")
 
@@ -81,9 +86,7 @@ class CoverageCheck(ScoredCheck):
         return self._max_points
 
     def __coverage_run(self) -> None:
-        """
-        Run the coverage tool on the project.
-        """
+        """Run the coverage tool on the project."""
         command = [self.__coverage_full_path] + COVERAGE_RUN_ARGS + COVERAGE_RUN_PYTEST_ARGS
 
         try:
@@ -97,9 +100,7 @@ class CoverageCheck(ScoredCheck):
             raise CheckError(f"Coverage run failed: {output.stdout}")
 
     def __coverage_report(self) -> int:
-        """
-        Generate a report from the coverage tool.
-        """
+        """Generate a report from the coverage tool."""
         source_files = find_all_source_files(self._project_root)
 
         try:

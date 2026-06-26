@@ -1,25 +1,23 @@
 """
 Module containing the structure check.
+
 It checks if the project structure is correct.
 """
 
-import logging
-
 import json
+import logging
+from typing import Optional
 
-from grader.checks.abstract_check import NonScoredCheck, CheckError, NonScoredCheckResult
-from grader.utils.external_resources import is_resource_remote, download_file_from_url
+from grader.checks.abstract_check import CheckError, NonScoredCheck, NonScoredCheckResult
+from grader.utils.external_resources import download_file_from_url, is_resource_remote
 from grader.utils.logger import VERBOSE
 from grader.utils.structure_validator import StructureValidator
-from typing import Optional
 
 logger = logging.getLogger("grader")
 
 
 class StructureCheck(NonScoredCheck):
-    """
-    The Structure check class.
-    """
+    """The Structure check class."""
 
     def __init__(
         self,
@@ -30,6 +28,16 @@ class StructureCheck(NonScoredCheck):
         is_venv_required: bool = False,
         env_vars: Optional[dict[str, str]] = None,
     ):
+        """
+        Initialize the structure check.
+
+        :param name: The name of the check.
+        :param project_root: The root directory of the project.
+        :param structure_file: Path to the structure configuration file.
+        :param is_fatal: Whether the check is fatal.
+        :param is_venv_required: Whether a virtual environment is required.
+        :param env_vars: Optional environment variables for the check.
+        """
         super().__init__(name, project_root, is_fatal, is_venv_required, env_vars)
         self.__structure_file = structure_file
 
@@ -44,10 +52,11 @@ class StructureCheck(NonScoredCheck):
         :rtype: float
         """
         self._pre_run()
+        # TODO - this can be simplified
         self.__structure_file = (
             self.__structure_file
             if not is_resource_remote(self.__structure_file)
-            else download_file_from_url(self.__structure_file, is_json=True)
+            else download_file_from_url(self.__structure_file)
         )
         structure_elements = StructureCheck.__load_structure_file(self.__structure_file)
 
@@ -72,8 +81,8 @@ class StructureCheck(NonScoredCheck):
         :return: The structure information
         :rtype: list[StructureInformation]
         """
-
-        filepath = filepath if not is_resource_remote(filepath) else download_file_from_url(filepath, is_json=True)
+        # TODO - Simplify
+        filepath = filepath if not is_resource_remote(filepath) else download_file_from_url(filepath)
 
         try:
             with open(filepath, "r", encoding="utf-8") as file_pointer:

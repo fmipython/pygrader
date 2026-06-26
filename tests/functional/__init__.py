@@ -1,3 +1,1 @@
-"""
-Functional tests for the grader.
-"""
+"""Functional tests for the grader."""

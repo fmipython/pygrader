@@ -1,6 +1,4 @@
-"""
-Module containing the Grader class.
-"""
+"""Module containing the Grader class."""
 
 import os
 import shutil
@@ -23,9 +21,7 @@ from grader.utils.virtual_environment import VirtualEnvironment
 
 
 class Grader:
-    """
-    Main grader class that orchestrates the grading process.
-    """
+    """Main grader class that orchestrates the grading process."""
 
     def __init__(
         self,
@@ -36,6 +32,16 @@ class Grader:
         is_keeping_venv: bool = False,
         is_skipping_venv_creation: bool = False,
     ):
+        """
+        Initialize the Grader.
+
+        :param student_id: The ID of the student.
+        :param project_root: The root directory of the project to grade.
+        :param logger: The logger instance for output.
+        :param config_path: Optional path to configuration file.
+        :param is_keeping_venv: Whether to keep the virtual environment after grading.
+        :param is_skipping_venv_creation: Whether to skip virtual environment creation.
+        """
         self.__logger = logger
 
         self.__logger.info("Python project grader, %s", const.VERSION)
@@ -70,7 +76,7 @@ class Grader:
 
     def grade(self) -> list[CheckResult]:
         """
-        Main grader method that runs all checks and returns their results.
+        Run all checks and return their results.
 
         :return: A list of CheckResult objects containing the results of the checks.
         """
@@ -122,6 +128,7 @@ class Grader:
     def __cleanup(self) -> None:
         """
         Cleanup temporary files created during the grading process.
+
         This is called at the end of grading to ensure no temporary files are left behind.
         """
         shutil.rmtree(const.TEMP_FILES_DIR, ignore_errors=True)
@@ -133,6 +140,4 @@ class Grader:
 
 
 class GraderError(Exception):
-    """
-    Custom exception for grader errors.
-    """
+    """Custom exception for grader errors."""

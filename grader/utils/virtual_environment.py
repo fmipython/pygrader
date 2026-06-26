@@ -1,13 +1,12 @@
-"""
-Module containing the virtual environment class.
-"""
+"""Module containing the virtual environment class."""
 
 from __future__ import annotations  # Python 3.14 will fix this
+
 import logging
 import os
 import shutil
-import grader.utils.constants as const
 
+import grader.utils.constants as const
 from grader.utils.logger import VERBOSE
 from grader.utils.process import run
 
@@ -17,6 +16,7 @@ logger = logging.getLogger("grader")
 class VirtualEnvironment:
     """
     Class that handles the creation and deletion of a virtual environment.
+
     Acts as a context manager. Everything executed within it, can assume that the venv is setup.
     """
 
@@ -29,6 +29,14 @@ class VirtualEnvironment:
         is_keeping_existing_venv: bool = False,
         name: str = const.VENV_NAME,
     ):
+        """
+        Initialize the virtual environment manager.
+
+        :param project_path: The path to the project directory.
+        :param is_keeping_venv_after_run: Whether to keep the venv after execution.
+        :param is_keeping_existing_venv: Whether to keep existing venv directories.
+        :param name: The name of the virtual environment directory.
+        """
         self._project_path = project_path
         # TODO - To fully allow for a custom venv name, we need to rethink how we handle paths in the constants
         self._venv_path = os.path.join(project_path, name)
@@ -36,17 +44,20 @@ class VirtualEnvironment:
         self.__is_keeping_existing_venv = is_keeping_existing_venv
 
     def __enter__(self) -> VirtualEnvironment:
+        """Enter the context manager and set up the virtual environment."""
         self.setup()
         VirtualEnvironment.is_initialized = True
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:  # type: ignore
+        """Exit the context manager and tear down the virtual environment."""
         self.teardown()
         VirtualEnvironment.is_initialized = False
 
     def setup(self) -> None:
         """
-        Setup the virtual environment.
+        Set up the virtual environment.
+
         Check if there is an existing venv, if so, delete it.
         Check if the project is a package, if yes, install.
         If not, check for requirements.txt.
@@ -91,9 +102,7 @@ class VirtualEnvironment:
         VirtualEnvironment.__install_requirements(self._venv_path, grader_requirements_path)
 
     def __remove_existing_venv(self) -> None:
-        """
-        Remove any existing virtual environment in the project directory.
-        """
+        """Remove any existing virtual environment in the project directory."""
         possible_venv_paths = [os.path.join(self._project_path, venv_path) for venv_path in const.POSSIBLE_VENV_DIRS]
 
         for path in possible_venv_paths:
@@ -102,9 +111,7 @@ class VirtualEnvironment:
                 shutil.rmtree(path)
 
     def teardown(self) -> None:
-        """
-        Delete the virtual environment.
-        """
+        """Delete the virtual environment."""
         logger.debug(self.__is_keeping_venv_after_run)
         if not self.__is_keeping_venv_after_run:
             shutil.rmtree(self._venv_path)
@@ -113,15 +120,15 @@ class VirtualEnvironment:
     def __install_requirements(venv_path: str, requirements_path: str) -> None:
         """
         Install the requirements specified in the requirements file into the virtual environment.
+
         :param venv_path: The path to the virtual environment.
         :type venv_path: str
         :param requirements_path: The path to the requirements file.
         :type requirements_path: str
         :raises VirtualEnvironmentError: If the installation of requirements fails.
         :return: None
-        :rtype: None
+        :rtype: None.
         """
-
         pip_path = os.path.join(venv_path, const.PIP_PATH)
 
         output = run([pip_path, "install", "-r", requirements_path])
@@ -134,15 +141,15 @@ class VirtualEnvironment:
     def __install_project_as_package(venv_path: str, project_path: str) -> None:
         """
         Install the project as a package into the virtual environment.
+
         :param venv_path: The path to the virtual environment.
         :type venv_path: str
         :param project_path: The path to the project.
         :type project_path: str
         :raises VirtualEnvironmentError: If the installation of the project fails.
         :return: None
-        :rtype: None
+        :rtype: None.
         """
-
         pip_path = os.path.join(venv_path, const.PIP_PATH)
 
         # Editable install fixes issues with directory structure renaming in pyproject.toml
@@ -154,6 +161,4 @@ class VirtualEnvironment:
 
 
 class VirtualEnvironmentError(Exception):
-    """
-    Exception raised when an error occurs during the virtual environment setup.
-    """
+    """Exception raised when an error occurs during the virtual environment setup."""

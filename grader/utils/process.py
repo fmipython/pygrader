@@ -1,10 +1,8 @@
-"""
-Module containing a wrapper for launching shell commands
-"""
+"""Module containing a wrapper for launching shell commands."""
 
 import logging
-import subprocess
 import os
+import subprocess
 from typing import Optional
 
 # from grader.utils.logger import VERBOSE
@@ -17,6 +15,7 @@ def run(
 ) -> subprocess.CompletedProcess[str]:
     """
     Execute a command in the terminal.
+
     Wraps the subprocess.run function, with the check=False, capture_output=True and text=True flags.
 
     If the command passes, log the stdout.

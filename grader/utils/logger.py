@@ -1,10 +1,8 @@
-"""
-Module containing the logger setup function and the custom VERBOSE level.
-"""
+"""Module containing the logger setup function and the custom VERBOSE level."""
 
 import logging
-from logging.handlers import RotatingFileHandler
 import sys
+from logging.handlers import RotatingFileHandler
 from typing import Optional
 
 VERBOSE = 15
@@ -14,7 +12,7 @@ logging.addLevelName(VERBOSE, "VERBOSE")
 
 def setup_logger(student_id: Optional[str] = None, verbosity: int = 0, suppress_info: bool = False) -> logging.Logger:
     """
-    Setup the logger with the given verbosity level and student id
+    Set up the logger with the given verbosity level and student id.
 
     Args:
         student_id: The id of the student. Defaults to None.
@@ -51,7 +49,7 @@ def setup_logger(student_id: Optional[str] = None, verbosity: int = 0, suppress_
 
     # Console handler setup
     class NoExceptionFormatter(logging.Formatter):
-        def formatException(self, ei: tuple) -> str:
+        def formatException(self, ei: tuple) -> str:  # noqa: ARG002
             return ""
 
         def format(self, record: logging.LogRecord) -> str:

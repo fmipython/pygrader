@@ -1,6 +1,4 @@
-"""
-Module for loading the configuration file.
-"""
+"""Module for loading the configuration file."""
 
 import json
 from pathlib import Path
@@ -20,16 +18,16 @@ from grader.utils.json_with_templates import load_with_values
 def load_config(config_path: str) -> dict:
     """
     Load the configuration file.
+
     :param config_path: Path, URL or Cove URI to the configuration file.
     :return: The configuration as a dictionary.
     """
-
     if is_resource_cove(config_path):
         return load_from_cove(config_path)
 
     if is_resource_remote(config_path):
         try:
-            config_path = download_file_from_url(config_path, is_json=True)
+            config_path = download_file_from_url(config_path)
         except ExternalResourceError as exc:
             raise InvalidConfigError(f"Could not load configuration from {config_path}") from exc
 
@@ -40,7 +38,7 @@ def load_config(config_path: str) -> dict:
 
 def read_from_file(config_path: str) -> dict:
     """
-    Read the configuration from a file
+    Read the configuration from a file.
 
     :param config_path: File path to the configuration file
     :return: The configuration as a dictionary
@@ -63,7 +61,6 @@ def load_from_cove(cove_uri: str) -> dict:
     :param cove_uri: The Cove URI to load the configuration from
     :return: The configuration as a dictionary
     """
-
     try:
         result = fetch_from_cove(cove_uri)
     except ExternalResourceError as exc:
@@ -76,6 +73,4 @@ def load_from_cove(cove_uri: str) -> dict:
 
 
 class InvalidConfigError(Exception):
-    """
-    Custom exception for invalid configuration files.
-    """
+    """Custom exception for invalid configuration files."""

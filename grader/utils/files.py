@@ -1,6 +1,4 @@
-"""
-Module containing the file-related functions.
-"""
+"""Module containing the file-related functions."""
 
 import os
 import zipfile
@@ -94,7 +92,7 @@ def is_path_zip(path: str) -> bool:
 
 def unzip_archive(archive_path: str, target_directory: Optional[str] = None) -> str:
     """
-    Unzip the archive containing the project
+    Unzip the archive containing the project.
 
     :param archive_path: The path to the archive to unzip
     :param target_directory: The path to the target directory where the archive will be unzipped.

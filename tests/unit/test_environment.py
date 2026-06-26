@@ -1,18 +1,14 @@
-"""
-Unit tests for the environment module in the grader.utils package.
-"""
+"""Unit tests for the environment module in the grader.utils package."""
 
 import os
 import unittest
+from unittest.mock import MagicMock, patch
 
-from unittest.mock import patch, MagicMock
 from grader.utils.environment import merge_environment_variables
 
 
 class TestEnvironmentMerging(unittest.TestCase):
-    """
-    Unit tests for the merge_environment_variables function.
-    """
+    """Unit tests for the merge_environment_variables function."""
 
     def setUp(self) -> None:
         """Set up test environment."""
@@ -25,9 +21,7 @@ class TestEnvironmentMerging(unittest.TestCase):
         os.environ.update(self.original_env)
 
     def test_01_both_none_returns_none(self) -> None:
-        """
-        Test that merging None and None returns an empty dict.
-        """
+        """Test that merging None and None returns an empty dict."""
         # Act
         result = merge_environment_variables(None, None)
 
@@ -36,9 +30,7 @@ class TestEnvironmentMerging(unittest.TestCase):
 
     @patch("os.environ")
     def test_02_both_empty_returns_none(self, existing_env: MagicMock) -> None:
-        """
-        Test that merging empty dicts returns an empty dict.
-        """
+        """Test that merging empty dicts returns an empty dict."""
         # Arrange
         existing_env.return_value = {}
 
@@ -49,9 +41,7 @@ class TestEnvironmentMerging(unittest.TestCase):
         self.assertEqual(result, {})
 
     def test_03_global_only(self) -> None:
-        """
-        Test that only global environment variables are merged with system env.
-        """
+        """Test that only global environment variables are merged with system env."""
         # Arrange
         os.environ["SYSTEM_VAR"] = "system_value"
         global_env = {"GLOBAL_VAR": "global_value"}
@@ -65,9 +55,7 @@ class TestEnvironmentMerging(unittest.TestCase):
         self.assertEqual(result["GLOBAL_VAR"], "global_value")
 
     def test_04_check_only(self) -> None:
-        """
-        Test that only check-specific environment variables are merged with system env.
-        """
+        """Test that only check-specific environment variables are merged with system env."""
         # Arrange
         os.environ["SYSTEM_VAR"] = "system_value"
         check_env = {"CHECK_VAR": "check_value"}
@@ -81,9 +69,7 @@ class TestEnvironmentMerging(unittest.TestCase):
         self.assertEqual(result["CHECK_VAR"], "check_value")
 
     def test_05_check_overrides_global(self) -> None:
-        """
-        Test that check-specific variables override global variables.
-        """
+        """Test that check-specific variables override global variables."""
         # Arrange
         os.environ["SYSTEM_VAR"] = "system_value"
         global_env = {"API_KEY": "global_key"}
@@ -97,9 +83,7 @@ class TestEnvironmentMerging(unittest.TestCase):
         self.assertEqual(result["API_KEY"], "check_key")
 
     def test_06_global_overrides_system(self) -> None:
-        """
-        Test that global variables override system variables.
-        """
+        """Test that global variables override system variables."""
         # Arrange
         os.environ["API_KEY"] = "system_key"
         global_env = {"API_KEY": "global_key"}
@@ -112,9 +96,7 @@ class TestEnvironmentMerging(unittest.TestCase):
         self.assertEqual(result["API_KEY"], "global_key")
 
     def test_07_check_overrides_system(self) -> None:
-        """
-        Test that check-specific variables override system variables.
-        """
+        """Test that check-specific variables override system variables."""
         # Arrange
         os.environ["API_KEY"] = "system_key"
         check_env = {"API_KEY": "check_key"}
@@ -129,6 +111,7 @@ class TestEnvironmentMerging(unittest.TestCase):
     def test_08_complete_merge_priority(self) -> None:
         """
         Test complete merging with all three sources (system, global, check).
+
         Verify priority: check > global > system.
         """
         # Arrange

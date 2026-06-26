@@ -1,25 +1,23 @@
 """
 Module containing the requirements.txt check.
+
 It checks if requirements.txt exists in the project root.
 """
 
 import logging
 import os
-
 from pathlib import Path
+from typing import Optional
 
 from grader.checks.abstract_check import ScoredCheck, ScoredCheckResult
-from grader.utils.constants import REQUIREMENTS_FILENAME, PYPROJECT_FILENAME
+from grader.utils.constants import PYPROJECT_FILENAME, REQUIREMENTS_FILENAME
 from grader.utils.virtual_environment import VirtualEnvironment, VirtualEnvironmentError
-from typing import Optional
 
 logger = logging.getLogger("grader")
 
 
 class RequirementsCheck(ScoredCheck):
-    """
-    The requirements.txt check class.
-    """
+    """The requirements.txt check class."""
 
     def __init__(
         self,
@@ -30,6 +28,16 @@ class RequirementsCheck(ScoredCheck):
         is_checking_install: bool = False,
         env_vars: Optional[dict[str, str]] = None,
     ):
+        """
+        Initialize the requirements check.
+
+        :param name: The name of the check.
+        :param project_root: The root directory of the project.
+        :param max_points: The maximum points this check can award.
+        :param is_venv_required: Whether a virtual environment is required.
+        :param is_checking_install: Whether to check if dependencies can be installed.
+        :param env_vars: Optional environment variables for the check.
+        """
         super().__init__(name, max_points, project_root, is_venv_required, env_vars)
 
         self.__requirements_path = os.path.join(self._project_root, REQUIREMENTS_FILENAME)
@@ -39,9 +47,10 @@ class RequirementsCheck(ScoredCheck):
     def run(self) -> ScoredCheckResult:
         """
         Run the requirements check on the project.
+
         Check if requirements.txt exists in the project root - the score is either 0 or full points.
         :return: The score from the requirements.txt check
-        :rtype: float
+        :rtype: float.
         """
         self._pre_run()
 

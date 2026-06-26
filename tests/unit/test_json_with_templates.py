@@ -1,15 +1,17 @@
+"""Tests for JSON template utilities."""
+
 import unittest
-from unittest.mock import patch, mock_open, MagicMock
+from unittest.mock import MagicMock, mock_open, patch
 
 from grader.utils.json_with_templates import load_with_values
 
 
 class TestJsonWithTemplates(unittest.TestCase):
+    """Tests for the load_with_values function."""
+
     @patch("builtins.open", new_callable=mock_open, read_data='{"key": "${{value}}"}')
     def test_01_successful_substitution(self, _: MagicMock) -> None:
-        """
-        Test successful substitution of a single placeholder.
-        """
+        """Test successful substitution of a single placeholder."""
         # Arrange
         # (mock_file already set up)
 
@@ -21,9 +23,7 @@ class TestJsonWithTemplates(unittest.TestCase):
 
     @patch("builtins.open", new_callable=mock_open, read_data='{"key": "${{missing}}"}')
     def test_02_missing_placeholder_value(self, _: MagicMock) -> None:
-        """
-        Test error raised when a placeholder value is missing.
-        """
+        """Test error raised when a placeholder value is missing."""
         # Arrange
         # (mock_file already set up)
 
@@ -34,9 +34,7 @@ class TestJsonWithTemplates(unittest.TestCase):
 
     @patch("builtins.open", new_callable=mock_open, read_data='{"a": "${{x}}", "b": "${{y}}"}')
     def test_04_multiple_placeholders(self, _: MagicMock) -> None:
-        """
-        Test substitution of multiple placeholders.
-        """
+        """Test substitution of multiple placeholders."""
         # Arrange
         # (mock_file already set up)
 
@@ -48,9 +46,7 @@ class TestJsonWithTemplates(unittest.TestCase):
 
     @patch("builtins.open", new_callable=mock_open, read_data='{"num": "${{n}}"}')
     def test_05_non_string_value(self, _: MagicMock) -> None:
-        """
-        Test substitution with a non-string value.
-        """
+        """Test substitution with a non-string value."""
         # Act
         result = load_with_values("dummy.json", n=123)  # type: ignore
 

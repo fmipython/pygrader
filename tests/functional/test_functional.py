@@ -1,12 +1,9 @@
-"""
-Module for functional tests of the grader.
-"""
+"""Module for functional tests of the grader."""
 
 import os
 import shutil
 import unittest
 import zipfile
-
 from pathlib import Path
 from typing import Optional
 
@@ -15,14 +12,13 @@ from grader.utils.process import run
 
 
 class BaseFunctionalTestWithGrader(unittest.TestCase):
-    """
-    Base class for functional tests with the grader.
-    """
+    """Base class for functional tests with the grader."""
 
     repo_url = "https://github.com/fmipython/pygrader"
     clone_path = "/tmp/pygrader-cloned"
 
     def setUp(self) -> None:
+        """Set up test fixtures by cloning the grader repository if needed."""
         if os.path.exists(self.clone_path):
             return
 
@@ -46,6 +42,7 @@ class BaseFunctionalTestWithGrader(unittest.TestCase):
             os.remove(functional_tests_path)
 
     def tearDown(self) -> None:
+        """Clean up test fixtures by removing the cloned repository."""
         if not os.path.exists(self.clone_path):
             return
 
@@ -54,14 +51,10 @@ class BaseFunctionalTestWithGrader(unittest.TestCase):
 
 @unittest.skipIf(os.name == "nt", "Test skipped on Windows")
 class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
-    """
-    Functional tests for the grader in a good weather scenario.
-    """
+    """Functional tests for the grader in a good weather scenario."""
 
     def test_01_requirements_txt_exists(self) -> None:
-        """
-        Verify that the grader can check the requirements.txt file.
-        """
+        """Verify that the grader can check the requirements.txt file."""
         # Arrange
         command = build_command(project_path=self.clone_path)
 
@@ -76,9 +69,7 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
         self.assertTrue(is_score_correct(expected_score=10, target_check="requirements", grader_output=run_stdout))
 
     def test_02_pylint_check(self) -> None:
-        """
-        Verify that the grader runs the pylint check and returns the expected score.
-        """
+        """Verify that the grader runs the pylint check and returns the expected score."""
         # Arrange
         command = build_command(project_path=self.clone_path)
 
@@ -93,9 +84,7 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
         self.assertTrue(is_score_correct(expected_score=10, target_check="pylint", grader_output=run_stdout))
 
     def test_03_type_hints_check(self) -> None:
-        """
-        Verify that the grader runs the type hints check and returns the expected score.
-        """
+        """Verify that the grader runs the type hints check and returns the expected score."""
         # Arrange
         command = build_command(project_path=self.clone_path)
 
@@ -111,9 +100,7 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
 
     @unittest.skip("Coverage check test is too unstable")
     def test_04_coverage_check(self) -> None:
-        """
-        Verify that the grader runs the coverage check and returns the expected score.
-        """
+        """Verify that the grader runs the coverage check and returns the expected score."""
         # Arrange
         command = build_command(project_path=self.clone_path)
 
@@ -128,9 +115,7 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
         self.assertTrue(is_score_correct(expected_score=8, target_check="coverage", grader_output=run_stdout))
 
     def test_05_log_file_created(self) -> None:
-        """
-        Verify that the log file is created.
-        """
+        """Verify that the log file is created."""
         # Arrange
         log_file = "grader.log"
         if os.path.exists(log_file):
@@ -146,9 +131,7 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
         os.remove(log_file)
 
     def test_06_log_file_with_student_id(self) -> None:
-        """
-        Verify that the log file is created with the student ID in its name.
-        """
+        """Verify that the log file is created with the student ID in its name."""
         # Arrange
         student_id = "student123"
         log_file = f"{student_id}.log"
@@ -165,9 +148,7 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
         os.remove(log_file)
 
     def test_07_student_id_in_output(self) -> None:
-        """
-        Verify that the student ID is included in the output.
-        """
+        """Verify that the student ID is included in the output."""
         # Arrange
         student_id = "student123"
         expected_output = f"Running checks for student {student_id}"
@@ -183,9 +164,7 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
         )
 
     def test_08_default_log_file_name(self) -> None:
-        """
-        Verify that the default log file name is used when no student ID is provided.
-        """
+        """Verify that the default log file name is used when no student ID is provided."""
         # Arrange
         log_file = "grader.log"
         if os.path.exists(log_file):
@@ -202,9 +181,7 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
 
     @unittest.skip("Unstable test")
     def test_09_all_checks_score_one(self) -> None:
-        """
-        Verify that all checks return a score of 1 when using the full_single_point.json configuration.
-        """
+        """Verify that all checks return a score of 1 when using the full_single_point.json configuration."""
         # Arrange
         config_file = "full_single_point.json"
         command = build_command(project_path=self.clone_path, config_file=config_file)
@@ -224,9 +201,7 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
             )
 
     def test_10_only_pylint_check(self) -> None:
-        """
-        Verify that only the pylint check is executed when using the only_pylint.json configuration.
-        """
+        """Verify that only the pylint check is executed when using the only_pylint.json configuration."""
         # Arrange
         config_file = "only_pylint.json"
         command = build_command(project_path=self.clone_path, config_file=config_file)
@@ -249,14 +224,10 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
 
 @unittest.skipIf(os.name == "nt", "Test skipped on Windows")
 class TestFunctionalBadWeatherWithGrader(BaseFunctionalTestWithGrader):
-    """
-    Functional tests for the grader in a bad weather scenario.
-    """
+    """Functional tests for the grader in a bad weather scenario."""
 
     def test_11_requirements_txt_does_not_exist(self) -> None:
-        """
-        Verify that the grader handles the absence of requirements.txt gracefully.
-        """
+        """Verify that the grader handles the absence of requirements.txt gracefully."""
         # Arrange
         command = build_command(project_path=self.clone_path)
 
@@ -277,9 +248,7 @@ class TestFunctionalBadWeatherWithGrader(BaseFunctionalTestWithGrader):
         self.assertTrue(is_score_correct(expected_score=0, target_check="requirements", grader_output=run_stdout))
 
     def test_12_no_config_provided(self) -> None:
-        """
-        Verify that the grader handles the absence of a configuration file gracefully.
-        """
+        """Verify that the grader handles the absence of a configuration file gracefully."""
         # Arrange
         random_config_path = "/tmp/nonexistent_config.json"
         command = build_command(project_path=self.clone_path, config_file=random_config_path)
@@ -292,9 +261,7 @@ class TestFunctionalBadWeatherWithGrader(BaseFunctionalTestWithGrader):
         self.assertIn("Configuration file not found", run_result.stdout)
 
     def test_13_no_student_id_in_output(self) -> None:
-        """
-        Verify that the student ID is not included in the output when no student ID is provided.
-        """
+        """Verify that the student ID is not included in the output when no student ID is provided."""
         # Arrange
         unexpected_output = "Running checks for student"
         command = build_command(project_path=self.clone_path)
@@ -309,9 +276,7 @@ class TestFunctionalBadWeatherWithGrader(BaseFunctionalTestWithGrader):
         )
 
     def test_14_no_project_path_provided(self) -> None:
-        """
-        Verify that the grader handles the absence of a project path gracefully.
-        """
+        """Verify that the grader handles the absence of a project path gracefully."""
         # Arrange
         command = build_command(project_path=None)
 
@@ -323,9 +288,7 @@ class TestFunctionalBadWeatherWithGrader(BaseFunctionalTestWithGrader):
         self.assertIn("error: the following arguments are required: project_root", run_result.stderr)
 
     def test_15_invalid_project_path(self) -> None:
-        """
-        Verify that the grader handles an invalid project path gracefully.
-        """
+        """Verify that the grader handles an invalid project path gracefully."""
         # Arrange
         invalid_path = "/tmp/invalid_project_path"
         if os.path.exists(invalid_path):
@@ -344,6 +307,7 @@ class TestFunctionalBadWeatherWithGrader(BaseFunctionalTestWithGrader):
 class BaseFunctionalTestWithSampleProject(unittest.TestCase):
     """
     Base class for functional tests with a sample project.
+
     This class clones a sample project from GitHub.
     It provides setup and teardown methods to manage the cloned repository.
     """
@@ -352,6 +316,7 @@ class BaseFunctionalTestWithSampleProject(unittest.TestCase):
     clone_path = "/tmp/sample_project"
 
     def setUp(self) -> None:
+        """Set up test fixtures by cloning the sample project repository if needed."""
         if os.path.exists(self.clone_path):
             return
 
@@ -365,6 +330,7 @@ class BaseFunctionalTestWithSampleProject(unittest.TestCase):
             os.remove(functional_tests_path)
 
     def tearDown(self) -> None:
+        """Clean up test fixtures by removing the cloned repository."""
         if not os.path.exists(self.clone_path):
             return
 
@@ -372,14 +338,10 @@ class BaseFunctionalTestWithSampleProject(unittest.TestCase):
 
 
 class TestVariousConfigsOnSampleProject(BaseFunctionalTestWithSampleProject):
-    """
-    Functional tests for various configurations on the sample project.
-    """
+    """Functional tests for various configurations on the sample project."""
 
     def test_01_only_pylint(self) -> None:
-        """
-        Verify that only the pylint check is executed when using the only_pylint.json configuration.
-        """
+        """Verify that only the pylint check is executed when using the only_pylint.json configuration."""
         # Arrange
         command = build_command(project_path=self.clone_path, config_file="only_pylint.json")
 
@@ -394,9 +356,7 @@ class TestVariousConfigsOnSampleProject(BaseFunctionalTestWithSampleProject):
         )
 
     def test_02_full(self) -> None:
-        """
-        Verify that all checks are executed and return the expected scores when using the full.json configuration.
-        """
+        """Verify that all checks are executed and return the expected scores when using the full.json configuration."""
         # Arrange
         command = build_command(project_path=self.clone_path, config_file="full.json")
 
@@ -413,9 +373,7 @@ class TestVariousConfigsOnSampleProject(BaseFunctionalTestWithSampleProject):
         self.assertTrue(is_score_correct(expected_score=10, target_check="coverage", grader_output=run_result.stdout))
 
     def test_03_full_single_point(self) -> None:
-        """
-        Verify that all checks return a score of 1 when using the full_single_point.json configuration.
-        """
+        """Verify that all checks return a score of 1 when using the full_single_point.json configuration."""
         # Arrange
         command = build_command(project_path=self.clone_path, config_file="full_single_point.json")
 
@@ -433,8 +391,9 @@ class TestVariousConfigsOnSampleProject(BaseFunctionalTestWithSampleProject):
 
     def test_04_structure(self) -> None:
         """
-        Verify that the structure check is executed and returns the expected result
-            when using the structure.json configuration.
+        Verify that the structure check is executed and returns the expected result.
+
+        Uses the structure.json configuration.
         """
         # Arrange
         command = build_command(project_path=self.clone_path, config_file="structure.json")
@@ -450,9 +409,7 @@ class TestVariousConfigsOnSampleProject(BaseFunctionalTestWithSampleProject):
 
     @unittest.skip("The tests for sample_project are not in the repo")
     def test_05_tests(self) -> None:
-        """
-        Verify that the tests are executed and return the expected score when using the tests.json configuration.
-        """
+        """Verify that the tests are executed and return the expected score when using the tests.json configuration."""
         # Arrange
         command = build_command(project_path=self.clone_path, config_file="tests.json")
 
@@ -464,9 +421,7 @@ class TestVariousConfigsOnSampleProject(BaseFunctionalTestWithSampleProject):
         self.assertTrue(is_score_correct(expected_score=13, target_check="tests", grader_output=run_result.stdout))
 
     def test_06_2024(self) -> None:
-        """
-        Verify that the checks are executed and return the expected scores when using the 2024.json configuration.
-        """
+        """Verify that the checks are executed and return the expected scores when using the 2024.json configuration."""
         # Arrange
         command = build_command(project_path=self.clone_path, config_file="2024.json")
 
@@ -485,14 +440,13 @@ class TestVariousConfigsOnSampleProject(BaseFunctionalTestWithSampleProject):
 
 
 class TestRemoteTests(BaseFunctionalTestWithSampleProject):
-    """
-    Functional tests for the remote tests in the sample project.
-    """
+    """Functional tests for the remote tests in the sample project."""
 
     def test_01_remote_tests(self) -> None:
         """
-        Verify that the remote tests are executed and return the expected score
-            when using the tests.json configuration.
+        Verify that the remote tests are executed and return the expected score.
+
+        Uses the tests.json configuration.
         """
         # Arrange
         path_to_tests = os.path.join(self.clone_path, "tests", "test_sample_code.py")
@@ -511,10 +465,10 @@ class TestRemoteTests(BaseFunctionalTestWithSampleProject):
 
 
 class TestZipFileOnSampleProject(BaseFunctionalTestWithSampleProject):
+    """Tests for grading zip file archives."""
+
     def test_01_zip_archive_passed(self) -> None:
-        """
-        Verify that when passing a zip version of the project, it is graded.
-        """
+        """Verify that when passing a zip version of the project, it is graded."""
         # Arrange
         folder_path = Path(self.clone_path)
         zip_path = folder_path / "project.zip"

@@ -1,12 +1,10 @@
-"""
-Unit tests for the TypeHintsCheck class.
-"""
+"""Unit tests for the TypeHintsCheck class."""
 
 import os
 import shutil
 import unittest
 from subprocess import CompletedProcess
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import grader.utils.constants as const
 from grader.checks.abstract_check import CheckError, ScoredCheckResult
@@ -14,14 +12,10 @@ from grader.checks.type_hints_check import TypeHintsCheck
 
 
 class TestTypeHintsCheck(unittest.TestCase):
-    """
-    Test cases for the TypeHintsCheck class.
-    """
+    """Test cases for the TypeHintsCheck class."""
 
     def setUp(self) -> None:
-        """
-        Set up the test environment.
-        """
+        """Set up the test environment."""
         self.type_hints_check = TypeHintsCheck("type_hints", "sample_dir", 2, is_venv_required=False)
         # This way, we have 3 ranges: 0-33, 34-66, 67-100
         return super().setUp()

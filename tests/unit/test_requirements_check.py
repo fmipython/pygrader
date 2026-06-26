@@ -1,32 +1,24 @@
-"""
-Unit tests for the RequirementsCheck class in the requirements_check module.
-"""
+"""Unit tests for the RequirementsCheck class in the requirements_check module."""
 
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-from grader.checks.requirements_check import RequirementsCheck
 from grader.checks.abstract_check import ScoredCheckResult
+from grader.checks.requirements_check import RequirementsCheck
 from grader.utils.virtual_environment import VirtualEnvironmentError
 
 
 class TestRequirementsCheck(unittest.TestCase):
-    """
-    Unit tests for the RequirementsCheck class.
-    """
+    """Unit tests for the RequirementsCheck class."""
 
     def setUp(self) -> None:
-        """
-        Set up the test case environment.
-        """
+        """Set up the test case environment."""
         self.requirements_check = RequirementsCheck("requirements", "sample_dir", 1, is_venv_required=False)
         return super().setUp()
 
     @patch("pathlib.Path.exists")
     def test_01_requirements_exist(self, mocked_exists: MagicMock) -> None:
-        """
-        Test that the requirements file exists.
-        """
+        """Test that the requirements file exists."""
         # Arrange
         mocked_exists.return_value = True
         expected_score = ScoredCheckResult(self.requirements_check.name, 1, "", "", self.requirements_check.max_points)
@@ -39,9 +31,7 @@ class TestRequirementsCheck(unittest.TestCase):
 
     @patch("pathlib.Path.exists")
     def test_02_requirements_does_not_exist(self, mocked_exists: MagicMock) -> None:
-        """
-        Test that the requirements file does not exist.
-        """
+        """Test that the requirements file does not exist."""
         # Arrange
         mocked_exists.return_value = False
         expected_score = ScoredCheckResult(
@@ -64,8 +54,9 @@ class TestRequirementsCheck(unittest.TestCase):
         self, mocked_exists: MagicMock, mocked_venv_class: MagicMock
     ) -> None:
         """
-        Test that when is_checking_install=True and requirements exist,
-        a virtual environment is created, set up, and torn down successfully.
+        Test that when is_checking_install=True and requirements exist.
+
+        A virtual environment is created, set up, and torn down successfully.
         """
         # Arrange
         mocked_exists.return_value = True
@@ -94,8 +85,9 @@ class TestRequirementsCheck(unittest.TestCase):
         self, mocked_exists: MagicMock, mocked_venv_class: MagicMock
     ) -> None:
         """
-        Test that when is_checking_install=True and venv setup fails,
-        the check returns 0 score with the error message.
+        Test that when is_checking_install=True and venv setup fails.
+
+        The check returns 0 score with the error message.
         """
         # Arrange
         mocked_exists.return_value = True
@@ -125,8 +117,9 @@ class TestRequirementsCheck(unittest.TestCase):
         self, mocked_exists: MagicMock, mocked_venv_class: MagicMock
     ) -> None:
         """
-        Test that when is_checking_install=False, no virtual environment is created
-        even if requirements file exists.
+        Test that when is_checking_install=False, no virtual environment is created.
+
+        Even if requirements file exists.
         """
         # Arrange
         mocked_exists.return_value = True
@@ -149,8 +142,9 @@ class TestRequirementsCheck(unittest.TestCase):
         self, mocked_exists: MagicMock, mocked_venv_class: MagicMock
     ) -> None:
         """
-        Test that when is_checking_install=True but no requirements file exists,
-        no virtual environment is created.
+        Test that when is_checking_install=True but no requirements file exists.
+
+        No virtual environment is created.
         """
         # Arrange
         mocked_exists.return_value = False

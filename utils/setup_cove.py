@@ -1,3 +1,4 @@
+"""Setup script for Cove API integration."""
 import json
 
 import requests

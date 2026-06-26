@@ -1,12 +1,12 @@
 """
 Main entry point of the program.
-Calls all the checks, and stores their results
+
+Calls all the checks, and stores their results.
 """
 
 import os
 import shutil
 from pathlib import Path
-
 
 import grader.utils.constants as const
 from desktop.cli import get_args
@@ -40,9 +40,7 @@ def build_reporter(report_format: str) -> ResultsReporter:
 
 
 def run_grader() -> None:
-    """
-    Run the grader application.
-    """
+    """Run the grader application."""
     args = get_args()
     is_suppressing_info = args["report_format"] == "json" or args["report_format"] == "csv" or args["suppress_info"]
     log = setup_logger(

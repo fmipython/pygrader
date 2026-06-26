@@ -1,26 +1,20 @@
-"""
-Unit tests for the external resources functions.
-"""
+"""Unit tests for the external resources functions."""
 
 import unittest
-from unittest.mock import patch, MagicMock, call
+from unittest.mock import MagicMock, call, patch
 
 import requests
 
-from grader.utils.external_resources import is_resource_remote, download_file_from_url
 from grader.utils.constants import TEMP_FILES_DIR
+from grader.utils.external_resources import download_file_from_url, is_resource_remote
 
 
 class TestIsResourceRemote(unittest.TestCase):
-    """
-    Unit tests for the is_resource_remote function.
-    """
+    """Unit tests for the is_resource_remote function."""
 
     @patch("urllib.parse.urlparse")
     def test_01_scheme_http(self, mock_urlparse: MagicMock) -> None:
-        """
-        Test if the function correctly identifies a remote resource with HTTP scheme.
-        """
+        """Test if the function correctly identifies a remote resource with HTTP scheme."""
         # Arrange
         mock_urlparse.return_value.scheme = "http"
 
@@ -32,9 +26,7 @@ class TestIsResourceRemote(unittest.TestCase):
 
     @patch("urllib.parse.urlparse")
     def test_02_scheme_https(self, mock_urlparse: MagicMock) -> None:
-        """
-        Test if the function correctly identifies a remote resource with HTTPS scheme.
-        """
+        """Test if the function correctly identifies a remote resource with HTTPS scheme."""
         # Arrange
         mock_urlparse.return_value.scheme = "https"
 
@@ -46,9 +38,7 @@ class TestIsResourceRemote(unittest.TestCase):
 
     @patch("urllib.parse.urlparse")
     def test_03_scheme_ftp(self, mock_urlparse: MagicMock) -> None:
-        """
-        Test if the function correctly identifies a remote resource with FTP scheme.
-        """
+        """Test if the function correctly identifies a remote resource with FTP scheme."""
         # Arrange
         mock_urlparse.return_value.scheme = "ftp"
 
@@ -60,9 +50,7 @@ class TestIsResourceRemote(unittest.TestCase):
 
     @patch("urllib.parse.urlparse")
     def test_04_scheme_file(self, mock_urlparse: MagicMock) -> None:
-        """
-        Test if the function correctly identifies a local resource with file scheme.
-        """
+        """Test if the function correctly identifies a local resource with file scheme."""
         # Arrange
         mock_urlparse.return_value.scheme = "file"
 
@@ -74,9 +62,7 @@ class TestIsResourceRemote(unittest.TestCase):
 
     @patch("urllib.parse.urlparse")
     def test_05_no_scheme(self, mock_urlparse: MagicMock) -> None:
-        """
-        Test if the function correctly identifies a local resource without a scheme.
-        """
+        """Test if the function correctly identifies a local resource without a scheme."""
         # Arrange
         mock_urlparse.return_value.scheme = ""
 
@@ -88,19 +74,15 @@ class TestIsResourceRemote(unittest.TestCase):
 
 
 class TestDownloadFileFromUrl(unittest.TestCase):
-    """
-    Unit tests for the download_file_from_url function.
-    """
+    """Unit tests for the download_file_from_url function."""
 
     @patch("requests.get")
     @patch("os.makedirs")
     @patch("builtins.open")
     def test_01_directory_created(self, _: MagicMock, mock_makedirs: MagicMock, mock_get: MagicMock) -> None:
-        """
-        Test if the function creates the TEMP_FILES_DIR directory.
-        """
+        """Test if the function creates the TEMP_FILES_DIR directory."""
         # Arrange
-        mock_get.return_value = MagicMock(status_code=200, iter_content=lambda chunk_size: [b"data"])
+        mock_get.return_value = MagicMock(status_code=200, iter_content=lambda chunk_size: [b"data"])  # noqa: ARG005
 
         # Act
         with patch("json.load"):
@@ -116,13 +98,11 @@ class TestDownloadFileFromUrl(unittest.TestCase):
     def test_02_parse_filename_if_not_passed(
         self, mock_urlparse: MagicMock, mock_open: MagicMock, _: MagicMock, mock_get: MagicMock
     ) -> None:
-        """
-        Test if the function creates the TEMP_FILES_DIR directory.
-        """
+        """Test if the function creates the TEMP_FILES_DIR directory."""
         # Arrange
         sample_filename = "resource"
         sample_filepath = f"/folderA/{sample_filename}"
-        mock_get.return_value = MagicMock(status_code=200, iter_content=lambda chunk_size: [b"data"])
+        mock_get.return_value = MagicMock(status_code=200, iter_content=lambda chunk_size: [b"data"])  # noqa: ARG005
         mock_urlparse.return_value.path = sample_filepath
 
         # Act
@@ -139,13 +119,11 @@ class TestDownloadFileFromUrl(unittest.TestCase):
     def test_03_default_filename(
         self, mock_urlparse: MagicMock, mock_open: MagicMock, _: MagicMock, mock_get: MagicMock
     ) -> None:
-        """
-        Test if the function creates the TEMP_FILES_DIR directory.
-        """
+        """Test if the function creates the TEMP_FILES_DIR directory."""
         # Arrange
         sample_filename = ""
         sample_filepath = f"/folderA/{sample_filename}"
-        mock_get.return_value = MagicMock(status_code=200, iter_content=lambda chunk_size: [b"data"])
+        mock_get.return_value = MagicMock(status_code=200, iter_content=lambda chunk_size: [b"data"])  # noqa: ARG005
         mock_urlparse.return_value.path = sample_filepath
         expected_filename = "downloaded_file"
 
@@ -163,13 +141,11 @@ class TestDownloadFileFromUrl(unittest.TestCase):
     def test_04_passed_filename(
         self, mock_urlparse: MagicMock, mock_open: MagicMock, _: MagicMock, mock_get: MagicMock
     ) -> None:
-        """
-        Test if the function creates the TEMP_FILES_DIR directory.
-        """
+        """Test if the function creates the TEMP_FILES_DIR directory."""
         # Arrange
         sample_filename = "resource"
         sample_filepath = f"/folderA/{sample_filename}"
-        mock_get.return_value = MagicMock(status_code=200, iter_content=lambda chunk_size: [b"data"])
+        mock_get.return_value = MagicMock(status_code=200, iter_content=lambda chunk_size: [b"data"])  # noqa: ARG005
         mock_urlparse.return_value.path = sample_filepath
         expected_filename = "passed_filename.txt"
 
@@ -182,9 +158,7 @@ class TestDownloadFileFromUrl(unittest.TestCase):
 
     @patch("requests.get")
     def test_05_download_raises_exception_on_failure(self, mock_get: MagicMock) -> None:
-        """
-        Test if the function raises an exception when the download fails.
-        """
+        """Test if the function raises an exception when the download fails."""
         # Arrange
         mock_get.side_effect = requests.RequestException("Download failed")
 

@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "dotenv>=0.9.9",
-    "py-cove",
+    "py-cove @ git+https://github.com/lyubolp/py-cove.git@v1.3.1",
     "pylint>=4.0.2",
     "python-dotenv>=1.2.1",
     "requests>=2.32.5",

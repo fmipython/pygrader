@@ -1,63 +1,53 @@
-"""
-Unit tests for the Grader class
-"""
+"""Unit tests for the Grader class."""
 
 import os
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-from grader.grader import Grader, GraderError
 from grader.checks.abstract_check import (
     CheckError,
-    ScoredCheck,
-    ScoredCheckResult,
     NonScoredCheck,
     NonScoredCheckResult,
+    ScoredCheck,
+    ScoredCheckResult,
 )
+from grader.grader import Grader, GraderError
 
 
 class TestGrader(unittest.TestCase):
-    """
-    Unit tests for the Grader class.
-    """
+    """Unit tests for the Grader class."""
 
     @patch("grader.utils.config.load_config")
     def test_01_load_config_fails(self, mock_load_config: MagicMock) -> None:
-        """
-        Test that Grader exits with SystemExit when the configuration file is not found.
-        """
+        """Test that Grader exits with SystemExit when the configuration file is not found."""
         # Arrange
         mock_load_config.side_effect = FileNotFoundError("Config file not found")
 
         # Act
         with self.assertRaises(GraderError):
-            Grader("student_id", "project_root", "config_path", logger=MagicMock())
+            Grader("student_id", "project_root", config_path="config_path", logger=MagicMock())
 
     @patch("os.path.exists")
     def test_02_project_root_does_not_exist(self, mock_exists: MagicMock) -> None:
-        """
-        Test that Grader exits with SystemExit when the project root directory does not exist.
-        """
+        """Test that Grader exits with SystemExit when the project root directory does not exist."""
         # Arrange
         mock_exists.return_value = False
         config_path = os.path.join("config", "full_single_point.json")
 
         # Act & Assert
         with self.assertRaises(GraderError):
-            Grader("student_id", "nonexistent_project_root", config_path, logger=MagicMock())
+            Grader("student_id", "nonexistent_project_root", config_path=config_path, logger=MagicMock())
 
     @patch("grader.grader.create_checks")
     def test_03_create_checks_is_called(self, mock_create_checks: MagicMock) -> None:
-        """
-        Test that create_checks is called when grade() is called.
-        """
+        """Test that create_checks is called when grade() is called."""
         # Arrange
         sample_config_path = os.path.join("config", "full_single_point.json")
         sample_project_path = os.path.join("/tmp", "project_root")
         os.makedirs(sample_project_path, exist_ok=True)
 
         mock_create_checks.return_value = ([], [])
-        grader = Grader("student_id", sample_project_path, sample_config_path, logger=MagicMock())
+        grader = Grader("student_id", sample_project_path, config_path=sample_config_path, logger=MagicMock())
 
         # Act
         grader.grade()
@@ -69,9 +59,7 @@ class TestGrader(unittest.TestCase):
 
     @patch("grader.grader.create_checks")
     def test_04_non_venv_checks_run_called(self, mock_create_checks: MagicMock) -> None:
-        """
-        Test that the run method of each non_venv_check is called when grade() is executed.
-        """
+        """Test that the run method of each non_venv_check is called when grade() is executed."""
         # Arrange
         sample_config_path = os.path.join("config", "full_single_point.json")
         sample_project_path = os.path.join("/tmp", "project_root")
@@ -83,7 +71,7 @@ class TestGrader(unittest.TestCase):
         mock_check2.run.return_value = "result2"
         mock_create_checks.return_value = ([mock_check1, mock_check2], [])
 
-        grader = Grader("student_id", sample_project_path, sample_config_path, logger=MagicMock())
+        grader = Grader("student_id", sample_project_path, config_path=sample_config_path, logger=MagicMock())
 
         # Act
         grader.grade()
@@ -96,9 +84,7 @@ class TestGrader(unittest.TestCase):
 
     @patch("grader.grader.create_checks")
     def test_05_non_venv_checks_results_are_returned(self, mock_create_checks: MagicMock) -> None:
-        """
-        Test that the results from non_venv_checks are returned by grade().
-        """
+        """Test that the results from non_venv_checks are returned by grade()."""
         # Arrange
         sample_config_path = os.path.join("config", "full_single_point.json")
         sample_project_path = os.path.join("/tmp", "project_root")
@@ -112,7 +98,7 @@ class TestGrader(unittest.TestCase):
         mock_check2.run.return_value = result2
         mock_create_checks.return_value = ([mock_check1, mock_check2], [])
 
-        grader = Grader("student_id", sample_project_path, sample_config_path, logger=MagicMock())
+        grader = Grader("student_id", sample_project_path, config_path=sample_config_path, logger=MagicMock())
 
         # Act
         results = grader.grade()
@@ -125,8 +111,9 @@ class TestGrader(unittest.TestCase):
     @patch("grader.grader.create_checks")
     def test_06_skipping_venv_creation_returns_only_non_venv_checks(self, mock_create_checks: MagicMock) -> None:
         """
-        Test that when is_skipping_venv_creation is True and venv_checks is not empty,
-        only non_venv_checks results are returned by grade().
+        Test that when is_skipping_venv_creation is True and venv_checks is not empty.
+
+        Only non_venv_checks results are returned by grade().
         """
         # Arrange
         sample_config_path = os.path.join("config", "full_single_point.json")
@@ -149,7 +136,11 @@ class TestGrader(unittest.TestCase):
         )
 
         grader = Grader(
-            "student_id", sample_project_path, sample_config_path, logger=MagicMock(), is_skipping_venv_creation=True
+            "student_id",
+            sample_project_path,
+            config_path=sample_config_path,
+            logger=MagicMock(),
+            is_skipping_venv_creation=True,
         )
 
         # Act
@@ -165,9 +156,7 @@ class TestGrader(unittest.TestCase):
     def test_07_venv_checks_run_called_in_context_manager(
         self, mock_create_checks: MagicMock, mock_virtualenv: MagicMock
     ) -> None:
-        """
-        Test that the run method of each venv_check is called inside the VirtualEnvironment context manager.
-        """
+        """Test that the run method of each venv_check is called inside the VirtualEnvironment context manager."""
         # Arrange
         sample_config_path = os.path.join("config", "full_single_point.json")
         sample_project_path = os.path.join("/tmp", "project_root")
@@ -185,7 +174,7 @@ class TestGrader(unittest.TestCase):
         mock_virtualenv.return_value.__enter__.return_value = mock_context_manager
         mock_virtualenv.return_value.__exit__.return_value = None
 
-        grader = Grader("student_id", sample_project_path, sample_config_path, logger=MagicMock())
+        grader = Grader("student_id", sample_project_path, config_path=sample_config_path, logger=MagicMock())
 
         # Act
         grader.grade()
@@ -202,9 +191,7 @@ class TestGrader(unittest.TestCase):
     def test_08_venv_checks_results_are_returned(
         self, mock_create_checks: MagicMock, mock_virtualenv: MagicMock
     ) -> None:
-        """
-        Test that the results from venv_checks are returned by grade().
-        """
+        """Test that the results from venv_checks are returned by grade()."""
         # Arrange
         sample_config_path = os.path.join("config", "full_single_point.json")
         sample_project_path = os.path.join("/tmp", "project_root")
@@ -225,7 +212,7 @@ class TestGrader(unittest.TestCase):
         mock_virtualenv.return_value.__enter__.return_value = mock_context_manager
         mock_virtualenv.return_value.__exit__.return_value = None
 
-        grader = Grader("student_id", sample_project_path, sample_config_path, logger=MagicMock())
+        grader = Grader("student_id", sample_project_path, config_path=sample_config_path, logger=MagicMock())
 
         # Act
         results = grader.grade()
@@ -237,9 +224,7 @@ class TestGrader(unittest.TestCase):
 
     @patch("grader.grader.create_checks")
     def test_09_scored_checkerror_returns_scored_result(self, mock_create_checks: MagicMock) -> None:
-        """
-        Test that if a ScoredCheck raises CheckError, grade returns a ScoredCheckResult with score 0.
-        """
+        """Test that if a ScoredCheck raises CheckError, grade returns a ScoredCheckResult with score 0."""
         # Arrange
 
         sample_config_path = os.path.join("config", "full_single_point.json")
@@ -252,7 +237,7 @@ class TestGrader(unittest.TestCase):
         mock_scored_check.run.side_effect = CheckError("fail")
         mock_create_checks.return_value = ([mock_scored_check], [])
 
-        grader = Grader("student_id", sample_project_path, sample_config_path, logger=MagicMock())
+        grader = Grader("student_id", sample_project_path, config_path=sample_config_path, logger=MagicMock())
 
         # Act
         results = grader.grade()
@@ -268,10 +253,7 @@ class TestGrader(unittest.TestCase):
 
     @patch("grader.grader.create_checks")
     def test_10_nonscored_checkerror_returns_nonscored_result(self, mock_create_checks: MagicMock) -> None:
-        """
-        Test that if a NonScoredCheck raises CheckError, grade returns a NonScoredCheckResult with result=False.
-        """
-
+        """Test that if a NonScoredCheck raises CheckError, grade returns a NonScoredCheckResult with result=False."""
         sample_config_path = os.path.join("config", "full_single_point.json")
         sample_project_path = os.path.join("/tmp", "project_root")
         os.makedirs(sample_project_path, exist_ok=True)
@@ -281,7 +263,7 @@ class TestGrader(unittest.TestCase):
         mock_nonscored_check.run.side_effect = CheckError("fail")
         mock_create_checks.return_value = ([mock_nonscored_check], [])
 
-        grader = Grader("student_id", sample_project_path, sample_config_path, logger=MagicMock())
+        grader = Grader("student_id", sample_project_path, config_path=sample_config_path, logger=MagicMock())
 
         # Act
         results = grader.grade()
@@ -296,29 +278,22 @@ class TestGrader(unittest.TestCase):
 
     @patch("grader.grader.create_checks")
     def test_11_unknown_checkerror_raises_typeerror(self, mock_create_checks: MagicMock) -> None:
-        """
-        Test that if a check is neither ScoredCheck nor NonScoredCheck and raises CheckError, grade raises TypeError.
-        """
-
+        """Test that if a check is neither ScoredCheck nor NonScoredCheck and raises CheckError, grade raises TypeError."""
         sample_config_path = os.path.join("config", "full_single_point.json")
         sample_project_path = os.path.join("/tmp", "project_root")
         os.makedirs(sample_project_path, exist_ok=True)
 
         class UnknownCheck:
-            """
-            Dummy check for the test.
-            """
+            """Dummy check for the test."""
 
             def run(self) -> None:
-                """
-                Run the unknown check.
-                """
+                """Run the unknown check."""
                 raise CheckError("fail")
 
         mock_unknown_check = UnknownCheck()
         mock_create_checks.return_value = ([mock_unknown_check], [])
 
-        grader = Grader("student_id", sample_project_path, sample_config_path, logger=MagicMock())
+        grader = Grader("student_id", sample_project_path, config_path=sample_config_path, logger=MagicMock())
 
         # Act & Assert
         with self.assertRaises(TypeError):

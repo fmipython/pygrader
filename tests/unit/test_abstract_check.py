@@ -1,6 +1,4 @@
-"""
-Unit tests for the AbstractCheck class in the abstract_check module.
-"""
+"""Unit tests for the AbstractCheck class in the abstract_check module."""
 
 import unittest
 
@@ -8,25 +6,17 @@ from grader.checks.abstract_check import AbstractCheck, CheckError, CheckResult
 
 
 class TestAbstractCheck(unittest.TestCase):
-    """
-    Test cases for the AbstractCheck class.
-    """
+    """Test cases for the AbstractCheck class."""
 
     def test_01_run_without_venv_when_required(self) -> None:
-        """
-        Test that running the check without a virtual environment when it is required raises a RuntimeError.
-        """
+        """Test that running the check without a virtual environment when it is required raises a RuntimeError."""
 
         # Arrange
         class DummyCheck(AbstractCheck):
-            """
-            Dummy check class for testing
-            """
+            """Dummy check class for testing."""
 
             def run(self) -> CheckResult[int]:
-                """
-                Run the dummy check.
-                """
+                """Run the dummy check."""
                 super()._pre_run()
                 return CheckResult("dummy", 0, "", "")
 

@@ -1,9 +1,6 @@
-"""
-Unit tests for the main module.
-"""
+"""Unit tests for the main module."""
 
 import unittest
-
 from unittest.mock import MagicMock, patch
 
 from desktop.main import build_reporter, run_grader
@@ -11,14 +8,10 @@ from grader.utils.results_reporter import JSONResultsReporter, CSVResultsReporte
 
 
 class TestBuildReporter(unittest.TestCase):
-    """
-    Tests for the build_reporter function.
-    """
+    """Tests for the build_reporter function."""
 
     def test_01_build_json_reporter(self) -> None:
-        """
-        Test if the function returns a JSONResultsReporter when "json" is passed.
-        """
+        """Test if the function returns a JSONResultsReporter when "json" is passed."""
         # Arrange
         reporter_format = "json"
 
@@ -29,9 +22,7 @@ class TestBuildReporter(unittest.TestCase):
         self.assertIsInstance(reporter, JSONResultsReporter)
 
     def test_02_build_csv_reporter(self) -> None:
-        """
-        Test if the function returns a CSVResultsReporter when "csv" is passed.
-        """
+        """Test if the function returns a CSVResultsReporter when "csv" is passed."""
         # Arrange
         reporter_format = "csv"
 
@@ -42,9 +33,7 @@ class TestBuildReporter(unittest.TestCase):
         self.assertIsInstance(reporter, CSVResultsReporter)
 
     def test_03_build_plaintext_reporter(self) -> None:
-        """
-        Test if the function returns a PlainTextResultsReporter when "text" is passed.
-        """
+        """Test if the function returns a PlainTextResultsReporter when "text" is passed."""
         # Arrange
         reporter_format = "text"
 
@@ -55,9 +44,7 @@ class TestBuildReporter(unittest.TestCase):
         self.assertIsInstance(reporter, PlainTextResultsReporter)
 
     def test_04_build_default_reporter(self) -> None:
-        """
-        Test if the function returns a PlainTextResultsReporter when an unknown format is passed.
-        """
+        """Test if the function returns a PlainTextResultsReporter when an unknown format is passed."""
         # Arrange
         reporter_format = "unknown_format"
 
@@ -69,15 +56,11 @@ class TestBuildReporter(unittest.TestCase):
 
 
 class TestRunGrader(unittest.TestCase):
-    """
-    Tests for the run_grader function.
-    """
+    """Tests for the run_grader function."""
 
     @patch("desktop.main.get_args")
     def test_01_get_args_called(self, mock_get_args: MagicMock) -> None:
-        """
-        Test if get_args is called when run_grader is executed.
-        """
+        """Test if get_args is called when run_grader is executed."""
         # Arrange
         mock_get_args.return_value = {
             "student_id": "test_student",
@@ -99,9 +82,7 @@ class TestRunGrader(unittest.TestCase):
     @patch("desktop.main.get_args")
     @patch("desktop.main.setup_logger")
     def test_02_is_suppressing_info_json(self, mock_setup_logger: MagicMock, mock_get_args: MagicMock) -> None:
-        """
-        Test if is_suppressing_info is set to a proper value when report info is JSON
-        """
+        """Test if is_suppressing_info is set to a proper value when report info is JSON."""
         # Arrange
         mock_get_args.return_value = {
             "student_id": "test_student",
@@ -127,9 +108,7 @@ class TestRunGrader(unittest.TestCase):
     @patch("desktop.main.get_args")
     @patch("desktop.main.setup_logger")
     def test_03_is_suppressing_info_csv(self, mock_setup_logger: MagicMock, mock_get_args: MagicMock) -> None:
-        """
-        Test if is_suppressing_info is set to a proper value when report info is JSON
-        """
+        """Test if is_suppressing_info is set to a proper value when report info is JSON."""
         # Arrange
         mock_get_args.return_value = {
             "student_id": "test_student",
@@ -155,9 +134,7 @@ class TestRunGrader(unittest.TestCase):
     @patch("desktop.main.get_args")
     @patch("desktop.main.setup_logger")
     def test_04_is_suppressing_info_passed_true(self, mock_setup_logger: MagicMock, mock_get_args: MagicMock) -> None:
-        """
-        Test if is_suppressing_info is set to a proper value when report info is JSON
-        """
+        """Test if is_suppressing_info is set to a proper value when report info is JSON."""
         # Arrange
         mock_get_args.return_value = {
             "student_id": "test_student",
@@ -183,9 +160,7 @@ class TestRunGrader(unittest.TestCase):
     @patch("desktop.main.get_args")
     @patch("desktop.main.setup_logger")
     def test_04_is_suppressing_info_not_passed(self, mock_setup_logger: MagicMock, mock_get_args: MagicMock) -> None:
-        """
-        Test if is_suppressing_info is set to a proper value when report info is JSON
-        """
+        """Test if is_suppressing_info is set to a proper value when report info is JSON."""
         # Arrange
         mock_get_args.return_value = {
             "student_id": "test_student",
@@ -211,9 +186,7 @@ class TestRunGrader(unittest.TestCase):
     @patch("desktop.main.get_args")
     @patch("desktop.main.setup_logger")
     def test_05_setup_logger_called(self, mock_setup_logger: MagicMock, mock_get_args: MagicMock) -> None:
-        """
-        Test if is_suppressing_info is set to a proper value when report info is JSON
-        """
+        """Test if is_suppressing_info is set to a proper value when report info is JSON."""
         # Arrange
         expected_student_id = "test_student"
         expected_verbosity = 2
@@ -245,9 +218,7 @@ class TestRunGrader(unittest.TestCase):
     def test_06_grader_instantiated(
         self, mock_logger: MagicMock, mock_grader: MagicMock, mock_get_args: MagicMock
     ) -> None:
-        """
-        Test if is_suppressing_info is set to a proper value when report info is JSON
-        """
+        """Test if is_suppressing_info is set to a proper value when report info is JSON."""
         # Arrange
         expected_student_id = "test_student"
         expected_project_root = "/path/to/project"
@@ -273,18 +244,16 @@ class TestRunGrader(unittest.TestCase):
         mock_grader.assert_called_once_with(
             expected_student_id,
             expected_project_root,
-            expected_config_path,
             mock_logger.return_value,
-            expected_keep_venv,
-            expected_skip_venv_creation,
+            is_keeping_venv=expected_keep_venv,
+            is_skipping_venv_creation=expected_skip_venv_creation,
+            config_path=expected_config_path,
         )
 
     @patch("desktop.main.get_args")
     @patch("desktop.main.build_reporter")
     def test_07_build_reporter_called(self, mock_build_reporter: MagicMock, mock_get_args: MagicMock) -> None:
-        """
-        Test if get_args is called when run_grader is executed.
-        """
+        """Test if get_args is called when run_grader is executed."""
         # Arrange
         expected_report_format = "text"
         mock_get_args.return_value = {
@@ -315,9 +284,7 @@ class TestRunGrader(unittest.TestCase):
         mock_build_reporter: MagicMock,
         mock_get_args: MagicMock,
     ) -> None:
-        """
-        Test if get_args is called when run_grader is executed.
-        """
+        """Test if get_args is called when run_grader is executed."""
         # Arrange
         expected_report_format = "text"
         mock_get_args.return_value = {

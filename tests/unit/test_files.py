@@ -1,14 +1,11 @@
-"""
-Unit tests for the file utility functions.
-"""
+"""Unit tests for the file utility functions."""
 
 import os
 import shutil
 import unittest
-from typing import TypeAlias
-from unittest.mock import patch, MagicMock
 import zipfile
-from grader.utils.files import unzip_archive
+from typing import TypeAlias
+from unittest.mock import MagicMock, patch
 
 from grader.utils.files import (
     find_all_files_under_directory,
@@ -16,13 +13,12 @@ from grader.utils.files import (
     find_all_source_files,
     find_all_test_files,
     get_tests_directory_name,
+    unzip_archive,
 )
 
 
 class TestFindAllPythonFiles(unittest.TestCase):
-    """
-    Test cases for the find_all_python_files function.
-    """
+    """Test cases for the find_all_python_files function."""
 
     def __init__(self, methodName: str = "runTest") -> None:
         """
@@ -92,9 +88,7 @@ class TestFindAllPythonFiles(unittest.TestCase):
 
 
 class TestFindAllSourceFiles(unittest.TestCase):
-    """
-    Test cases for the find_all_source_files function.
-    """
+    """Test cases for the find_all_source_files function."""
 
     def __init__(self, methodName: str = "runTest") -> None:
         """
@@ -151,9 +145,7 @@ class TestFindAllSourceFiles(unittest.TestCase):
 
 
 class TestFindAllTestFiles(unittest.TestCase):
-    """
-    Test cases for the find_all_test_files function.
-    """
+    """Test cases for the find_all_test_files function."""
 
     def __init__(self, methodName: str = "runTest") -> None:
         """
@@ -208,9 +200,7 @@ class TestFindAllTestFiles(unittest.TestCase):
 
 
 class TestGetTestsDirectoryName(unittest.TestCase):
-    """
-    Test cases for the get_tests_directory_name function.
-    """
+    """Test cases for the get_tests_directory_name function."""
 
     def __init__(self, methodName: str = "runTest") -> None:
         """
@@ -223,17 +213,13 @@ class TestGetTestsDirectoryName(unittest.TestCase):
         super().__init__(methodName)
 
     def tearDown(self) -> None:
-        """
-        Tear down the test environment.
-        """
+        """Tear down the test environment."""
         if os.path.exists(self.__sample_dir):
             shutil.rmtree(self.__sample_dir)
         return super().tearDown()
 
     def test_01_tests_directory(self) -> None:
-        """
-        Verify that get_tests_directory_name returns the proper directory name.
-        """
+        """Verify that get_tests_directory_name returns the proper directory name."""
         # Arrange
         test_dir_name = "tests"
         expected_test_dir = os.path.join(self.__sample_dir, test_dir_name)
@@ -246,9 +232,7 @@ class TestGetTestsDirectoryName(unittest.TestCase):
         self.assertEqual(expected_test_dir, actual_test_dir)
 
     def test_02_test_directory(self) -> None:
-        """
-        Verify that get_tests_directory_name returns the proper directory name.
-        """
+        """Verify that get_tests_directory_name returns the proper directory name."""
         # Arrange
         test_dir_name = "test"
         expected_test_dir = os.path.join(self.__sample_dir, test_dir_name)
@@ -261,9 +245,7 @@ class TestGetTestsDirectoryName(unittest.TestCase):
         self.assertEqual(expected_test_dir, actual_test_dir)
 
     def test_03_tst_directory(self) -> None:
-        """
-        Verify that get_tests_directory_name returns the proper directory name.
-        """
+        """Verify that get_tests_directory_name returns the proper directory name."""
         # Arrange
         test_dir_name = "tst"
         expected_test_dir = os.path.join(self.__sample_dir, test_dir_name)
@@ -276,9 +258,7 @@ class TestGetTestsDirectoryName(unittest.TestCase):
         self.assertEqual(expected_test_dir, actual_test_dir)
 
     def test_04_no_directory(self) -> None:
-        """
-        Verify that get_tests_directory_name returns None when there is no tests directory.
-        """
+        """Verify that get_tests_directory_name returns None when there is no tests directory."""
         # Arrange
         test_dir_name = "some_other_name"
         self.__create_structure(self.__sample_dir, test_dir_name)
@@ -304,9 +284,7 @@ class TestGetTestsDirectoryName(unittest.TestCase):
 
 
 class TestFindAllFilesUnderDirectory(unittest.TestCase):
-    """
-    Test cases for the find_all_files_under_directory function.
-    """
+    """Test cases for the find_all_files_under_directory function."""
 
     DirectoryStructure: TypeAlias = list[tuple[str, list[str], list[str]]]
 
@@ -323,8 +301,9 @@ class TestFindAllFilesUnderDirectory(unittest.TestCase):
     @patch("os.walk")
     def test_01_partial_files_result(self, mocked_os_walk: MagicMock) -> None:
         """
-        Verify that find_all_files_under_directory returns the proper files
-            when there are multiple files with different extensions.
+        Verify that find_all_files_under_directory returns the proper files.
+
+        Tests with multiple files with different extensions.
 
         :param mocked_os_walk: Mocked os.walk function.
         :type mocked_os_walk: MagicMock
@@ -342,8 +321,9 @@ class TestFindAllFilesUnderDirectory(unittest.TestCase):
     @patch("os.walk")
     def test_02_all_files_result(self, mocked_os_walk: MagicMock) -> None:
         """
-        Verify that find_all_files_under_directory returns the proper files
-            when there are multiple files with the same extension.
+        Verify that find_all_files_under_directory returns the proper files.
+
+        Tests with multiple files with the same extension.
 
         :param mocked_os_walk: Mocked os.walk function.
         :type mocked_os_walk: MagicMock
@@ -361,8 +341,9 @@ class TestFindAllFilesUnderDirectory(unittest.TestCase):
     @patch("os.walk")
     def test_03_no_files_result(self, mocked_os_walk: MagicMock) -> None:
         """
-        Verify that find_all_files_under_directory returns an empty list
-            when there are no files with the searched extension.
+        Verify that find_all_files_under_directory returns an empty list.
+
+        Tests when there are no files with the searched extension.
 
         :param mocked_os_walk: Mocked os.walk function.
         :type mocked_os_walk: MagicMock
@@ -381,8 +362,9 @@ class TestFindAllFilesUnderDirectory(unittest.TestCase):
     @patch("os.walk")
     def test_03_no_files_overall(self, mocked_os_walk: MagicMock) -> None:
         """
-        Verify that find_all_files_under_directory returns an empty list
-            when there are no files.
+        Verify that find_all_files_under_directory returns an empty list.
+
+        Tests when there are no files.
 
         :param mocked_os_walk: Mocked os.walk function.
         :type mocked_os_walk: MagicMock
@@ -396,7 +378,7 @@ class TestFindAllFilesUnderDirectory(unittest.TestCase):
         extension_to_search_for: str,
     ) -> None:
         """
-        Base test for find_all_files_under_directory.
+        Provide base test for find_all_files_under_directory.
 
         :param mocked_os_walk: Mocked os.walk function.
         :type mocked_os_walk: MagicMock
@@ -442,15 +424,11 @@ class TestFindAllFilesUnderDirectory(unittest.TestCase):
 
 
 class TestUnzipArchive(unittest.TestCase):
-    """
-    Test cases for the unzip_archive function.
-    """
+    """Test cases for the unzip_archive function."""
 
     @patch("zipfile.ZipFile")
     def test_01_unzip_to_default_directory(self, mock_zipfile: MagicMock) -> None:
-        """
-        Verify that unzip_archive extracts to the default directory and returns the correct path.
-        """
+        """Verify that unzip_archive extracts to the default directory and returns the correct path."""
         # Setup
         mock_zip = MagicMock()
         mock_zipfile.return_value.__enter__.return_value = mock_zip
@@ -465,9 +443,7 @@ class TestUnzipArchive(unittest.TestCase):
 
     @patch("zipfile.ZipFile")
     def test_02_unzip_to_custom_directory(self, mock_zipfile: MagicMock) -> None:
-        """
-        Verify that unzip_archive extracts to a custom target directory.
-        """
+        """Verify that unzip_archive extracts to a custom target directory."""
         mock_zip = MagicMock()
         mock_zipfile.return_value.__enter__.return_value = mock_zip
         archive_path = "/fake/path/test_archive.zip"
@@ -480,18 +456,14 @@ class TestUnzipArchive(unittest.TestCase):
 
     @patch("zipfile.ZipFile", side_effect=zipfile.BadZipFile)
     def test_03_invalid_zip_file(self, mock_exists: MagicMock) -> None:
-        """
-        Verify that unzip_archive raises an exception for an invalid zip file.
-        """
+        """Verify that unzip_archive raises an exception for an invalid zip file."""
         archive_path = "/fake/path/invalid.zip"
         with self.assertRaises(Exception):
             unzip_archive(archive_path)
         self.assertTrue(mock_exists.called)
 
     def test_04_nonexistent_zip_file(self) -> None:
-        """
-        Verify that unzip_archive raises an exception for a nonexistent file.
-        """
+        """Verify that unzip_archive raises an exception for a nonexistent file."""
         archive_path = "/nonexistent/path/to/file.zip"
         with self.assertRaises(FileNotFoundError):
             unzip_archive(archive_path)

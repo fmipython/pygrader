@@ -1,23 +1,21 @@
 """
 Module containing the type hints check.
+
 It calls mypy as a subprocess to generate a report and then read from the report.
 """
 
 import logging
 from typing import Optional
 
-from grader.checks.abstract_check import ScoredCheck, CheckError, ScoredCheckResult
-from grader.utils.constants import MYPY_TYPE_HINT_CONFIG, REPORTS_TEMP_DIR, MYPY_LINE_COUNT_REPORT, MYPY_PATH
-from grader.utils import files
-from grader.utils import process
+from grader.checks.abstract_check import CheckError, ScoredCheck, ScoredCheckResult
+from grader.utils import files, process
+from grader.utils.constants import MYPY_LINE_COUNT_REPORT, MYPY_PATH, MYPY_TYPE_HINT_CONFIG, REPORTS_TEMP_DIR
 
 logger = logging.getLogger("grader")
 
 
 class TypeHintsCheck(ScoredCheck):
-    """
-    The TypeHints check class.
-    """
+    """The TypeHints check class."""
 
     def __init__(
         self,
@@ -27,6 +25,15 @@ class TypeHintsCheck(ScoredCheck):
         is_venv_required: bool,
         env_vars: Optional[dict[str, str]] = None,
     ):
+        """
+        Initialize the type hints check.
+
+        :param name: The name of the check.
+        :param project_root: The root directory of the project.
+        :param max_points: The maximum points this check can award.
+        :param is_venv_required: Whether a virtual environment is required.
+        :param env_vars: Optional environment variables for the check.
+        """
         super().__init__(name, max_points, project_root, is_venv_required, env_vars)
 
         self.__mypy_binary = MYPY_PATH
@@ -97,6 +104,7 @@ class TypeHintsCheck(ScoredCheck):
     def __translate_score(self, mypy_score: float) -> float:
         """
         Split the mypy score into regions and assign a score based on the region.
+
         The amount of regions depends on the max points for the criteria.
 
         :param pylint_score: The score from pylint to be translated

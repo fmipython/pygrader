@@ -1,37 +1,45 @@
-"""
-Module containing the check for running tests against the submitted code.
-"""
+"""Module containing the check for running tests against the submitted code."""
 
+import logging
+import os
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import Optional
-import logging
-import os
 
 from grader.checks.abstract_check import CheckError, ScoredCheck, ScoredCheckResult
-from grader.utils.constants import PYTEST_ARGS, PYTEST_PATH, PYTEST_ROOT_DIR_ARG
-from grader.utils.external_resources import is_resource_remote, download_file_from_url
-from grader.utils.logger import VERBOSE
 from grader.utils import process
+from grader.utils.constants import PYTEST_ARGS, PYTEST_PATH, PYTEST_ROOT_DIR_ARG
+from grader.utils.external_resources import (
+    download_file_from_url,
+    download_python_file_from_cove,
+    is_resource_cove,
+    is_resource_remote,
+)
+from grader.utils.logger import VERBOSE
 
 logger = logging.getLogger("grader")
 
 
 @dataclass
 class TestId:
+    """Container for test identification information."""
+
     class_name: str
     test_name: str
 
     def __str__(self) -> str:
+        """Return string representation of test ID."""
         return f"{self.class_name}::{self.test_name}"
 
     def pretty(self, is_passing: bool) -> str:
+        """Return a pretty formatted test result message."""
         return f"Test {str(self)} {'passed' if is_passing else 'failed'}."
 
 
 class RunTestsCheck(ScoredCheck):
     """
     The tests check class.
+
     This class is responsible for running tests on the submitted code and scoring the results.
     """
 
@@ -47,7 +55,7 @@ class RunTestsCheck(ScoredCheck):
         env_vars: Optional[dict[str, str]] = None,
     ):
         """
-        Initialize the TestsCheck class.
+        Initialize the RunTestsCheck class.
 
         :param name: The name of the check.
         :param project_root: The root directory of the project.
@@ -169,9 +177,10 @@ class RunTestsCheck(ScoredCheck):
     def _pre_run(self) -> None:
         super()._pre_run()
 
-        self.__tests_path = [
-            path if not is_resource_remote(path) else download_file_from_url(path) for path in self.__tests_path
-        ]
+        # TODO - This will be similar to config.py:load_config
+        # A function that handles different types of resources should be introduced.
+
+        self.__tests_path = [RunTestsCheck.__download_test(path) for path in self.__tests_path]
 
     def __calculate_score(self, passed_tests: list[TestId], failed_tests: list[TestId]) -> tuple[float, float, float]:
         """
@@ -182,7 +191,6 @@ class RunTestsCheck(ScoredCheck):
         :returns: The total score from the tests.
         :rtype: float
         """
-
         passed_tests_score = sum(self.__score_test(passed_test) for passed_test in passed_tests)
 
         failed_tests_score = sum(self.__score_test(failed_test) for failed_test in failed_tests)
@@ -218,3 +226,19 @@ class RunTestsCheck(ScoredCheck):
 
         logger.debug("Test %s::%s scored %.2f", test_class, test_name, score)
         return score
+
+    @staticmethod
+    def __download_test(path: str) -> str:
+        """
+        Download a test file from a remote URL and save it in temp_files under the pygrader root directory.
+
+        :param path: The URL to download the test file from
+        :return: The path to the saved test file
+        """
+        if is_resource_cove(path):
+            return download_python_file_from_cove(path)
+
+        if is_resource_remote(path):
+            return download_file_from_url(path)
+
+        return path

@@ -1,3 +1,1 @@
-"""
-Unit tests for the grader.
-"""
+"""Unit tests for the grader."""

@@ -1,6 +1,7 @@
+"""Utilities for loading and processing JSON files with template placeholders."""
+
 import json
 import re
-
 
 pattern = re.compile(r"\$\{\{(\w+)\}\}")
 
@@ -8,6 +9,7 @@ pattern = re.compile(r"\$\{\{(\w+)\}\}")
 def load_with_values(file_path: str, **kwargs: str) -> dict:
     """
     Load a JSON file with template placeholders and replace them with provided values.
+
     :param file_path: Path to the JSON file.
     :param values: Key-value pairs to replace in the JSON file.
     :return: The processed JSON content as a dictionary.

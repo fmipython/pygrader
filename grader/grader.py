@@ -1,48 +1,59 @@
-"""
-Module containing the Grader class.
-"""
+"""Module containing the Grader class."""
 
-from logging import Logger
 import os
 import shutil
-import grader.utils.constants as const
+from logging import Logger
+from typing import Optional
 
+import grader.utils.constants as const
 from grader.checks.abstract_check import (
     AbstractCheck,
     CheckError,
-    NonScoredCheckResult,
     CheckResult,
-    ScoredCheckResult,
-    ScoredCheck,
     NonScoredCheck,
+    NonScoredCheckResult,
+    ScoredCheck,
+    ScoredCheckResult,
 )
-
 from grader.checks.checks_factory import create_checks
-from grader.utils.config import load_config, InvalidConfigError
+from grader.utils.config import InvalidConfigError, load_config
 from grader.utils.virtual_environment import VirtualEnvironment
 
 
 class Grader:
-    """
-    Main grader class that orchestrates the grading process.
-    """
+    """Main grader class that orchestrates the grading process."""
 
     def __init__(
         self,
         student_id: str,
         project_root: str,
-        config_path: str,
         logger: Logger,
+        config_path: Optional[str] = None,
         is_keeping_venv: bool = False,
         is_skipping_venv_creation: bool = False,
     ):
+        """
+        Initialize the Grader.
+
+        :param student_id: The ID of the student.
+        :param project_root: The root directory of the project to grade.
+        :param logger: The logger instance for output.
+        :param config_path: Optional path to configuration file.
+        :param is_keeping_venv: Whether to keep the virtual environment after grading.
+        :param is_skipping_venv_creation: Whether to skip virtual environment creation.
+        """
         self.__logger = logger
 
         self.__logger.info("Python project grader, %s", const.VERSION)
         self.__is_keeping_venv = is_keeping_venv
         self.__is_skipping_venv_creation = is_skipping_venv_creation
         try:
+            if config_path is None:
+                raise InvalidConfigError("No configuration source provided")
+
+            self.__logger.info("Loading configuration from file: %s", config_path)
             self.__config = load_config(config_path)
+
             self.__logger.debug(f"Config contents: {self.__config}")
         except InvalidConfigError as exc:
             self.__logger.error("Error with the configuration file")
@@ -65,7 +76,7 @@ class Grader:
 
     def grade(self) -> list[CheckResult]:
         """
-        Main grader method that runs all checks and returns their results.
+        Run all checks and return their results.
 
         :return: A list of CheckResult objects containing the results of the checks.
         """
@@ -78,7 +89,11 @@ class Grader:
 
         venv_config = self.__config.get("venv", {})
 
-        with VirtualEnvironment(self.__project_root, is_keeping_venv_after_run=self.__is_keeping_venv, **venv_config):
+        with VirtualEnvironment(
+            self.__project_root,
+            is_keeping_venv_after_run=self.__is_keeping_venv,
+            **venv_config,
+        ):
             scores += [self.__run_check(check) for check in venv_checks]
 
         self.__cleanup()
@@ -113,6 +128,7 @@ class Grader:
     def __cleanup(self) -> None:
         """
         Cleanup temporary files created during the grading process.
+
         This is called at the end of grading to ensure no temporary files are left behind.
         """
         shutil.rmtree(const.TEMP_FILES_DIR, ignore_errors=True)
@@ -124,6 +140,4 @@ class Grader:
 
 
 class GraderError(Exception):
-    """
-    Custom exception for grader errors.
-    """
+    """Custom exception for grader errors."""

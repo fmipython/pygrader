@@ -1,24 +1,123 @@
-"""
-Unit tests for the TestsCheck class.
-"""
+"""Unit tests for the TestsCheck class."""
 
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-from grader.checks.run_tests_check import RunTestsCheck
 from grader.checks.abstract_check import CheckError, ScoredCheckResult
+from grader.checks.run_tests_check import RunTestsCheck
 from grader.utils.logger import VERBOSE
 
 
-class TestTestsCheck(unittest.TestCase):
-    """
-    Test cases for the TestsCheck class.
-    """
+class TestDownloadTest(unittest.TestCase):
+    """Unit tests for the __download_test static method via _pre_run."""
 
     def setUp(self) -> None:
-        """
-        Set up the test environment.
-        """
+        """Set up a RunTestsCheck instance for testing."""
+        self.name = "Test Check"
+        self.project_root = "/path/to/project"
+        self.max_points = 10
+        self.is_venv_required = False
+
+    @patch("grader.checks.run_tests_check.download_python_file_from_cove")
+    @patch("grader.checks.run_tests_check.is_resource_cove")
+    def test_01_cove_path_calls_download_python_file_from_cove(
+        self, mock_is_cove: MagicMock, mock_download_cove: MagicMock
+    ) -> None:
+        """Test that a Cove URI path delegates to download_python_file_from_cove."""
+        # Arrange
+        cove_path = "cove://example/test_file"
+        mock_is_cove.return_value = True
+        mock_download_cove.return_value = "/tmp/test_file.py"
+        check = RunTestsCheck(self.name, self.project_root, self.max_points, self.is_venv_required, [cove_path])
+
+        # Act
+        check._pre_run()
+
+        # Assert
+        mock_download_cove.assert_called_once_with(cove_path)
+
+    @patch("grader.checks.run_tests_check.download_file_from_url")
+    @patch("grader.checks.run_tests_check.is_resource_remote")
+    @patch("grader.checks.run_tests_check.is_resource_cove")
+    def test_02_remote_path_calls_download_file_from_url(
+        self, mock_is_cove: MagicMock, mock_is_remote: MagicMock, mock_download_url: MagicMock
+    ) -> None:
+        """Test that a remote URL path delegates to download_file_from_url."""
+        # Arrange
+        remote_path = "https://example.com/test_file.py"
+        mock_is_cove.return_value = False
+        mock_is_remote.return_value = True
+        mock_download_url.return_value = "/tmp/test_file.py"
+        check = RunTestsCheck(self.name, self.project_root, self.max_points, self.is_venv_required, [remote_path])
+
+        # Act
+        check._pre_run()
+
+        # Assert
+        mock_download_url.assert_called_once_with(remote_path)
+
+    @patch("grader.checks.run_tests_check.is_resource_remote")
+    @patch("grader.checks.run_tests_check.is_resource_cove")
+    def test_03_local_path_returned_unchanged(self, mock_is_cove: MagicMock, mock_is_remote: MagicMock) -> None:
+        """Test that a local path is returned unchanged."""
+        # Arrange
+        local_path = "/path/to/test_file.py"
+        mock_is_cove.return_value = False
+        mock_is_remote.return_value = False
+        check = RunTestsCheck(self.name, self.project_root, self.max_points, self.is_venv_required, [local_path])
+
+        # Act
+        check._pre_run()
+
+        # Assert
+        mock_is_cove.assert_called_once_with(local_path)
+        mock_is_remote.assert_called_once_with(local_path)
+
+    @patch("grader.checks.run_tests_check.download_file_from_url")
+    @patch("grader.checks.run_tests_check.download_python_file_from_cove")
+    @patch("grader.checks.run_tests_check.is_resource_remote")
+    @patch("grader.checks.run_tests_check.is_resource_cove")
+    def test_04_mixed_paths_processed_correctly(
+        self,
+        mock_is_cove: MagicMock,
+        mock_is_remote: MagicMock,
+        mock_download_cove: MagicMock,
+        mock_download_url: MagicMock,
+    ) -> None:
+        """Test that a list with mixed path types is handled correctly."""
+        # Arrange
+        cove_path = "cove://example/test_cove"
+        remote_path = "https://example.com/test_remote.py"
+        local_path = "/path/to/local_test.py"
+
+        def is_cove_side_effect(path: str) -> bool:
+            return path == cove_path
+
+        def is_remote_side_effect(path: str) -> bool:
+            return path == remote_path
+
+        mock_is_cove.side_effect = is_cove_side_effect
+        mock_is_remote.side_effect = is_remote_side_effect
+        mock_download_cove.return_value = "/tmp/test_cove.py"
+        mock_download_url.return_value = "/tmp/test_remote.py"
+
+        check = RunTestsCheck(
+            self.name, self.project_root, self.max_points, self.is_venv_required, [cove_path, remote_path, local_path]
+        )
+
+        # Act
+        check._pre_run()
+
+        # Assert
+        mock_download_cove.assert_called_once_with(cove_path)
+        mock_download_url.assert_called_once_with(remote_path)
+
+
+class TestTestsCheck(unittest.TestCase):
+    """Test cases for the TestsCheck class."""
+
+    def setUp(self) -> None:
+        """Set up the test environment."""
         self.name = "Test Check"
         self.project_root = "/path/to/project"
         self.max_points = 100
@@ -39,9 +138,7 @@ class TestTestsCheck(unittest.TestCase):
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
     def test_01_all_tests_pass(self, mock_pytest_run: MagicMock) -> None:
-        """
-        Verify run calculates the correct score when all tests pass.
-        """
+        """Verify run calculates the correct score when all tests pass."""
         # Arrange
         expected_info = "Test test_1::test_1 passed.\nTest test_2::test_2 passed."
         mock_pytest_run.return_value = "PASSED ::test_1::test_1\nPASSED ::test_2::test_2"
@@ -55,9 +152,7 @@ class TestTestsCheck(unittest.TestCase):
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
     def test_02_some_tests_fail(self, mock_pytest_run: MagicMock) -> None:
-        """
-        Verify run calculates the correct score when some tests fail.
-        """
+        """Verify run calculates the correct score when some tests fail."""
         # Arrange
         expected_info = "Test test_1::test_1 passed.\nTest test_2::test_2 failed."
         mock_pytest_run.return_value = "PASSED ::test_1::test_1\nFAILED ::test_2::test_2"
@@ -71,9 +166,7 @@ class TestTestsCheck(unittest.TestCase):
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
     def test_03_score_exceeds_max_points(self, mock_pytest_run: MagicMock) -> None:
-        """
-        Verify run raises CheckError when total score exceeds max_points.
-        """
+        """Verify run raises CheckError when total score exceeds max_points."""
         # Arrange
         test_score_mapping = {"test_1": 20.0, "test_2": 30.0, "test_3": 60.0}
 
@@ -95,9 +188,7 @@ class TestTestsCheck(unittest.TestCase):
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
     def test_04_logs_correct_passed_and_failed_counts(self, mock_pytest_run: MagicMock) -> None:
-        """
-        Verify run logs the correct number of passed and failed tests.
-        """
+        """Verify run logs the correct number of passed and failed tests."""
         # Arrange
         mock_pytest_run.return_value = "PASSED ::test_1::test_1\nFAILED ::test_2::test_2"
 
@@ -111,9 +202,7 @@ class TestTestsCheck(unittest.TestCase):
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
     def test_05_empty_test_results(self, mock_pytest_run: MagicMock) -> None:
-        """
-        Verify run handles empty test results gracefully.
-        """
+        """Verify run handles empty test results gracefully."""
         # Arrange
         mock_pytest_run.return_value = ""
         expected_score = ScoredCheckResult(self.name, 0.0, "", "", self.max_points)
@@ -126,9 +215,7 @@ class TestTestsCheck(unittest.TestCase):
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
     def test_06_invalid_pytest_output(self, mock_pytest_run: MagicMock) -> None:
-        """
-        Verify run handles invalid pytest output gracefully.
-        """
+        """Verify run handles invalid pytest output gracefully."""
         # Arrange
         mock_pytest_run.return_value = "INVALID OUTPUT"
         expected_score = ScoredCheckResult(self.name, 0.0, "", "", self.max_points)
@@ -141,9 +228,7 @@ class TestTestsCheck(unittest.TestCase):
 
     @patch("grader.utils.process.run")
     def test_07_pytest_raises_os_error(self, mock_run: MagicMock) -> None:
-        """
-        Verify run raises CheckError when pytest raises OSError.
-        """
+        """Verify run raises CheckError when pytest raises OSError."""
         # Arrange
         mock_run.side_effect = OSError("Test error")
 
@@ -153,9 +238,7 @@ class TestTestsCheck(unittest.TestCase):
 
     @patch("grader.utils.process.run")
     def test_08_pytest_raises_value_error(self, mock_run: MagicMock) -> None:
-        """
-        Verify run raises CheckError when pytest raises ValueError.
-        """
+        """Verify run raises CheckError when pytest raises ValueError."""
         # Arrange
         mock_run.side_effect = ValueError("Test error")
 
@@ -165,9 +248,7 @@ class TestTestsCheck(unittest.TestCase):
 
     @patch("grader.utils.process.run")
     def test_09_pytest_returncode_greater_than_2(self, mock_run: MagicMock) -> None:
-        """
-        Verify run raises CheckError when pytest returncode is greater than 2.
-        """
+        """Verify run raises CheckError when pytest returncode is greater than 2."""
         # Arrange
         mock_run.return_value.returncode = 3
 
@@ -177,9 +258,7 @@ class TestTestsCheck(unittest.TestCase):
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
     def test_10_class_scored(self, mock_pytest_run: MagicMock) -> None:
-        """
-        Verify run calculates the correct score when there is class-based scoring.
-        """
+        """Verify run calculates the correct score when there is class-based scoring."""
         # Arrange
         mock_pytest_run.return_value = "PASSED ::ClassB::test_1\nPASSED ::ClassB::test_2\nPASSED ::ClassA::test_3"
         expected_info = "Test ClassB::test_1 passed.\nTest ClassB::test_2 passed.\nTest ClassA::test_3 passed."
@@ -194,9 +273,7 @@ class TestTestsCheck(unittest.TestCase):
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
     def test_11_test_scored_both_name_and_class(self, mock_pytest_run: MagicMock) -> None:
-        """
-        Verify run calculates the correct score when there is name and class-based scoring.
-        """
+        """Verify run calculates the correct score when there is name and class-based scoring."""
         # Arrange
         mock_pytest_run.return_value = "PASSED ::ClassB::test_1\nPASSED ::ClassB::test_2\nPASSED ::ClassA::test_3"
         expected_info = "Test ClassB::test_1 passed.\nTest ClassB::test_2 passed.\nTest ClassA::test_3 passed."
@@ -220,9 +297,7 @@ class TestTestsCheck(unittest.TestCase):
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
     def test_12_test_default_scored(self, mock_pytest_run: MagicMock) -> None:
-        """
-        Verify run calculates the correct score when there is name and class-based scoring.
-        """
+        """Verify run calculates the correct score when there is name and class-based scoring."""
         # Arrange
         mock_pytest_run.return_value = "PASSED ::ClassB::test_1\nPASSED ::ClassB::test_2\nPASSED ::ClassA::test_3"
         expected_info = "Test ClassB::test_1 passed.\nTest ClassB::test_2 passed.\nTest ClassA::test_3 passed."

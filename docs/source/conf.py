@@ -1,3 +1,4 @@
+"""Sphinx configuration for the pygrader documentation."""
 import os
 import sys
 

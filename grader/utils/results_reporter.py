@@ -16,13 +16,27 @@ class ResultsReporter(ABC):
     """
 
     @abstractmethod
-    def display(self, results: list[CheckResult], verbose: bool, file_descriptor: TextIO = sys.stdout) -> None:
+    def display(
+        self,
+        results: list[CheckResult],
+        verbose: bool,
+        file_descriptor: TextIO = sys.stdout,
+    ) -> None:
         """
         Display the results in a specific format.
 
         :param results: A list of CheckResult objects to display.
         :param verbose: Whether to include info and error fields in the output.
         :param file_descriptor: The file descriptor to write the output to, defaults to sys.stdout.
+        """
+
+    @abstractmethod
+    def to_string(self, results: list[CheckResult], verbose: bool) -> str:
+        """
+        Convert the results to a string in a specific format.
+        :param results: A list of CheckResult objects to convert.
+        :param verbose: Whether to include info and error fields in the output.
+        :return: A string representation of the results in a specific format.
         """
 
     def _to_file_descriptor(self, content: str, file_descriptor: TextIO) -> None:
@@ -42,7 +56,12 @@ class JSONResultsReporter(ResultsReporter):
     This class implements the `display` method to format and print the results in JSON format.
     """
 
-    def display(self, results: list[CheckResult], verbose: bool, file_descriptor: TextIO = sys.stdout) -> None:
+    def display(
+        self,
+        results: list[CheckResult],
+        verbose: bool,
+        file_descriptor: TextIO = sys.stdout,
+    ) -> None:
         """
         Display the results in JSON format.
 
@@ -50,6 +69,10 @@ class JSONResultsReporter(ResultsReporter):
         :param verbose: Whether to include info and error fields in the output.
         :param file_descriptor: The file descriptor to write the output to.
         """
+        output = self.to_string(results, verbose)
+        self._to_file_descriptor(output, file_descriptor)
+
+    def to_string(self, results: list[CheckResult], verbose: bool) -> str:
         scored_results = [result for result in results if isinstance(result, ScoredCheckResult)]
         total_score = sum(scored_result.result for scored_result in scored_results)
         total_max_score = sum(result.max_score for result in scored_results)
@@ -65,7 +88,7 @@ class JSONResultsReporter(ResultsReporter):
 
         output = json.dumps(content, indent=4)
 
-        self._to_file_descriptor(output, file_descriptor)
+        return output
 
 
 def result_to_json(check_result: CheckResult, verbose: bool) -> dict:
@@ -139,7 +162,12 @@ class CSVResultsReporter(ResultsReporter):
     This class implements the `display` method to format and print the results in CSV format.
     """
 
-    def display(self, results: list[CheckResult], verbose: bool, file_descriptor: TextIO = sys.stdout) -> None:
+    def display(
+        self,
+        results: list[CheckResult],
+        verbose: bool,
+        file_descriptor: TextIO = sys.stdout,
+    ) -> None:
         """
         Display the results in CSV format.
 
@@ -147,6 +175,10 @@ class CSVResultsReporter(ResultsReporter):
         :param verbose: Whether to include info and error fields in the output.
         :param file_descriptor: The file descriptor to write the output to.
         """
+        output = self.to_string(results, verbose)
+        self._to_file_descriptor(output, file_descriptor)
+
+    def to_string(self, results: list[CheckResult], verbose: bool) -> str:
         scored_results = [result for result in results if isinstance(result, ScoredCheckResult)]
         total_score = sum(scored_result.result for scored_result in scored_results)
         total_max_score = sum(result.max_score for result in scored_results)
@@ -158,7 +190,7 @@ class CSVResultsReporter(ResultsReporter):
         output += [result_to_csv(check_result, verbose) for check_result in results]
         output.append(f"Total,{total_score},{total_max_score}")
 
-        self._to_file_descriptor("\n".join(output) + "\n", file_descriptor)
+        return "\n".join(output) + "\n"
 
 
 def result_to_csv(check_result: CheckResult, verbose: bool) -> str:
@@ -192,7 +224,12 @@ class PlainTextResultsReporter(ResultsReporter):
     This class implements the `display` method to format and print the results in plain text format.
     """
 
-    def display(self, results: list[CheckResult], verbose: bool, file_descriptor: TextIO = sys.stdout) -> None:
+    def display(
+        self,
+        results: list[CheckResult],
+        verbose: bool,
+        file_descriptor: TextIO = sys.stdout,
+    ) -> None:
         """
         Display the results in plain text format.
 
@@ -200,13 +237,17 @@ class PlainTextResultsReporter(ResultsReporter):
         :param verbose: Whether to include info and error fields in the output.
         :param file_descriptor: The file descriptor to write the output to.
         """
+        output = self.to_string(results, verbose)
+        self._to_file_descriptor(output, file_descriptor)
+
+    def to_string(self, results: list[CheckResult], verbose: bool) -> str:
         scored_results = [result for result in results if isinstance(result, ScoredCheckResult)]
         total_score = sum(scored_result.result for scored_result in scored_results)
         total_max_score = sum(result.max_score for result in scored_results)
 
         output = [result_to_plain_text(check_result, verbose) for check_result in results]
         output.append(f"Total Score: {total_score}/{total_max_score}")
-        self._to_file_descriptor("\n".join(output) + "\n", file_descriptor)
+        return "\n".join(output) + "\n"
 
 
 def result_to_plain_text(check_result: CheckResult, verbose: bool) -> str:

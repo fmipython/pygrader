@@ -10,15 +10,15 @@ from pathlib import Path
 
 import grader.utils.constants as const
 from desktop.cli import get_args
-from desktop.results_reporter import (
+from grader.grader import Grader
+from grader.utils.files import is_path_zip, unzip_archive
+from grader.utils.logger import setup_logger
+from grader.utils.results_reporter import (
     CSVResultsReporter,
     JSONResultsReporter,
     PlainTextResultsReporter,
     ResultsReporter,
 )
-from grader.grader import Grader
-from grader.utils.files import is_path_zip, unzip_archive
-from grader.utils.logger import setup_logger
 
 
 def build_reporter(report_format: str) -> ResultsReporter:

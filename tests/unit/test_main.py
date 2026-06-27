@@ -244,10 +244,10 @@ class TestRunGrader(unittest.TestCase):
         mock_grader.assert_called_once_with(
             expected_student_id,
             expected_project_root,
-            expected_config_path,
             mock_logger.return_value,
-            expected_keep_venv,
-            expected_skip_venv_creation,
+            is_keeping_venv=expected_keep_venv,
+            is_skipping_venv_creation=expected_skip_venv_creation,
+            config_path=expected_config_path,
         )
 
     @patch("desktop.main.get_args")

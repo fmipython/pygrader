@@ -4,7 +4,9 @@ import unittest
 import unittest.mock
 from unittest.mock import MagicMock, patch
 
-from grader.utils.config import InvalidConfigError, load_config
+from cove_sdk import BaseItem, JSONItem
+
+from grader.utils.config import InvalidConfigError, load_config, load_from_cove
 from grader.utils.external_resources import ExternalResourceError
 
 
@@ -97,3 +99,42 @@ class TestConfig(unittest.TestCase):
         # Act & Assert
         with self.assertRaises(InvalidConfigError):
             load_config(sample_config_path)
+
+
+class TestLoadFromCove(unittest.TestCase):
+    """Unit tests for the load_from_cove function."""
+
+    @patch("grader.utils.config.fetch_from_cove")
+    def test_01_fetch_from_cove_raises_error_wrapped_in_invalid_config(self, mock_fetch: MagicMock) -> None:
+        """Test that an ExternalResourceError is wrapped in InvalidConfigError."""
+        # Arrange
+        mock_fetch.side_effect = ExternalResourceError("fetch failed")
+
+        # Act & Assert
+        with self.assertRaises(InvalidConfigError):
+            load_from_cove("cove://example/config")
+
+    @patch("grader.utils.config.fetch_from_cove")
+    def test_02_non_json_item_raises_invalid_config(self, mock_fetch: MagicMock) -> None:
+        """Test that a non-JSONItem result raises InvalidConfigError."""
+        # Arrange
+        mock_fetch.return_value = MagicMock(spec=BaseItem)
+
+        # Act & Assert
+        with self.assertRaises(InvalidConfigError):
+            load_from_cove("cove://example/config")
+
+    @patch("grader.utils.config.fetch_from_cove")
+    def test_03_returns_json_value_of_json_item(self, mock_fetch: MagicMock) -> None:
+        """Test that the json_value of a JSONItem is returned."""
+        # Arrange
+        expected_config = {"key": "value", "checks": []}
+        mock_item = MagicMock(spec=JSONItem)
+        mock_item.json_value = expected_config
+        mock_fetch.return_value = mock_item
+
+        # Act
+        result = load_from_cove("cove://example/config")
+
+        # Assert
+        self.assertEqual(result, expected_config)

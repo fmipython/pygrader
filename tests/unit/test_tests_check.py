@@ -8,6 +8,111 @@ from grader.checks.run_tests_check import RunTestsCheck
 from grader.utils.logger import VERBOSE
 
 
+class TestDownloadTest(unittest.TestCase):
+    """Unit tests for the __download_test static method via _pre_run."""
+
+    def setUp(self) -> None:
+        """Set up a RunTestsCheck instance for testing."""
+        self.name = "Test Check"
+        self.project_root = "/path/to/project"
+        self.max_points = 10
+        self.is_venv_required = False
+
+    @patch("grader.checks.run_tests_check.download_python_file_from_cove")
+    @patch("grader.checks.run_tests_check.is_resource_cove")
+    def test_01_cove_path_calls_download_python_file_from_cove(
+        self, mock_is_cove: MagicMock, mock_download_cove: MagicMock
+    ) -> None:
+        """Test that a Cove URI path delegates to download_python_file_from_cove."""
+        # Arrange
+        cove_path = "cove://example/test_file"
+        mock_is_cove.return_value = True
+        mock_download_cove.return_value = "/tmp/test_file.py"
+        check = RunTestsCheck(self.name, self.project_root, self.max_points, self.is_venv_required, [cove_path])
+
+        # Act
+        check._pre_run()
+
+        # Assert
+        mock_download_cove.assert_called_once_with(cove_path)
+
+    @patch("grader.checks.run_tests_check.download_file_from_url")
+    @patch("grader.checks.run_tests_check.is_resource_remote")
+    @patch("grader.checks.run_tests_check.is_resource_cove")
+    def test_02_remote_path_calls_download_file_from_url(
+        self, mock_is_cove: MagicMock, mock_is_remote: MagicMock, mock_download_url: MagicMock
+    ) -> None:
+        """Test that a remote URL path delegates to download_file_from_url."""
+        # Arrange
+        remote_path = "https://example.com/test_file.py"
+        mock_is_cove.return_value = False
+        mock_is_remote.return_value = True
+        mock_download_url.return_value = "/tmp/test_file.py"
+        check = RunTestsCheck(self.name, self.project_root, self.max_points, self.is_venv_required, [remote_path])
+
+        # Act
+        check._pre_run()
+
+        # Assert
+        mock_download_url.assert_called_once_with(remote_path)
+
+    @patch("grader.checks.run_tests_check.is_resource_remote")
+    @patch("grader.checks.run_tests_check.is_resource_cove")
+    def test_03_local_path_returned_unchanged(self, mock_is_cove: MagicMock, mock_is_remote: MagicMock) -> None:
+        """Test that a local path is returned unchanged."""
+        # Arrange
+        local_path = "/path/to/test_file.py"
+        mock_is_cove.return_value = False
+        mock_is_remote.return_value = False
+        check = RunTestsCheck(self.name, self.project_root, self.max_points, self.is_venv_required, [local_path])
+
+        # Act
+        check._pre_run()
+
+        # Assert
+        mock_is_cove.assert_called_once_with(local_path)
+        mock_is_remote.assert_called_once_with(local_path)
+
+    @patch("grader.checks.run_tests_check.download_file_from_url")
+    @patch("grader.checks.run_tests_check.download_python_file_from_cove")
+    @patch("grader.checks.run_tests_check.is_resource_remote")
+    @patch("grader.checks.run_tests_check.is_resource_cove")
+    def test_04_mixed_paths_processed_correctly(
+        self,
+        mock_is_cove: MagicMock,
+        mock_is_remote: MagicMock,
+        mock_download_cove: MagicMock,
+        mock_download_url: MagicMock,
+    ) -> None:
+        """Test that a list with mixed path types is handled correctly."""
+        # Arrange
+        cove_path = "cove://example/test_cove"
+        remote_path = "https://example.com/test_remote.py"
+        local_path = "/path/to/local_test.py"
+
+        def is_cove_side_effect(path: str) -> bool:
+            return path == cove_path
+
+        def is_remote_side_effect(path: str) -> bool:
+            return path == remote_path
+
+        mock_is_cove.side_effect = is_cove_side_effect
+        mock_is_remote.side_effect = is_remote_side_effect
+        mock_download_cove.return_value = "/tmp/test_cove.py"
+        mock_download_url.return_value = "/tmp/test_remote.py"
+
+        check = RunTestsCheck(
+            self.name, self.project_root, self.max_points, self.is_venv_required, [cove_path, remote_path, local_path]
+        )
+
+        # Act
+        check._pre_run()
+
+        # Assert
+        mock_download_cove.assert_called_once_with(cove_path)
+        mock_download_url.assert_called_once_with(remote_path)
+
+
 class TestTestsCheck(unittest.TestCase):
     """Test cases for the TestsCheck class."""
 

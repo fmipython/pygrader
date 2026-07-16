@@ -2,6 +2,7 @@
 
 import os
 from importlib.metadata import version
+from importlib.resources import files
 
 VERSION = version("pygrader")
 
@@ -10,7 +11,9 @@ VERSION = version("pygrader")
 ROOT_DIR = os.path.dirname(os.path.realpath(__name__))
 REPORTS_TEMP_DIR = os.path.join(ROOT_DIR, "reports")
 CONFIG_DIR = os.path.join(ROOT_DIR, "config")
-TEMP_FILES_DIR = os.path.join(ROOT_DIR, "temp_files")  # TODO - Change this to be under WORK_DIR ?
+TEMP_FILES_DIR = os.path.join(
+    ROOT_DIR, "temp_files"
+)  # TODO - Change this to be under WORK_DIR ?
 
 WORK_DIR = os.path.join("/tmp", "pygrader")
 
@@ -31,14 +34,14 @@ PIP_PATH_UNIX = os.path.join("bin", "pip")
 
 PIP_PATH = PIP_PATH_WINDOWS if os.name == "nt" else PIP_PATH_UNIX
 
-GRADER_REQUIREMENTS = os.path.join(CONFIG_DIR, "grader_requirements.txt")
+GRADER_REQUIREMENTS = files("config").joinpath("grader_requirements.txt")
 
 # Type hints constants
 MYPY_BIN_WINDOWS = "mypy.exe"
 MYPY_BIN_UNIX = "mypy"
 MYPY_BIN = MYPY_BIN_WINDOWS if os.name == "nt" else MYPY_BIN_UNIX
 
-MYPY_TYPE_HINT_CONFIG = os.path.join(ROOT_DIR, "config", "mypy_type_hints_2024.ini")
+MYPY_TYPE_HINT_CONFIG = files("config").joinpath("mypy_type_hints_2024.ini")
 MYPY_LINE_COUNT_REPORT = os.path.join(REPORTS_TEMP_DIR, "linecount.txt")
 MYPY_PATH_WINDOWS = os.path.join(VENV_NAME, "Scripts", MYPY_BIN)
 MYPY_PATH_UNIX = os.path.join(VENV_NAME, "bin", MYPY_BIN)
@@ -50,7 +53,7 @@ PYLINT_BIN_WINDOWS = os.path.join("Scripts", "pylint.exe")
 PYLINT_BIN_UNIX = os.path.join("bin", "pylint")
 PYLINT_BIN = PYLINT_BIN_WINDOWS if os.name == "nt" else PYLINT_BIN_UNIX
 PYLINT_PATH = os.path.join(VENV_NAME, PYLINT_BIN)
-PYLINTRC = os.path.join(CONFIG_DIR, "2024.pylintrc")
+PYLINTRC = files("config").joinpath("2024.pylintrc")
 
 # Pytest constants
 PYTEST_BIN_WINDOWS = "pytest.exe"

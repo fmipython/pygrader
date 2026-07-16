@@ -20,7 +20,10 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 # List only the directory/package you want to include
-packages = ["grader", "grader.checks", "grader.utils"]
+packages = ["grader", "grader.checks", "grader.utils", "config"]
+
+[tool.setuptools.package-data]
+config = ["grader_requirements.txt", "mypy_type_hints_2024.ini", "2024.pylintrc"]
 
 [tool.complexipy]
 paths = ["grader", "tests", "desktop", "web"]

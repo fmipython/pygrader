@@ -1,5 +1,15 @@
 # pygrader
 
+## 1.9.1
+
+- Moved file dependecies to wheel
+
+## 1.9.0
+
+- Results reporters moved from `desktop` to `grader` package
+- Added cove integration
+- Switched to `ruff` for linting and formatting
+
 ## 1.8.1
 
 - When installing from pyproject.toml, use editable install to fix directory structure issues

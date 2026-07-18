@@ -34,6 +34,7 @@ class ResultsReporter(ABC):
     def to_string(self, results: list[CheckResult], verbose: bool) -> str:
         """
         Convert the results to a string in a specific format.
+
         :param results: A list of CheckResult objects to convert.
         :param verbose: Whether to include info and error fields in the output.
         :return: A string representation of the results in a specific format.
@@ -73,6 +74,13 @@ class JSONResultsReporter(ResultsReporter):
         self._to_file_descriptor(output, file_descriptor)
 
     def to_string(self, results: list[CheckResult], verbose: bool) -> str:
+        """
+        Convert the results to a JSON string.
+
+        :param results: A list of CheckResult objects to convert.
+        :param verbose: Whether to include info and error fields in the output.
+        :return: A string representation of the results in JSON format.
+        """
         scored_results = [result for result in results if isinstance(result, ScoredCheckResult)]
         total_score = sum(scored_result.result for scored_result in scored_results)
         total_max_score = sum(result.max_score for result in scored_results)
@@ -179,6 +187,13 @@ class CSVResultsReporter(ResultsReporter):
         self._to_file_descriptor(output, file_descriptor)
 
     def to_string(self, results: list[CheckResult], verbose: bool) -> str:
+        """
+        Convert the results to a CSV string.
+
+        :param results: A list of CheckResult objects to convert.
+        :param verbose: Whether to include info and error fields in the output.
+        :return: A string representation of the results in CSV format.
+        """
         scored_results = [result for result in results if isinstance(result, ScoredCheckResult)]
         total_score = sum(scored_result.result for scored_result in scored_results)
         total_max_score = sum(result.max_score for result in scored_results)
@@ -241,6 +256,13 @@ class PlainTextResultsReporter(ResultsReporter):
         self._to_file_descriptor(output, file_descriptor)
 
     def to_string(self, results: list[CheckResult], verbose: bool) -> str:
+        """
+        Convert the results to a plain-text string.
+
+        :param results: A list of CheckResult objects to convert.
+        :param verbose: Whether to include info and error fields in the output.
+        :return: A string representation of the results in plain-text format.
+        """
         scored_results = [result for result in results if isinstance(result, ScoredCheckResult)]
         total_score = sum(scored_result.result for scored_result in scored_results)
         total_max_score = sum(result.max_score for result in scored_results)

@@ -11,9 +11,7 @@ VERSION = version("pygrader")
 ROOT_DIR = os.path.dirname(os.path.realpath(__name__))
 REPORTS_TEMP_DIR = os.path.join(ROOT_DIR, "reports")
 CONFIG_DIR = os.path.join(ROOT_DIR, "config")
-TEMP_FILES_DIR = os.path.join(
-    ROOT_DIR, "temp_files"
-)  # TODO - Change this to be under WORK_DIR ?
+TEMP_FILES_DIR = os.path.join(ROOT_DIR, "temp_files")  # TODO - Change this to be under WORK_DIR ?
 
 WORK_DIR = os.path.join("/tmp", "pygrader")
 

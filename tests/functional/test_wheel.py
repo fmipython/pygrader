@@ -1,4 +1,4 @@
-"""Module for functional tests related to the wheel package"""
+"""Module for functional tests related to the wheel package."""
 
 import unittest
 from pathlib import Path
@@ -8,21 +8,22 @@ from grader.utils.process import run
 
 
 class TestWheel(unittest.TestCase):
-    """Class for testing wheel package functionality"""
+    """Class for testing wheel package functionality."""
 
     temp_dir: TemporaryDirectory
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
+        """Create a temporary directory for wheel building tests."""
         cls.temp_dir = TemporaryDirectory()
 
     @classmethod
-    def tearDownClass(cls):
+    def tearDownClass(cls) -> None:
+        """Clean up the temporary directory after tests."""
         cls.temp_dir.cleanup()
 
-    def test_01_wheel_build(self):
-        """Test the wheel building process"""
-
+    def test_01_wheel_build(self) -> None:
+        """Test the wheel building process."""
         try:
             wheel_path = build_wheel(self.temp_dir.name)
         except RuntimeError as e:
@@ -32,7 +33,7 @@ class TestWheel(unittest.TestCase):
 
 
 def build_wheel(build_dir: str) -> Path:
-    """Function to build a wheel package for testing purposes"""
+    """Build a wheel package for testing purposes."""
     # Implementation of wheel building logic goes here
     build_command = ["uv", "build", "--wheel", "--out-dir", build_dir]
 

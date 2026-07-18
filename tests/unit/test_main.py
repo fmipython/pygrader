@@ -4,7 +4,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 from desktop.main import build_reporter, run_grader
-from grader.utils.results_reporter import JSONResultsReporter, CSVResultsReporter, PlainTextResultsReporter
+from grader.utils.results_reporter import CSVResultsReporter, JSONResultsReporter, PlainTextResultsReporter
 
 
 class TestBuildReporter(unittest.TestCase):

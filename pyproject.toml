@@ -1,6 +1,6 @@
 [project]
 name = "pygrader"
-version = "1.10.1"
+version = "1.10.2"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -36,7 +36,7 @@ details = "low"
 json = true
 
 [tool.uv.sources]
-py-cove = { git = "https://github.com/lyubolp/py-cove", rev = "v1.3.1" }
+py-cove = { git = "https://github.com/lyubolp/py-cove", rev = "v1.4.0" }
 
 [dependency-groups]
 dev = [

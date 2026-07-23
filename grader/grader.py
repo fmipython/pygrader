@@ -25,9 +25,9 @@ class Grader:
 
     def __init__(
         self,
-        student_id: str,
+        run_id: str,
         project_root: str,
-        logger: Logger,
+        logger: Optional[Logger] = None,
         config_path: Optional[str] = None,
         is_keeping_venv: bool = False,
         is_skipping_venv_creation: bool = False,
@@ -35,14 +35,14 @@ class Grader:
         """
         Initialize the Grader.
 
-        :param student_id: The ID of the student.
+        :param run_id: The ID of the current run.
         :param project_root: The root directory of the project to grade.
         :param logger: The logger instance for output.
         :param config_path: Optional path to configuration file.
         :param is_keeping_venv: Whether to keep the virtual environment after grading.
         :param is_skipping_venv_creation: Whether to skip virtual environment creation.
         """
-        self.__logger = logger
+        self.__logger = logger or Logger(run_id)
 
         self.__logger.info("Python project grader, %s", const.VERSION)
         self.__is_keeping_venv = is_keeping_venv
@@ -60,8 +60,8 @@ class Grader:
             self.__logger.exception(exc)
             raise GraderError("Could not load configuration file") from exc
 
-        if student_id is not None:
-            self.__logger.info("Running checks for student %s", student_id)
+        if run_id is not None:
+            self.__logger.info("Running checks for student %s", run_id)
 
         self.__logger.debug("Project root: %s", project_root)
         self.__logger.debug("Configuration file: %s", config_path)

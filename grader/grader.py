@@ -8,7 +8,6 @@ from typing import Optional
 import grader.utils.constants as const
 from grader.checks.abstract_check import (
     AbstractCheck,
-    CheckError,
     CheckResult,
     NonScoredCheck,
     NonScoredCheckResult,
@@ -16,7 +15,8 @@ from grader.checks.abstract_check import (
     ScoredCheckResult,
 )
 from grader.checks.checks_factory import create_checks
-from grader.utils.config import InvalidConfigError, load_config
+from grader.exceptions import CheckError, InvalidConfigError, InvalidProjectRootError
+from grader.utils.config import load_config
 from grader.utils.virtual_environment import VirtualEnvironment
 
 
@@ -58,7 +58,7 @@ class Grader:
         except InvalidConfigError as exc:
             self.__logger.error("Error with the configuration file")
             self.__logger.exception(exc)
-            raise GraderError("Could not load configuration file") from exc
+            raise
 
         if run_id is not None:
             self.__logger.info("Running checks for student %s", run_id)
@@ -72,7 +72,7 @@ class Grader:
         self.__project_root = project_root
         if not os.path.exists(self.__project_root):
             self.__logger.error("Project root directory does not exist")
-            raise GraderError("Project root directory does not exist")
+            raise InvalidProjectRootError("Project root directory does not exist")
 
     def grade(self) -> list[CheckResult]:
         """
@@ -137,7 +137,3 @@ class Grader:
         if os.path.exists(coverage_file_full_path):
             os.remove(coverage_file_full_path)
         shutil.rmtree(os.path.join(self.__project_root, const.PYTEST_CACHE), ignore_errors=True)
-
-
-class GraderError(Exception):
-    """Custom exception for grader errors."""

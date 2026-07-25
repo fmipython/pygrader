@@ -7,8 +7,9 @@ from subprocess import CompletedProcess
 from unittest.mock import MagicMock, patch
 
 import grader.utils.constants as const
-from grader.checks.abstract_check import CheckError, ScoredCheckResult
+from grader.checks.abstract_check import ScoredCheckResult
 from grader.checks.type_hints_check import TypeHintsCheck
+from grader.exceptions import CheckError
 
 
 class TestTypeHintsCheck(unittest.TestCase):

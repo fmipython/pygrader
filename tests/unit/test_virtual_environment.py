@@ -8,8 +8,9 @@ from subprocess import CompletedProcess
 from unittest.mock import MagicMock, patch
 
 import grader.utils.constants as const
+from grader.exceptions import VirtualEnvironmentError
 from grader.utils.process import run
-from grader.utils.virtual_environment import VirtualEnvironment, VirtualEnvironmentError
+from grader.utils.virtual_environment import VirtualEnvironment
 
 
 # TODO - These tests take some time to run, also aren't exactly unit tests. Consider refactoring

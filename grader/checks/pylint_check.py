@@ -12,7 +12,8 @@ from typing import Optional
 from pylint.reporters.text import TextReporter
 
 import grader.utils.constants as const
-from grader.checks.abstract_check import CheckError, ScoredCheck, ScoredCheckResult
+from grader.checks.abstract_check import ScoredCheck, ScoredCheckResult
+from grader.exceptions import CheckError
 
 # import grader.utils.files as files
 from grader.utils import files, process

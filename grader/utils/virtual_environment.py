@@ -7,6 +7,7 @@ import os
 import shutil
 
 import grader.utils.constants as const
+from grader.exceptions import VirtualEnvironmentError
 from grader.utils.logger import VERBOSE
 from grader.utils.process import run
 
@@ -158,7 +159,3 @@ class VirtualEnvironment:
         if output.returncode != 0:
             logger.error("Failed to install project from %s", project_path)
             raise VirtualEnvironmentError(f"Failed to install project from {project_path}")
-
-
-class VirtualEnvironmentError(Exception):
-    """Exception raised when an error occurs during the virtual environment setup."""

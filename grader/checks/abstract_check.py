@@ -9,6 +9,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Generic, Optional, TypeVar
 
+from grader.exceptions import CheckError
 from grader.utils.logger import VERBOSE
 from grader.utils.virtual_environment import VirtualEnvironment
 
@@ -170,7 +171,3 @@ class NonScoredCheck(AbstractCheck[bool]):
     def is_fatal(self) -> bool:
         """Return True if the check failing is fatal, False otherwise."""
         return self._is_fatal
-
-
-class CheckError(Exception):
-    """Custom exception for check errors."""

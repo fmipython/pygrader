@@ -4,8 +4,9 @@ import unittest
 from json import JSONDecodeError
 from unittest.mock import MagicMock, patch
 
-from grader.checks.abstract_check import CheckError, NonScoredCheckResult
+from grader.checks.abstract_check import NonScoredCheckResult
 from grader.checks.structure_check import StructureCheck
+from grader.exceptions import CheckError
 
 
 class TestStructureCheck(unittest.TestCase):

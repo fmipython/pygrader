@@ -6,7 +6,8 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Optional
 
-from grader.checks.abstract_check import CheckError, ScoredCheck, ScoredCheckResult
+from grader.checks.abstract_check import ScoredCheck, ScoredCheckResult
+from grader.exceptions import CheckError
 from grader.utils import process
 from grader.utils.constants import PYTEST_ARGS, PYTEST_PATH, PYTEST_ROOT_DIR_ARG
 from grader.utils.external_resources import (

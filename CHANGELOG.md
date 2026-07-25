@@ -1,8 +1,24 @@
 # pygrader
 
-## 1.9.1
+## 1.12.0
 
-- Moved file dependecies to wheel
+- Refactor exceptions
+
+## 1.11.0
+
+- Refactor init args
+
+## 1.10.2
+
+- Bump cove version
+
+## 1.10.1
+
+- Remove version tag from py-cove
+
+## 1.10.0
+
+- Wheel is now self-contained
 
 ## 1.9.0
 

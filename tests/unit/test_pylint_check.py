@@ -5,8 +5,8 @@ from subprocess import CompletedProcess
 from unittest.mock import MagicMock, patch
 
 import grader.utils.constants as const
-from grader.checks.abstract_check import CheckError
 from grader.checks.pylint_check import PylintCheck
+from grader.exceptions import CheckError
 
 
 class TestPylintCheck(unittest.TestCase):

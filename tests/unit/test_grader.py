@@ -5,13 +5,13 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 from grader.checks.abstract_check import (
-    CheckError,
     NonScoredCheck,
     NonScoredCheckResult,
     ScoredCheck,
     ScoredCheckResult,
 )
-from grader.grader import Grader, GraderError
+from grader.exceptions import CheckError, InvalidConfigError, InvalidProjectRootError
+from grader.grader import Grader
 
 
 class TestGrader(unittest.TestCase):
@@ -24,7 +24,7 @@ class TestGrader(unittest.TestCase):
         mock_load_config.side_effect = FileNotFoundError("Config file not found")
 
         # Act
-        with self.assertRaises(GraderError):
+        with self.assertRaises(InvalidConfigError):
             Grader("student_id", "project_root", config_path="config_path", logger=MagicMock())
 
     @patch("os.path.exists")
@@ -35,7 +35,7 @@ class TestGrader(unittest.TestCase):
         config_path = os.path.join("config", "full_single_point.json")
 
         # Act & Assert
-        with self.assertRaises(GraderError):
+        with self.assertRaises(InvalidProjectRootError):
             Grader("student_id", "nonexistent_project_root", config_path=config_path, logger=MagicMock())
 
     @patch("grader.grader.create_checks")

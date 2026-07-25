@@ -13,6 +13,7 @@ from cove_sdk import BaseItem, PythonItem, fetch_uri, is_cove_uri
 from cove_sdk.exceptions import CoveAPIError, URIParseError
 from dotenv import load_dotenv
 
+from grader.exceptions import ExternalResourceError
 from grader.utils.constants import TEMP_FILES_DIR
 from grader.utils.logger import VERBOSE
 
@@ -141,7 +142,3 @@ def fetch_from_cove(cove_uri: str) -> BaseItem:
         raise ExternalResourceError(f"Cove resource not found: {cove_uri}")
 
     return result
-
-
-class ExternalResourceError(Exception):
-    """Custom exception for external resource errors."""

@@ -10,8 +10,9 @@ from pathlib import Path
 from typing import Optional
 
 from grader.checks.abstract_check import ScoredCheck, ScoredCheckResult
+from grader.exceptions import VirtualEnvironmentError
 from grader.utils.constants import PYPROJECT_FILENAME, REQUIREMENTS_FILENAME
-from grader.utils.virtual_environment import VirtualEnvironment, VirtualEnvironmentError
+from grader.utils.virtual_environment import VirtualEnvironment
 
 logger = logging.getLogger("grader")
 

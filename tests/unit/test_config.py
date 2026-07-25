@@ -6,8 +6,8 @@ from unittest.mock import MagicMock, patch
 
 from cove_sdk import BaseItem, JSONItem
 
-from grader.utils.config import InvalidConfigError, load_config, load_from_cove
-from grader.utils.external_resources import ExternalResourceError
+from grader.exceptions import ExternalResourceError, InvalidConfigError
+from grader.utils.config import load_config, load_from_cove
 
 
 class TestConfig(unittest.TestCase):

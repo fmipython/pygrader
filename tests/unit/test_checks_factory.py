@@ -3,8 +3,8 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from grader.checks.checks_factory import InvalidCheckError, create_checks
-from grader.utils.config import InvalidConfigError
+from grader.checks.checks_factory import create_checks
+from grader.exceptions import InvalidCheckError, InvalidConfigError
 
 
 class TestChecksFactory(unittest.TestCase):

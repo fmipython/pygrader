@@ -3,8 +3,9 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from grader.checks.abstract_check import CheckError, ScoredCheckResult
+from grader.checks.abstract_check import ScoredCheckResult
 from grader.checks.run_tests_check import RunTestsCheck
+from grader.exceptions import CheckError
 from grader.utils.logger import VERBOSE
 
 

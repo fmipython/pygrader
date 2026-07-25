@@ -8,9 +8,9 @@ import requests
 from cove_sdk import BaseItem, PythonItem
 from cove_sdk.exceptions import CoveAPIError, URIParseError
 
+from grader.exceptions import ExternalResourceError
 from grader.utils.constants import TEMP_FILES_DIR
 from grader.utils.external_resources import (
-    ExternalResourceError,
     download_file_from_url,
     download_python_file_from_cove,
     fetch_from_cove,

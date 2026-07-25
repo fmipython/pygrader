@@ -2,7 +2,8 @@
 
 import unittest
 
-from grader.checks.abstract_check import AbstractCheck, CheckError, CheckResult
+from grader.checks.abstract_check import AbstractCheck, CheckResult
+from grader.exceptions import CheckError
 
 
 class TestAbstractCheck(unittest.TestCase):

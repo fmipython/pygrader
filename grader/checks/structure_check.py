@@ -8,7 +8,8 @@ import json
 import logging
 from typing import Optional
 
-from grader.checks.abstract_check import CheckError, NonScoredCheck, NonScoredCheckResult
+from grader.checks.abstract_check import NonScoredCheck, NonScoredCheckResult
+from grader.exceptions import CheckError
 from grader.utils.external_resources import download_file_from_url, is_resource_remote
 from grader.utils.logger import VERBOSE
 from grader.utils.structure_validator import StructureValidator

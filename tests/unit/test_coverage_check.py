@@ -5,8 +5,9 @@ from subprocess import CompletedProcess
 from typing import Optional
 from unittest.mock import MagicMock, patch
 
-from grader.checks.abstract_check import CheckError, ScoredCheckResult
+from grader.checks.abstract_check import ScoredCheckResult
 from grader.checks.coverage_check import CoverageCheck
+from grader.exceptions import CheckError
 
 
 class TestCoverageCheck(unittest.TestCase):

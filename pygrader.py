@@ -3,7 +3,7 @@
 import sys
 
 from desktop.main import run_grader
-from grader.grader import GraderError
+from grader.exceptions import GraderError
 
 if __name__ == "__main__":
     try:

@@ -5,8 +5,8 @@ from pathlib import Path
 
 from cove_sdk import JSONItem
 
+from grader.exceptions import ExternalResourceError, InvalidConfigError
 from grader.utils.external_resources import (
-    ExternalResourceError,
     download_file_from_url,
     fetch_from_cove,
     is_resource_cove,
@@ -70,7 +70,3 @@ def load_from_cove(cove_uri: str) -> dict:
         raise InvalidConfigError(f"Cove resource is not a JSON item: {cove_uri}")
 
     return result.json_value
-
-
-class InvalidConfigError(Exception):
-    """Custom exception for invalid configuration files."""

@@ -7,7 +7,7 @@ from grader.checks.requirements_check import RequirementsCheck
 from grader.checks.run_tests_check import RunTestsCheck
 from grader.checks.structure_check import StructureCheck
 from grader.checks.type_hints_check import TypeHintsCheck
-from grader.utils.config import InvalidConfigError
+from grader.exceptions import InvalidCheckError, InvalidConfigError
 from grader.utils.environment import merge_environment_variables
 
 NAME_TO_CHECK: dict[str, type[AbstractCheck]] = {
@@ -81,7 +81,3 @@ def __create_check(project_root: str, expected_keys: set[str], check: dict, glob
     created_check = check_class(name, project_root, **other_args)
 
     return created_check
-
-
-class InvalidCheckError(Exception):
-    """Custom exception for invalid check names."""

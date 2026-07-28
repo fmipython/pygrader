@@ -89,7 +89,47 @@ The grading system is built around **checks** - independent validation modules:
   - Typos in venv config keys will cause defaults to be used
   - Consider adding validation for production use
 
-### 3. Virtual Environment Management
+### 3. External Resources (URLs and Cove)
+Several configuration values are not restricted to local paths - they can also point to
+remote resources. Resolution lives in `grader/utils/external_resources.py`:
+
+- `is_resource_remote(path)` - true for `http`/`https`/`ftp` URLs
+- `is_resource_cove(path)` - true for `cove://` URIs (delegates to `cove_sdk.is_cove_uri`)
+- `download_file_from_url(url)` - downloads to `TEMP_FILES_DIR`, returns the local path
+- `fetch_from_cove(uri)` - returns the raw `BaseItem` from Cove
+- `fetch_json_from_cove(uri)` - returns the `json_value` of a Cove `JSONItem` (dict)
+- `download_python_file_from_cove(uri)` - writes a Cove `PythonItem` to `TEMP_FILES_DIR/<key>.py`
+
+**Cove** is an external content store accessed through the `py-cove` SDK (`cove_sdk`).
+Resources are addressed with `cove://` URIs, and every fetch requires the `COVE_API_KEY`
+environment variable (loaded from `.env` via `python-dotenv`). A missing key, an unparsable
+URI, or a missing resource raises `ExternalResourceError`.
+
+**Where Cove URIs are accepted**:
+- **Config file** (`--config`) - `grader/utils/config.py:load_config` → `load_from_cove` (expects a JSON item)
+- **Tests check** (`tests_path`) - `RunTestsCheck.__download_test` (expects Python items, downloaded to disk)
+- **Structure check** (`structure_file`) - `StructureCheck.__read_structure` (expects a JSON item, used in memory)
+
+```json
+{
+    "name": "structure",
+    "is_venv_required": false,
+    "structure_file": "cove://fmi-python/project-structure"
+}
+```
+
+**Guidelines when adding Cove support elsewhere**:
+- Pick the helper by item type: JSON payloads use `fetch_json_from_cove` (no temp file needed),
+  Python sources use `download_python_file_from_cove`
+- Check `is_resource_cove` **before** `is_resource_remote` - a `cove://` URI is not an HTTP URL,
+  but the ordering keeps the intent explicit
+- Wrap `ExternalResourceError` in the error type of the calling layer (`CheckError` inside checks,
+  `InvalidConfigError` in config loading)
+- In tests, patch the helper where it is imported (e.g.
+  `@patch("grader.checks.structure_check.fetch_json_from_cove")`) rather than the SDK itself;
+  use `MagicMock(spec=JSONItem)` / `MagicMock(spec=PythonItem)` when testing the helpers themselves
+
+### 4. Virtual Environment Management
 - Each project is graded in an isolated virtual environment
 - Managed by `VirtualEnvironment` class (`utils/virtual_environment.py`)
 - Handles dependency installation from `requirements.txt` or `pyproject.toml`
@@ -104,7 +144,7 @@ The grading system is built around **checks** - independent validation modules:
     - Set via config file `venv.name`
     - Prevents conflicts with student's own .venv
 
-### 4. Grader Orchestration
+### 5. Grader Orchestration
 The `Grader` class (`grader/grader.py`) orchestrates:
 1. Configuration loading
 2. Virtual environment setup
@@ -124,10 +164,15 @@ The `Grader` class (`grader/grader.py`) orchestrates:
 ### Testing
 - **Framework**: unittest with coverage (not pytest)
 - **Test Runner**: `uv run -m unittest` or `just test`
-- **Unit Tests**: `tests/unit/test_*.py` - test individual components
+- **Unit Tests**: `tests/unit/test_*.py` - test individual components (~20 seconds for the whole suite)
 - **Functional Tests**: `tests/functional/test_functional.py` - end-to-end tests
 - **Coverage Target**: 85% minimum (enforced by `just coverage`)
 - **Coverage Tool**: coverage.py with lcov output
+
+> **Prefer `just unit_tests` while iterating.** The functional tests create real virtual
+> environments and install dependencies, so `just test` takes ~10 minutes to complete.
+> Run the full suite (or just the functional ones) only when the change actually touches
+> end-to-end behaviour, and run them in the background so you can keep working.
 
 #### Testing Best Practices
 - **Mock External Dependencies**: Use `@patch` decorators to mock external calls
@@ -290,6 +335,7 @@ Core dependencies (from `pyproject.toml`):
 - `pylint>=4.0.2` - Code linting
 - `python-dotenv>=1.2.1` - Environment variable management
 - `requests>=2.32.5` - HTTP requests for external resources
+- `py-cove` (`cove_sdk`, pinned to a git tag) - Fetching `cove://` resources, needs `COVE_API_KEY`
 
 Dev dependencies:
 - `coverage>=7.11.3` - Test coverage analysis

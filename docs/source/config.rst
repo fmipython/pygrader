@@ -143,9 +143,10 @@ Structure Check
 """""""""""""""
 
 ``structure_file`` (optional)
-    Path or URL to a JSON file defining the required project structure.
+    Path, URL or Cove URI to a JSON file defining the required project structure.
     Supports template variables like ``${{config_dir}}``.
-    Can be a local path or a URL to a remote structure definition.
+    Can be a local path, a URL to a remote structure definition, or a ``cove://`` URI
+    pointing to a JSON item. Cove URIs require the ``COVE_API_KEY`` environment variable.
 
 Example:
 
@@ -155,6 +156,16 @@ Example:
         "name": "structure",
         "is_venv_required": false,
         "structure_file": "${{config_dir}}/project_structure.json"
+    }
+
+Example with a Cove URI:
+
+.. code-block:: json
+
+    {
+        "name": "structure",
+        "is_venv_required": false,
+        "structure_file": "cove://fmi-python/project-structure"
     }
 
 Project Structure Configuration

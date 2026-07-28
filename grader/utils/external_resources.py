@@ -9,7 +9,7 @@ from urllib.parse import urlparse
 import requests
 
 # from cove_sdk._uri import is_cove_uri
-from cove_sdk import BaseItem, PythonItem, fetch_uri, is_cove_uri
+from cove_sdk import BaseItem, JSONItem, PythonItem, fetch_uri, is_cove_uri
 from cove_sdk.exceptions import CoveAPIError, URIParseError
 from dotenv import load_dotenv
 
@@ -120,6 +120,24 @@ def download_python_file_from_cove(cove_uri: str, filename: Optional[str] = None
         file.write(result.python_value)
 
     return file_path
+
+
+def fetch_json_from_cove(cove_uri: str) -> dict:
+    """
+    Fetch a JSON resource from a Cove URI.
+
+    :param cove_uri: The Cove URI to fetch the JSON from
+    :raises ExternalResourceError: If the resource cannot be fetched or is not a JSON item
+    :return: The contents of the JSON item
+    """
+    logger.log(VERBOSE, "Fetching JSON from Cove URI %s", cove_uri)
+
+    result = fetch_from_cove(cove_uri)
+
+    if not isinstance(result, JSONItem):
+        raise ExternalResourceError(f"Cove resource is not a JSON item: {cove_uri}")
+
+    return result.json_value
 
 
 def fetch_from_cove(cove_uri: str) -> BaseItem:

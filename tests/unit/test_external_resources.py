@@ -5,7 +5,7 @@ import unittest
 from unittest.mock import MagicMock, call, patch
 
 import requests
-from cove_sdk import BaseItem, PythonItem
+from cove_sdk import BaseItem, JSONItem, PythonItem
 from cove_sdk.exceptions import CoveAPIError, URIParseError
 
 from grader.exceptions import ExternalResourceError
@@ -14,6 +14,7 @@ from grader.utils.external_resources import (
     download_file_from_url,
     download_python_file_from_cove,
     fetch_from_cove,
+    fetch_json_from_cove,
     is_resource_remote,
 )
 
@@ -235,6 +236,45 @@ class TestFetchFromCove(unittest.TestCase):
 
         # Assert
         self.assertEqual(result, mock_item)
+
+
+class TestFetchJsonFromCove(unittest.TestCase):
+    """Unit tests for the fetch_json_from_cove function."""
+
+    @patch("grader.utils.external_resources.fetch_from_cove")
+    def test_01_fetch_from_cove_raises_error_propagates(self, mock_fetch: MagicMock) -> None:
+        """Test that an ExternalResourceError from fetch_from_cove propagates."""
+        # Arrange
+        mock_fetch.side_effect = ExternalResourceError("fetch failed")
+
+        # Act & Assert
+        with self.assertRaises(ExternalResourceError):
+            fetch_json_from_cove("cove://example/resource")
+
+    @patch("grader.utils.external_resources.fetch_from_cove")
+    def test_02_non_json_item_raises_error(self, mock_fetch: MagicMock) -> None:
+        """Test that a non-JSONItem result raises ExternalResourceError."""
+        # Arrange
+        mock_fetch.return_value = MagicMock(spec=BaseItem)
+
+        # Act & Assert
+        with self.assertRaises(ExternalResourceError):
+            fetch_json_from_cove("cove://example/resource")
+
+    @patch("grader.utils.external_resources.fetch_from_cove")
+    def test_03_returns_json_value_of_json_item(self, mock_fetch: MagicMock) -> None:
+        """Test that the json_value of a JSONItem is returned."""
+        # Arrange
+        expected_json = {"source": {"name": "Source files", "required": True, "patterns": ["src/**/*.py"]}}
+        mock_item = MagicMock(spec=JSONItem)
+        mock_item.json_value = expected_json
+        mock_fetch.return_value = mock_item
+
+        # Act
+        result = fetch_json_from_cove("cove://example/resource")
+
+        # Assert
+        self.assertEqual(result, expected_json)
 
 
 class TestDownloadPythonFileFromCove(unittest.TestCase):

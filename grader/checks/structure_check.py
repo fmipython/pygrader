@@ -9,8 +9,13 @@ import logging
 from typing import Optional
 
 from grader.checks.abstract_check import NonScoredCheck, NonScoredCheckResult
-from grader.exceptions import CheckError
-from grader.utils.external_resources import download_file_from_url, is_resource_remote
+from grader.exceptions import CheckError, ExternalResourceError
+from grader.utils.external_resources import (
+    download_file_from_url,
+    fetch_json_from_cove,
+    is_resource_cove,
+    is_resource_remote,
+)
 from grader.utils.logger import VERBOSE
 from grader.utils.structure_validator import StructureValidator
 
@@ -34,7 +39,7 @@ class StructureCheck(NonScoredCheck):
 
         :param name: The name of the check.
         :param project_root: The root directory of the project.
-        :param structure_file: Path to the structure configuration file.
+        :param structure_file: Path, URL or Cove URI to the structure configuration file.
         :param is_fatal: Whether the check is fatal.
         :param is_venv_required: Whether a virtual environment is required.
         :param env_vars: Optional environment variables for the check.
@@ -53,12 +58,7 @@ class StructureCheck(NonScoredCheck):
         :rtype: float
         """
         self._pre_run()
-        # TODO - this can be simplified
-        self.__structure_file = (
-            self.__structure_file
-            if not is_resource_remote(self.__structure_file)
-            else download_file_from_url(self.__structure_file)
-        )
+
         structure_elements = StructureCheck.__load_structure_file(self.__structure_file)
 
         for element in structure_elements:
@@ -72,29 +72,53 @@ class StructureCheck(NonScoredCheck):
         return NonScoredCheckResult(self.name, True, "Structure is valid", "")
 
     @staticmethod
-    def __load_structure_file(filepath: str) -> list[StructureValidator]:
+    def __load_structure_file(source: str) -> list[StructureValidator]:
         """
         Read the structure JSON file and return the structure information.
 
-        :param filepath: The path to the structure file
-        :type filepath: str
+        The source can be a local path, a URL or a Cove URI.
+
+        :param source: The path, URL or Cove URI to the structure file
+        :type source: str
         :raises CheckError: If the structure file is invalid
         :return: The structure information
         :rtype: list[StructureInformation]
         """
-        # TODO - Simplify
-        filepath = filepath if not is_resource_remote(filepath) else download_file_from_url(filepath)
-
-        try:
-            with open(filepath, "r", encoding="utf-8") as file_pointer:
-                raw_structure = json.load(file_pointer)
-        except json.JSONDecodeError as error:
-            raise CheckError(f"Invalid structure file: {error}") from error
-        except OSError as error:
-            raise CheckError(f"Cannot read structure file: {error}") from error
+        raw_structure = StructureCheck.__read_structure(source)
 
         try:
             elements = [StructureValidator.from_dict(value) for value in raw_structure.values()]
         except KeyError as error:
             raise CheckError(f"Invalid structure file: {error}") from error
         return elements
+
+    @staticmethod
+    def __read_structure(source: str) -> dict:
+        """
+        Read the raw contents of the structure file.
+
+        :param source: The path, URL or Cove URI to the structure file
+        :type source: str
+        :raises CheckError: If the structure file cannot be read or is not valid JSON
+        :return: The raw structure contents
+        :rtype: dict
+        """
+        if is_resource_cove(source):
+            try:
+                return fetch_json_from_cove(source)
+            except ExternalResourceError as error:
+                raise CheckError(f"Cannot read structure file: {error}") from error
+
+        if is_resource_remote(source):
+            try:
+                source = download_file_from_url(source)
+            except ExternalResourceError as error:
+                raise CheckError(f"Cannot read structure file: {error}") from error
+
+        try:
+            with open(source, "r", encoding="utf-8") as file_pointer:
+                return json.load(file_pointer)
+        except json.JSONDecodeError as error:
+            raise CheckError(f"Invalid structure file: {error}") from error
+        except OSError as error:
+            raise CheckError(f"Cannot read structure file: {error}") from error

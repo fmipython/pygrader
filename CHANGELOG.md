@@ -1,5 +1,9 @@
 # pygrader
 
+## 1.13.0
+
+- Structure check now supports Cove URIs for the structure file
+
 ## 1.12.0
 
 - Refactor exceptions

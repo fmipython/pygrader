@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 
 from grader.checks.abstract_check import NonScoredCheckResult
 from grader.checks.structure_check import StructureCheck
-from grader.exceptions import CheckError
+from grader.exceptions import CheckError, ExternalResourceError
 
 
 class TestStructureCheck(unittest.TestCase):
@@ -282,3 +282,100 @@ class TestStructureCheck(unittest.TestCase):
         with self.assertRaises(CheckError) as context:
             self.structure_check.run()
         self.assertIn("Cannot read structure file", str(context.exception))
+
+    @patch("grader.checks.structure_check.download_file_from_url")
+    def test_16_load_structure_file_remote_download_fails(self, mock_download: MagicMock) -> None:
+        """Verify that run raises CheckError when the remote structure file cannot be downloaded."""
+        # Arrange
+        mock_download.side_effect = ExternalResourceError("Error downloading file")
+        structure_check = StructureCheck(
+            "structure", "sample_dir", "https://example.com/structure.json", is_venv_required=False
+        )
+
+        # Act & Assert
+        with self.assertRaises(CheckError) as context:
+            structure_check.run()
+        self.assertIn("Cannot read structure file", str(context.exception))
+
+
+class TestStructureCheckFromCove(unittest.TestCase):
+    """Test cases for loading the structure file of the StructureCheck class from Cove."""
+
+    def setUp(self) -> None:
+        """Set up the test environment."""
+        self.cove_uri = "cove://example/structure"
+        self.structure_check = StructureCheck("structure", "sample_dir", self.cove_uri, is_venv_required=False)
+        return super().setUp()
+
+    @patch("grader.utils.structure_validator.StructureValidator.is_structure_valid")
+    @patch("grader.checks.structure_check.fetch_json_from_cove")
+    def test_01_valid_structure_from_cove(self, mock_fetch_json: MagicMock, mock_structure_valid: MagicMock) -> None:
+        """Verify that the structure file is fetched from Cove and validated."""
+        # Arrange
+        mock_fetch_json.return_value = {
+            "source": {"name": "Source files", "required": True, "patterns": ["src/**/*.py"]},
+            "main": {"name": "Main file", "required": True, "patterns": ["main.py"]},
+        }
+        mock_structure_valid.return_value = True
+        expected = NonScoredCheckResult(self.structure_check.name, True, "Structure is valid", "")
+
+        # Act
+        result = self.structure_check.run()
+
+        # Assert
+        self.assertEqual(result, expected)
+        mock_fetch_json.assert_called_once_with(self.cove_uri)
+
+    @patch("grader.utils.structure_validator.StructureValidator.is_structure_valid")
+    @patch("grader.checks.structure_check.fetch_json_from_cove")
+    def test_02_invalid_structure_from_cove(self, mock_fetch_json: MagicMock, mock_structure_valid: MagicMock) -> None:
+        """Verify that an invalid required element from a Cove structure file fails the check."""
+        # Arrange
+        expected_element_name = "Main file"
+        mock_fetch_json.return_value = {
+            "main": {"name": expected_element_name, "required": True, "patterns": ["main.py"]},
+        }
+        mock_structure_valid.return_value = False
+        expected_info = f"Structure for '{expected_element_name}' is invalid."
+        expected = NonScoredCheckResult(self.structure_check.name, False, expected_info, "")
+
+        # Act
+        result = self.structure_check.run()
+
+        # Assert
+        self.assertEqual(result, expected)
+
+    @patch("grader.checks.structure_check.fetch_json_from_cove")
+    def test_03_cove_fetch_error_raises_check_error(self, mock_fetch_json: MagicMock) -> None:
+        """Verify that an ExternalResourceError from Cove is wrapped in a CheckError."""
+        # Arrange
+        mock_fetch_json.side_effect = ExternalResourceError("Cove resource not found")
+
+        # Act & Assert
+        with self.assertRaises(CheckError) as context:
+            self.structure_check.run()
+        self.assertIn("Cannot read structure file", str(context.exception))
+
+    @patch("grader.checks.structure_check.fetch_json_from_cove")
+    def test_04_invalid_structure_contents_from_cove(self, mock_fetch_json: MagicMock) -> None:
+        """Verify that malformed structure contents from Cove raise a CheckError."""
+        # Arrange
+        mock_fetch_json.return_value = {"first": {"second": -1}}
+
+        # Act & Assert
+        with self.assertRaises(CheckError) as context:
+            self.structure_check.run()
+        self.assertIn("Invalid structure file", str(context.exception))
+
+    @patch("grader.checks.structure_check.open", create=True)
+    @patch("grader.checks.structure_check.fetch_json_from_cove")
+    def test_05_cove_uri_is_not_opened_as_a_file(self, mock_fetch_json: MagicMock, mock_open: MagicMock) -> None:
+        """Verify that a Cove URI is never read from the file system."""
+        # Arrange
+        mock_fetch_json.return_value = {}
+
+        # Act
+        self.structure_check.run()
+
+        # Assert
+        mock_open.assert_not_called()

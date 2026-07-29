@@ -43,7 +43,7 @@ class Grader:
         :param is_keeping_venv: Whether to keep the virtual environment after grading.
         :param is_skipping_venv_creation: Whether to skip virtual environment creation.
         """
-        self.__logger = logger or setup_logger(run_id, verbosity=2)
+        self.__logger = logger or setup_logger(run_id)
 
         self.__logger.info("Python project grader, %s", const.VERSION)
         self.__is_keeping_venv = is_keeping_venv

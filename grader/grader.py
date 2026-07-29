@@ -17,6 +17,7 @@ from grader.checks.abstract_check import (
 from grader.checks.checks_factory import create_checks
 from grader.exceptions import CheckError, InvalidConfigError, InvalidProjectRootError
 from grader.utils.config import load_config
+from grader.utils.logger import setup_logger
 from grader.utils.virtual_environment import VirtualEnvironment
 
 
@@ -42,7 +43,7 @@ class Grader:
         :param is_keeping_venv: Whether to keep the virtual environment after grading.
         :param is_skipping_venv_creation: Whether to skip virtual environment creation.
         """
-        self.__logger = logger or Logger(run_id)
+        self.__logger = logger or setup_logger(run_id, verbosity=2)
 
         self.__logger.info("Python project grader, %s", const.VERSION)
         self.__is_keeping_venv = is_keeping_venv

@@ -25,7 +25,7 @@ class TestGrader(unittest.TestCase):
 
         # Act
         with self.assertRaises(InvalidConfigError):
-            Grader("student_id", "project_root", config_path="config_path", logger=MagicMock())
+            Grader(config_path="config_path", logger=MagicMock())
 
     @patch("os.path.exists")
     def test_02_project_root_does_not_exist(self, mock_exists: MagicMock) -> None:
@@ -33,10 +33,11 @@ class TestGrader(unittest.TestCase):
         # Arrange
         mock_exists.return_value = False
         config_path = os.path.join("config", "full_single_point.json")
+        grader = Grader(config_path=config_path, logger=MagicMock())
 
         # Act & Assert
         with self.assertRaises(InvalidProjectRootError):
-            Grader("student_id", "nonexistent_project_root", config_path=config_path, logger=MagicMock())
+            grader.grade("nonexistent_project_root")
 
     @patch("grader.grader.create_checks")
     def test_03_create_checks_is_called(self, mock_create_checks: MagicMock) -> None:
@@ -47,10 +48,10 @@ class TestGrader(unittest.TestCase):
         os.makedirs(sample_project_path, exist_ok=True)
 
         mock_create_checks.return_value = ([], [])
-        grader = Grader("student_id", sample_project_path, config_path=sample_config_path, logger=MagicMock())
+        grader = Grader(config_path=sample_config_path, logger=MagicMock())
 
         # Act
-        grader.grade()
+        grader.grade(sample_project_path)
 
         os.rmdir(sample_project_path)
 
@@ -71,10 +72,10 @@ class TestGrader(unittest.TestCase):
         mock_check2.run.return_value = "result2"
         mock_create_checks.return_value = ([mock_check1, mock_check2], [])
 
-        grader = Grader("student_id", sample_project_path, config_path=sample_config_path, logger=MagicMock())
+        grader = Grader(config_path=sample_config_path, logger=MagicMock())
 
         # Act
-        grader.grade()
+        grader.grade(sample_project_path)
 
         os.rmdir(sample_project_path)
 
@@ -98,10 +99,10 @@ class TestGrader(unittest.TestCase):
         mock_check2.run.return_value = result2
         mock_create_checks.return_value = ([mock_check1, mock_check2], [])
 
-        grader = Grader("student_id", sample_project_path, config_path=sample_config_path, logger=MagicMock())
+        grader = Grader(config_path=sample_config_path, logger=MagicMock())
 
         # Act
-        results = grader.grade()
+        results = grader.grade(sample_project_path)
 
         os.rmdir(sample_project_path)
 
@@ -136,15 +137,13 @@ class TestGrader(unittest.TestCase):
         )
 
         grader = Grader(
-            "student_id",
-            sample_project_path,
             config_path=sample_config_path,
             logger=MagicMock(),
             is_skipping_venv_creation=True,
         )
 
         # Act
-        results = grader.grade()
+        results = grader.grade(sample_project_path)
 
         os.rmdir(sample_project_path)
 
@@ -174,10 +173,10 @@ class TestGrader(unittest.TestCase):
         mock_virtualenv.return_value.__enter__.return_value = mock_context_manager
         mock_virtualenv.return_value.__exit__.return_value = None
 
-        grader = Grader("student_id", sample_project_path, config_path=sample_config_path, logger=MagicMock())
+        grader = Grader(config_path=sample_config_path, logger=MagicMock())
 
         # Act
-        grader.grade()
+        grader.grade(sample_project_path)
 
         os.rmdir(sample_project_path)
 
@@ -212,10 +211,10 @@ class TestGrader(unittest.TestCase):
         mock_virtualenv.return_value.__enter__.return_value = mock_context_manager
         mock_virtualenv.return_value.__exit__.return_value = None
 
-        grader = Grader("student_id", sample_project_path, config_path=sample_config_path, logger=MagicMock())
+        grader = Grader(config_path=sample_config_path, logger=MagicMock())
 
         # Act
-        results = grader.grade()
+        results = grader.grade(sample_project_path)
 
         os.rmdir(sample_project_path)
 
@@ -237,10 +236,10 @@ class TestGrader(unittest.TestCase):
         mock_scored_check.run.side_effect = CheckError("fail")
         mock_create_checks.return_value = ([mock_scored_check], [])
 
-        grader = Grader("student_id", sample_project_path, config_path=sample_config_path, logger=MagicMock())
+        grader = Grader(config_path=sample_config_path, logger=MagicMock())
 
         # Act
-        results = grader.grade()
+        results = grader.grade(sample_project_path)
 
         os.rmdir(sample_project_path)
 
@@ -263,10 +262,10 @@ class TestGrader(unittest.TestCase):
         mock_nonscored_check.run.side_effect = CheckError("fail")
         mock_create_checks.return_value = ([mock_nonscored_check], [])
 
-        grader = Grader("student_id", sample_project_path, config_path=sample_config_path, logger=MagicMock())
+        grader = Grader(config_path=sample_config_path, logger=MagicMock())
 
         # Act
-        results = grader.grade()
+        results = grader.grade(sample_project_path)
 
         os.rmdir(sample_project_path)
 
@@ -293,10 +292,35 @@ class TestGrader(unittest.TestCase):
         mock_unknown_check = UnknownCheck()
         mock_create_checks.return_value = ([mock_unknown_check], [])
 
-        grader = Grader("student_id", sample_project_path, config_path=sample_config_path, logger=MagicMock())
+        grader = Grader(config_path=sample_config_path, logger=MagicMock())
 
         # Act & Assert
         with self.assertRaises(TypeError):
-            grader.grade()
+            grader.grade(sample_project_path)
 
         os.rmdir(sample_project_path)
+
+    @patch("grader.grader.create_checks")
+    def test_12_one_grader_grades_multiple_projects(self, mock_create_checks: MagicMock) -> None:
+        """Test that a single Grader instance can grade multiple project roots via separate grade() calls."""
+        # Arrange
+        sample_config_path = os.path.join("config", "full_single_point.json")
+        first_project_path = os.path.join("/tmp", "project_root_1")
+        second_project_path = os.path.join("/tmp", "project_root_2")
+        os.makedirs(first_project_path, exist_ok=True)
+        os.makedirs(second_project_path, exist_ok=True)
+
+        mock_create_checks.return_value = ([], [])
+        grader = Grader(config_path=sample_config_path, logger=MagicMock())
+
+        # Act
+        grader.grade(first_project_path)
+        grader.grade(second_project_path)
+
+        os.rmdir(first_project_path)
+        os.rmdir(second_project_path)
+
+        # Assert
+        self.assertEqual(mock_create_checks.call_count, 2)
+        graded_project_roots = [call.args[1] for call in mock_create_checks.call_args_list]
+        self.assertEqual(graded_project_roots, [first_project_path, second_project_path])

@@ -66,15 +66,13 @@ def run_grader() -> None:
         project_root = str(args["project_root"])  # type safety
 
     grader = Grader(
-        args["student_id"],
-        project_root,
         log,
         is_keeping_venv=args["keep_venv"],
         is_skipping_venv_creation=args["skip_venv_creation"],
         config_path=args["config"],
     )
 
-    checks_results = grader.grade()
+    checks_results = grader.grade(project_root, args["student_id"])
 
     reporter = build_reporter(args["report_format"])
     verbose = args["verbosity"] >= 1

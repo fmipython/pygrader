@@ -89,10 +89,10 @@ class Grader:
         except (InvalidCheckError, VirtualEnvironmentError) as error:
             self.__logger.error("Grading failed for project %s", project_root)
             self.__logger.exception(error)
-            self.__cleanup(project_root)
             raise
+        finally:
+            self.__cleanup(project_root)
 
-        self.__cleanup(project_root)
         return scores
 
     def __run_checks(self, project_root: str) -> list[CheckResult]:

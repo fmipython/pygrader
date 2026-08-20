@@ -1,9 +1,11 @@
 """Unit tests for the main module."""
 
+import os
+import tempfile
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, call, patch
 
-from desktop.main import build_reporter, run_grader
+from desktop.main import build_reporter, expand_project_root, resolve_project_root, run_grader
 from grader.utils.results_reporter import CSVResultsReporter, JSONResultsReporter, PlainTextResultsReporter
 
 
@@ -307,3 +309,105 @@ class TestRunGrader(unittest.TestCase):
 
         # Assert
         mock_results_reporter.display.assert_called_once()
+
+    @patch("desktop.main.get_args")
+    @patch("desktop.main.Grader")
+    @patch("desktop.main.setup_logger")
+    def test_09_glob_project_root_grades_each_match(
+        self, _mock_logger: MagicMock, mock_grader: MagicMock, mock_get_args: MagicMock
+    ) -> None:
+        """Test that a glob project_root grades every matched directory, using its name as the run id."""
+        # Arrange
+        with tempfile.TemporaryDirectory() as batch_dir:
+            student_a = os.path.join(batch_dir, "student_a")
+            student_b = os.path.join(batch_dir, "student_b")
+            os.makedirs(student_a)
+            os.makedirs(student_b)
+
+            mock_get_args.return_value = {
+                "student_id": "test_student",
+                "project_root": os.path.join(batch_dir, "*"),
+                "config": "/path/to/config",
+                "report_format": "text",
+                "verbosity": 1,
+                "suppress_info": False,
+                "keep_venv": False,
+                "skip_venv_creation": False,
+            }
+
+            # Act
+            run_grader()
+
+            # Assert
+            self.assertEqual(
+                mock_grader.return_value.grade.call_args_list,
+                [call(student_a, "student_a"), call(student_b, "student_b")],
+            )
+
+
+class TestExpandProjectRoot(unittest.TestCase):
+    """Tests for the expand_project_root function."""
+
+    def test_01_literal_path_returned_unchanged(self) -> None:
+        """Verify a plain path with no glob metacharacters is never passed to glob.glob."""
+        self.assertEqual(expand_project_root("some/literal/path"), ["some/literal/path"])
+
+    def test_02_glob_returns_sorted_matches(self) -> None:
+        """Verify a wildcard pattern expands to every match, sorted."""
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            student_a = os.path.join(tmp_dir, "student_a")
+            student_b = os.path.join(tmp_dir, "student_b")
+            os.makedirs(student_b)
+            os.makedirs(student_a)
+
+            result = expand_project_root(os.path.join(tmp_dir, "*"))
+
+            self.assertEqual(result, [student_a, student_b])
+
+    def test_03_glob_with_no_matches_falls_back_to_pattern(self) -> None:
+        """Verify a wildcard pattern that matches nothing falls back to the raw pattern."""
+        pattern = "/nonexistent/pygrader_test_dir/*"
+
+        self.assertEqual(expand_project_root(pattern), [pattern])
+
+    def test_04_literal_path_with_brackets_not_treated_as_character_class(self) -> None:
+        """Verify a literal path containing '[' is returned as-is instead of matched as a glob."""
+        pattern = "projects/[final]"
+
+        self.assertEqual(expand_project_root(pattern), [pattern])
+
+
+class TestResolveProjectRoot(unittest.TestCase):
+    """Tests for the resolve_project_root function."""
+
+    def test_01_non_zip_path_returned_unchanged(self) -> None:
+        """Verify a plain directory path is returned unchanged, without touching the filesystem."""
+        self.assertEqual(resolve_project_root("some/project/dir"), "some/project/dir")
+
+    @patch("desktop.main.unzip_archive")
+    @patch("desktop.main.is_path_zip", return_value=True)
+    def test_02_zip_with_single_subfolder_is_flattened(self, _mock_is_zip: MagicMock, mock_unzip: MagicMock) -> None:
+        """Verify that a single top-level subfolder in the extracted archive becomes the project root."""
+        with tempfile.TemporaryDirectory() as extracted_dir:
+            project_dir = os.path.join(extracted_dir, "project")
+            os.makedirs(project_dir)
+            mock_unzip.return_value = extracted_dir
+
+            result = resolve_project_root("archive.zip")
+
+            self.assertEqual(result, project_dir)
+
+    @patch("desktop.main.unzip_archive")
+    @patch("desktop.main.is_path_zip", return_value=True)
+    def test_03_zip_with_multiple_subfolders_is_not_flattened(
+        self, _mock_is_zip: MagicMock, mock_unzip: MagicMock
+    ) -> None:
+        """Verify that multiple top-level subfolders leave the extraction root untouched."""
+        with tempfile.TemporaryDirectory() as extracted_dir:
+            os.makedirs(os.path.join(extracted_dir, "src"))
+            os.makedirs(os.path.join(extracted_dir, "tests"))
+            mock_unzip.return_value = extracted_dir
+
+            result = resolve_project_root("archive.zip")
+
+            self.assertEqual(result, extracted_dir)

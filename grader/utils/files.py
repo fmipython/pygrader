@@ -98,6 +98,7 @@ def unzip_archive(archive_path: str, target_directory: Optional[str] = None) -> 
     :param target_directory: The path to the target directory where the archive will be unzipped.
     :return: The path to the target directory.
     """
+    # TODO - Batch processing could result in multiple archives with the same name
     archive_stem = Path(archive_path).stem
     working_directory = target_directory or os.path.join(const.WORK_DIR, archive_stem)
 

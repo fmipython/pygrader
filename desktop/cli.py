@@ -15,7 +15,9 @@ def get_args() -> dict[str, Any]:
     """
     parser = argparse.ArgumentParser("Python project grader")
 
-    parser.add_argument("project_root", type=str, help="The path to the project directory")
+    parser.add_argument(
+        "project_root", type=str, help="The path to the project directory, or a glob pattern matching several"
+    )
     parser.add_argument("-c", "--config", type=str, help="The path to the config file to use")
     parser.add_argument("--student-id", type=str, help="The student's id")
     parser.add_argument(

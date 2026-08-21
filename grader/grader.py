@@ -6,14 +6,7 @@ from logging import Logger
 from typing import Optional
 
 import grader.utils.constants as const
-from grader.checks.abstract_check import (
-    AbstractCheck,
-    CheckResult,
-    NonScoredCheck,
-    NonScoredCheckResult,
-    ScoredCheck,
-    ScoredCheckResult,
-)
+from grader.checks.abstract_check import AbstractCheck
 from grader.checks.checks_factory import create_checks
 from grader.exceptions import (
     CheckError,
@@ -22,6 +15,7 @@ from grader.exceptions import (
     InvalidProjectRootError,
     VirtualEnvironmentError,
 )
+from grader.models.check_result import CheckResult, NonScoredCheck, NonScoredCheckResult, ScoredCheck, ScoredCheckResult
 from grader.utils.config import load_config
 from grader.utils.logger import setup_logger
 from grader.utils.virtual_environment import VirtualEnvironment

@@ -3,8 +3,8 @@
 import logging
 from typing import Optional
 
-from grader.checks.abstract_check import ScoredCheck, ScoredCheckResult
 from grader.exceptions import CheckError
+from grader.models.check_result import ScoredCheck, ScoredCheckResult
 from grader.utils.constants import (
     COVERAGE_PATH,
     COVERAGE_REPORT_ARGS,

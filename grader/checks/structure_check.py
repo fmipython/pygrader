@@ -8,8 +8,8 @@ import json
 import logging
 from typing import Optional
 
-from grader.checks.abstract_check import NonScoredCheck, NonScoredCheckResult
 from grader.exceptions import CheckError, ExternalResourceError
+from grader.models.check_result import NonScoredCheck, NonScoredCheckResult
 from grader.utils.external_resources import (
     download_file_from_url,
     fetch_json_from_cove,

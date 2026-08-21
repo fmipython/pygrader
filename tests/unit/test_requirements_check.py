@@ -3,9 +3,9 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from grader.checks.abstract_check import ScoredCheckResult
 from grader.checks.requirements_check import RequirementsCheck
 from grader.exceptions import VirtualEnvironmentError
+from grader.models.check_result import ScoredCheckResult
 
 
 class TestRequirementsCheck(unittest.TestCase):

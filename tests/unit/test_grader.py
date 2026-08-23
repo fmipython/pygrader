@@ -4,9 +4,10 @@ import os
 import unittest
 from unittest.mock import MagicMock, patch
 
+from grader.checks.abstract_check import NonScoredCheck, ScoredCheck
 from grader.exceptions import CheckError, InvalidConfigError, InvalidProjectRootError
 from grader.grader import Grader
-from grader.models.check_result import NonScoredCheck, NonScoredCheckResult, ScoredCheck, ScoredCheckResult
+from grader.models.check_result import NonScoredCheckResult, ScoredCheckResult
 
 
 class TestGrader(unittest.TestCase):

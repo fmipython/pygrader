@@ -7,8 +7,9 @@ It calls mypy as a subprocess to generate a report and then read from the report
 import logging
 from typing import Optional
 
+from grader.checks.abstract_check import ScoredCheck
 from grader.exceptions import CheckError
-from grader.models.check_result import ScoredCheck, ScoredCheckResult
+from grader.models.check_result import ScoredCheckResult
 from grader.utils import files, process
 from grader.utils.constants import MYPY_LINE_COUNT_REPORT, MYPY_PATH, MYPY_TYPE_HINT_CONFIG, REPORTS_TEMP_DIR
 

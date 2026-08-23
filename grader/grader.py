@@ -6,7 +6,7 @@ from logging import Logger
 from typing import Optional
 
 import grader.utils.constants as const
-from grader.checks.abstract_check import AbstractCheck
+from grader.checks.abstract_check import AbstractCheck, NonScoredCheck, ScoredCheck
 from grader.checks.checks_factory import create_checks
 from grader.exceptions import (
     CheckError,
@@ -15,7 +15,8 @@ from grader.exceptions import (
     InvalidProjectRootError,
     VirtualEnvironmentError,
 )
-from grader.models.check_result import CheckResult, NonScoredCheck, NonScoredCheckResult, ScoredCheck, ScoredCheckResult
+from grader.models.check_result import CheckResult, NonScoredCheckResult, ScoredCheckResult
+from grader.models.grading_result import GradingResult
 from grader.utils.config import load_config
 from grader.utils.logger import setup_logger
 from grader.utils.virtual_environment import VirtualEnvironment
@@ -62,7 +63,7 @@ class Grader:
         self.__logger.debug("Skipping virtual environment creation: %s", is_skipping_venv_creation)
         self.__logger.debug("PYTHONPATH: %s", os.environ.get("PYTHONPATH", "Not set"))
 
-    def grade(self, project_root: str, run_id: Optional[str] = None) -> list[CheckResult]:
+    def grade(self, project_root: str, run_id: str) -> GradingResult:
         """
         Run all checks against a project and return their results.
 
@@ -87,7 +88,10 @@ class Grader:
         finally:
             self.__cleanup(project_root)
 
-        return scores
+        total_score = sum(score.result for score in scores if isinstance(score, ScoredCheckResult))
+        max_score = sum(score.max_score for score in scores if isinstance(score, ScoredCheckResult))
+
+        return GradingResult(run_id, total_score, max_score, scores)
 
     def __run_checks(self, project_root: str) -> list[CheckResult]:
         """

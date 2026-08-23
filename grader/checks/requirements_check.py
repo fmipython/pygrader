@@ -9,8 +9,9 @@ import os
 from pathlib import Path
 from typing import Optional
 
+from grader.checks.abstract_check import ScoredCheck
 from grader.exceptions import VirtualEnvironmentError
-from grader.models.check_result import ScoredCheck, ScoredCheckResult
+from grader.models.check_result import ScoredCheckResult
 from grader.utils.constants import PYPROJECT_FILENAME, REQUIREMENTS_FILENAME
 from grader.utils.virtual_environment import VirtualEnvironment
 

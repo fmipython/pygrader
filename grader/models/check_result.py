@@ -15,7 +15,7 @@ class CheckResult(Generic[T]):
 
 
 @dataclass
-class ScoredCheckResult(CheckResult[T]):
+class ScoredCheckResult(CheckResult[float]):
     """Class representing the result of a scored check."""
 
     max_score: int

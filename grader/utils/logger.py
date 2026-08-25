@@ -10,7 +10,7 @@ MAX_LOG_FILES = 20
 logging.addLevelName(VERBOSE, "VERBOSE")
 
 
-def setup_logger(student_id: Optional[str] = None, verbosity: int = 0, suppress_info: bool = False) -> logging.Logger:
+def setup_logger(filename: Optional[str] = None, verbosity: int = 0, suppress_info: bool = False) -> logging.Logger:
     """
     Set up the logger with the given verbosity level and student id.
 
@@ -22,7 +22,7 @@ def setup_logger(student_id: Optional[str] = None, verbosity: int = 0, suppress_
     Returns:
         logging.Logger: The configured logger object.
     """
-    student_id = student_id or "grader"
+    filename = filename or "grader"
     logger = logging.getLogger("grader")
     logger.setLevel(logging.DEBUG)  # Set the logger to the lowest level to capture all messages
 
@@ -63,7 +63,7 @@ def setup_logger(student_id: Optional[str] = None, verbosity: int = 0, suppress_
     # Rotating file handler setup
     file_format = "%(asctime)s - %(levelname)s - %(message)s"
     file_handler = RotatingFileHandler(
-        filename=f"{student_id}.log",
+        filename=f"{filename}.log",
         maxBytes=0,  # No size limit
         backupCount=MAX_LOG_FILES - 1,  # -1 because the main file counts as one
     )

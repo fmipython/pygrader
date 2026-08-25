@@ -1,9 +1,7 @@
 """Module for handling the output of results from checks."""
 
 import json
-import sys
 from abc import ABC, abstractmethod
-from typing import TextIO, Union
 
 from grader.models.check_result import CheckResult, NonScoredCheckResult, ScoredCheckResult
 from grader.models.grading_result import GradingResult
@@ -25,7 +23,7 @@ class ResultsReporter(ABC):
 
         :param verbose: Whether to include info and error fields in the output.
         """
-        self._results = []
+        self._results: list[GradingResult] = []
         self._is_verbose = is_verbose
 
     @abstractmethod
@@ -35,6 +33,14 @@ class ResultsReporter(ABC):
 
         :return: A string representation of the results in a specific format.
         """
+
+    def add_result(self, result: GradingResult) -> None:
+        """
+        Add a GradingResult to the reporter.
+
+        :param result: The GradingResult to add.
+        """
+        self._results.append(result)
 
 
 class JSONResultsReporter(ResultsReporter):
@@ -141,96 +147,41 @@ class PlainTextResultsReporter(ResultsReporter):
     This class implements the `display` method to format and print the results in plain text format.
     """
 
-    def display(
-        self,
-        run_id: str,
-        results: list[CheckResult],
-        verbose: bool,
-        file_descriptor: TextIO = sys.stdout,
-    ) -> None:
-        """
-        Display the results in plain text format.
-
-        :param results: A list of CheckResult objects to display.
-        :param verbose: Whether to include info and error fields in the output.
-        :param file_descriptor: The file descriptor to write the output to.
-        """
-        output = self.to_string(run_id, results, verbose)
-        self._to_file_descriptor(output, file_descriptor)
-
-    def to_string(self, run_id: str, results: list[CheckResult], verbose: bool) -> str:
+    def to_string(self) -> str:
         """
         Convert the results to a plain-text string.
 
-        :param results: A list of CheckResult objects to convert.
-        :param verbose: Whether to include info and error fields in the output.
+        Each check result is emitted as its own line, followed by a per-run Total line.
+
         :return: A string representation of the results in plain-text format.
         """
-        scored_results = [result for result in results if isinstance(result, ScoredCheckResult)]
-        total_score = sum(scored_result.result for scored_result in scored_results)
-        total_max_score = sum(result.max_score for result in scored_results)
+        lines = []
+        for result in self._results:
+            lines += [self.__check_result_to_text(result.run_id, check_result) for check_result in result.results]
+            lines.append(f"Run ID: {result.run_id}, Total Score: {result.total_score}/{result.max_score}")
 
-        output = [result_to_plain_text(run_id, check_result, verbose) for check_result in results]
-        output.append(f"Total Score: {total_score}/{total_max_score}")
-        return "\n".join(output) + "\n"
+        return "\n".join(lines) + "\n"
 
+    def __check_result_to_text(self, run_id: str, check_result: CheckResult) -> str:
+        """
+        Convert a CheckResult to a plain text line.
 
-def result_to_plain_text(run_id: str, check_result: CheckResult, verbose: bool) -> str:
-    """
-    Convert a CheckResult to a plain text string.
+        :param run_id: The run the check result belongs to.
+        :param check_result: The CheckResult to convert.
+        """
+        match check_result:
+            case ScoredCheckResult():
+                score = f"{check_result.result}/{check_result.max_score}"
+                parts = [f"Run ID: {run_id}, Check: {check_result.name}, Score: {score}"]
+            case NonScoredCheckResult():
+                parts = [f"Run ID: {run_id}, Check: {check_result.name}, Result: {check_result.result}"]
+            case _:
+                raise ValueError(f"Unknown CheckResult type ({type(check_result)}) for check {check_result.name}")
 
-    :param result: The CheckResult to convert.
-    :type result: CheckResult
-    :param verbose: Whether to include info and error fields.
-    :type verbose: bool
-    :raises ValueError: If the result is not of type ScoredCheckResult or NonScoredCheckResult.
-    :return: A plain text string representation of the CheckResult.
-    :rtype: str
-    """
-    match check_result:
-        case ScoredCheckResult():
-            return scored_result_to_text(run_id, check_result, verbose)
-        case NonScoredCheckResult():
-            return non_scored_result_to_text(run_id, check_result, verbose)
-        case _:
-            raise ValueError(f"Unknown CheckResult type ({type(check_result)}) for check {check_result.name}")
+        if self._is_verbose:
+            if check_result.info:
+                parts.append(f"Info: {check_result.info}")
+            if check_result.error:
+                parts.append(f"Error: {check_result.error}")
 
-
-def scored_result_to_text(run_id: str, scored_result: ScoredCheckResult, verbose: bool) -> str:
-    """
-    Convert a ScoredCheckResult to a plain text string.
-
-    :param scored_result: The ScoredCheckResult to convert.
-    :type scored_result: ScoredCheckResult
-    :param verbose: Whether to include info and error fields.
-    :type verbose: bool
-    :return: A plain text string representation of the ScoredCheckResult.
-    :rtype: str.
-    """
-    parts = [f"Run ID: {run_id}, Check: {scored_result.name}, Score: {scored_result.result}/{scored_result.max_score}"]
-    if verbose:
-        if scored_result.info:
-            parts.append(f"Info: {scored_result.info}")
-        if scored_result.error:
-            parts.append(f"Error: {scored_result.error}")
-    return ". ".join(parts)
-
-
-def non_scored_result_to_text(run_id: str, non_scored_result: NonScoredCheckResult, verbose: bool) -> str:
-    """
-    Convert a NonScoredCheckResult to a plain text string.
-
-    :param non_scored_result: The NonScoredCheckResult to convert.
-    :type non_scored_result: NonScoredCheckResult
-    :param verbose: Whether to include info and error fields.
-    :type verbose: bool
-    :return: A plain text string representation of the NonScoredCheckResult.
-    :rtype: str.
-    """
-    parts = [f"Run ID: {run_id}, Check: {non_scored_result.name}, Result: {non_scored_result.result}"]
-    if verbose:
-        if non_scored_result.info:
-            parts.append(f"Info: {non_scored_result.info}")
-        if non_scored_result.error:
-            parts.append(f"Error: {non_scored_result.error}")
-    return ". ".join(parts)
+        return ". ".join(parts)

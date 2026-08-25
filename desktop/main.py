@@ -11,6 +11,8 @@ from pathlib import Path
 
 import grader.utils.constants as const
 from desktop.cli import get_args
+from desktop.utils import extract_student_id_from_path
+from grader.exceptions import GraderError
 from grader.grader import Grader
 from grader.utils.files import is_path_zip, unzip_archive
 from grader.utils.logger import setup_logger
@@ -22,7 +24,7 @@ from grader.utils.results_reporter import (
 )
 
 
-def build_reporter(report_format: str) -> ResultsReporter:
+def build_reporter(report_format: str, is_verbose: bool) -> ResultsReporter:
     """
     Build a results reporter based on the specified report format.
 
@@ -31,13 +33,13 @@ def build_reporter(report_format: str) -> ResultsReporter:
     """
     match report_format:
         case "json":
-            return JSONResultsReporter()
+            return JSONResultsReporter(is_verbose)
         case "csv":
-            return CSVResultsReporter()
+            return CSVResultsReporter(is_verbose)
         case "text":
-            return PlainTextResultsReporter()
+            return PlainTextResultsReporter(is_verbose)
         case _:
-            return PlainTextResultsReporter()
+            return PlainTextResultsReporter(is_verbose)
 
 
 def expand_project_root(pattern: str) -> list[str]:
@@ -89,38 +91,41 @@ def run_grader() -> None:
     """Run the grader application."""
     args = get_args()
     is_suppressing_info = args["report_format"] == "json" or args["report_format"] == "csv" or args["suppress_info"]
-    log = setup_logger(
-        args["student_id"],
-        verbosity=args["verbosity"],
-        suppress_info=is_suppressing_info,
-    )
 
     matched_paths = expand_project_root(args["project_root"])
     is_batch = len(matched_paths) > 1
 
+    logger = setup_logger(
+        args["student_id"] if not is_batch else None,
+        verbosity=args["verbosity"],
+        suppress_info=is_suppressing_info,
+    )
+
     grader = Grader(
-        log,
+        logger,
         is_keeping_venv=args["keep_venv"],
         is_skipping_venv_creation=args["skip_venv_creation"],
         config_path=args["config"],
     )
 
-    reporter = build_reporter(args["report_format"])
-    verbose = args["verbosity"] >= 1
+    reporter = build_reporter(args["report_format"], is_verbose=args["verbosity"] >= 1)
 
     for path in matched_paths:
         project_root = resolve_project_root(path)
 
-        # TODO - Think of ways to extract the student ID from the project root path
-        # <homework_name>/<student_id>-<student_name>_<number>_assignsubmission_file/<file>.zip
-        run_id = Path(path).stem if is_batch else args["student_id"]
+        run_id: str = extract_student_id_from_path(path) if is_batch else args["student_id"]
 
-        # TODO - Exceptions cause pygrader to completely stop and no cleanup of WORK_DIR
-        checks_results = grader.grade(project_root, run_id)
+        try:
+            grade = grader.grade(project_root, run_id)
 
-        # TODO - Combine the results of all runs into a single report if is_batch is True
-        # TODO - Add output to a file
-        reporter.display(checks_results, verbose=verbose)
+        except GraderError as error:
+            logger.error("Grading failed for project %s", project_root)
+            continue
+
+        reporter.add_result(grade)
+
+    # TODO - Add output to a file
+    print(reporter.to_string())
 
     if os.path.exists(const.WORK_DIR):
         shutil.rmtree(const.WORK_DIR)

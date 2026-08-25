@@ -33,7 +33,7 @@ class TestGrader(unittest.TestCase):
 
         # Act & Assert
         with self.assertRaises(InvalidProjectRootError):
-            grader.grade("nonexistent_project_root")
+            grader.grade("nonexistent_project_root", "student_id")
 
     @patch("grader.grader.create_checks")
     def test_03_create_checks_is_called(self, mock_create_checks: MagicMock) -> None:
@@ -47,7 +47,7 @@ class TestGrader(unittest.TestCase):
         grader = Grader(config_path=sample_config_path, logger=MagicMock())
 
         # Act
-        grader.grade(sample_project_path)
+        grader.grade(sample_project_path, "student_id")
 
         os.rmdir(sample_project_path)
 
@@ -71,7 +71,7 @@ class TestGrader(unittest.TestCase):
         grader = Grader(config_path=sample_config_path, logger=MagicMock())
 
         # Act
-        grader.grade(sample_project_path)
+        grader.grade(sample_project_path, "student_id")
 
         os.rmdir(sample_project_path)
 
@@ -98,12 +98,12 @@ class TestGrader(unittest.TestCase):
         grader = Grader(config_path=sample_config_path, logger=MagicMock())
 
         # Act
-        results = grader.grade(sample_project_path)
+        results = grader.grade(sample_project_path, "student_id")
 
         os.rmdir(sample_project_path)
 
         # Assert
-        self.assertEqual(results, [result1, result2])
+        self.assertEqual(results.results, [result1, result2])
 
     @patch("grader.grader.create_checks")
     def test_06_skipping_venv_creation_returns_only_non_venv_checks(self, mock_create_checks: MagicMock) -> None:
@@ -139,12 +139,12 @@ class TestGrader(unittest.TestCase):
         )
 
         # Act
-        results = grader.grade(sample_project_path)
+        results = grader.grade(sample_project_path, "student_id")
 
         os.rmdir(sample_project_path)
 
         # Assert
-        self.assertEqual(results, [result1, result2])
+        self.assertEqual(results.results, [result1, result2])
 
     @patch("grader.grader.VirtualEnvironment")
     @patch("grader.grader.create_checks")
@@ -172,7 +172,7 @@ class TestGrader(unittest.TestCase):
         grader = Grader(config_path=sample_config_path, logger=MagicMock())
 
         # Act
-        grader.grade(sample_project_path)
+        grader.grade(sample_project_path, "student_id")
 
         os.rmdir(sample_project_path)
 
@@ -210,12 +210,12 @@ class TestGrader(unittest.TestCase):
         grader = Grader(config_path=sample_config_path, logger=MagicMock())
 
         # Act
-        results = grader.grade(sample_project_path)
+        results = grader.grade(sample_project_path, "student_id")
 
         os.rmdir(sample_project_path)
 
         # Assert
-        self.assertEqual(results, [non_venv_result, venv_result1, venv_result2])
+        self.assertEqual(results.results, [non_venv_result, venv_result1, venv_result2])
 
     @patch("grader.grader.create_checks")
     def test_09_scored_checkerror_returns_scored_result(self, mock_create_checks: MagicMock) -> None:
@@ -235,16 +235,16 @@ class TestGrader(unittest.TestCase):
         grader = Grader(config_path=sample_config_path, logger=MagicMock())
 
         # Act
-        results = grader.grade(sample_project_path)
+        results = grader.grade(sample_project_path, "student_id")
 
         os.rmdir(sample_project_path)
 
         # Assert
-        self.assertEqual(len(results), 1)
-        self.assertIsInstance(results[0], ScoredCheckResult)
-        self.assertEqual(results[0].name, "scored_check")
-        self.assertEqual(results[0].result, 0)
-        self.assertEqual(results[0].max_score, 10)  # type: ignore
+        self.assertEqual(len(results.results), 1)
+        self.assertIsInstance(results.results[0], ScoredCheckResult)
+        self.assertEqual(results.results[0].name, "scored_check")
+        self.assertEqual(results.results[0].result, 0)
+        self.assertEqual(results.results[0].max_score, 10)  # type: ignore
 
     @patch("grader.grader.create_checks")
     def test_10_nonscored_checkerror_returns_nonscored_result(self, mock_create_checks: MagicMock) -> None:
@@ -261,15 +261,15 @@ class TestGrader(unittest.TestCase):
         grader = Grader(config_path=sample_config_path, logger=MagicMock())
 
         # Act
-        results = grader.grade(sample_project_path)
+        results = grader.grade(sample_project_path, "student_id")
 
         os.rmdir(sample_project_path)
 
         # Assert
-        self.assertEqual(len(results), 1)
-        self.assertIsInstance(results[0], NonScoredCheckResult)
-        self.assertEqual(results[0].name, "nonscored_check")
-        self.assertFalse(results[0].result)
+        self.assertEqual(len(results.results), 1)
+        self.assertIsInstance(results.results[0], NonScoredCheckResult)
+        self.assertEqual(results.results[0].name, "nonscored_check")
+        self.assertFalse(results.results[0].result)
 
     @patch("grader.grader.create_checks")
     def test_11_unknown_checkerror_raises_typeerror(self, mock_create_checks: MagicMock) -> None:
@@ -292,7 +292,7 @@ class TestGrader(unittest.TestCase):
 
         # Act & Assert
         with self.assertRaises(TypeError):
-            grader.grade(sample_project_path)
+            grader.grade(sample_project_path, "student_id")
 
         os.rmdir(sample_project_path)
 
@@ -310,8 +310,8 @@ class TestGrader(unittest.TestCase):
         grader = Grader(config_path=sample_config_path, logger=MagicMock())
 
         # Act
-        grader.grade(first_project_path)
-        grader.grade(second_project_path)
+        grader.grade(first_project_path, "student_1")
+        grader.grade(second_project_path, "student_2")
 
         os.rmdir(first_project_path)
         os.rmdir(second_project_path)

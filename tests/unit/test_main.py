@@ -6,6 +6,7 @@ import unittest
 from unittest.mock import MagicMock, call, patch
 
 from desktop.main import build_reporter, expand_project_root, resolve_project_root, run_grader
+from grader.models.grading_result import GradingResult
 from grader.utils.results_reporter import CSVResultsReporter, JSONResultsReporter, PlainTextResultsReporter
 
 
@@ -18,7 +19,7 @@ class TestBuildReporter(unittest.TestCase):
         reporter_format = "json"
 
         # Act
-        reporter = build_reporter(reporter_format)
+        reporter = build_reporter(reporter_format, is_verbose=False)
 
         # Assert
         self.assertIsInstance(reporter, JSONResultsReporter)
@@ -29,7 +30,7 @@ class TestBuildReporter(unittest.TestCase):
         reporter_format = "csv"
 
         # Act
-        reporter = build_reporter(reporter_format)
+        reporter = build_reporter(reporter_format, is_verbose=False)
 
         # Assert
         self.assertIsInstance(reporter, CSVResultsReporter)
@@ -40,7 +41,7 @@ class TestBuildReporter(unittest.TestCase):
         reporter_format = "text"
 
         # Act
-        reporter = build_reporter(reporter_format)
+        reporter = build_reporter(reporter_format, is_verbose=False)
 
         # Assert
         self.assertIsInstance(reporter, PlainTextResultsReporter)
@@ -51,7 +52,7 @@ class TestBuildReporter(unittest.TestCase):
         reporter_format = "unknown_format"
 
         # Act
-        reporter = build_reporter(reporter_format)
+        reporter = build_reporter(reporter_format, is_verbose=False)
 
         # Assert
         self.assertIsInstance(reporter, PlainTextResultsReporter)
@@ -99,7 +100,8 @@ class TestRunGrader(unittest.TestCase):
 
         expected_suppress_info = True
         # Act
-        with patch("desktop.main.Grader"):
+        with patch("desktop.main.Grader") as mock_grader:
+            mock_grader.return_value.grade.return_value = GradingResult("test_student", 0, 0, [])
             run_grader()
 
         actual_suppress_info = mock_setup_logger.call_args_list[0].kwargs["suppress_info"]
@@ -272,7 +274,7 @@ class TestRunGrader(unittest.TestCase):
             run_grader()
 
         # Assert
-        mock_build_reporter.assert_called_once_with(expected_report_format)
+        mock_build_reporter.assert_called_once_with(expected_report_format, is_verbose=True)
 
     @patch("desktop.main.get_args")
     @patch("desktop.main.build_reporter")
@@ -300,21 +302,27 @@ class TestRunGrader(unittest.TestCase):
         }
         mock_build_reporter.return_value = mock_results_reporter
 
-        mocked_results = MagicMock()
-        mock_grader.grade.return_value = mocked_results
+        mocked_grade = GradingResult("test_student", 0, 0, [])
+        mock_grader.return_value.grade.return_value = mocked_grade
 
         # Act
         with patch("desktop.main.setup_logger"):
             run_grader()
 
         # Assert
-        mock_results_reporter.display.assert_called_once()
+        mock_results_reporter.add_result.assert_called_once_with(mocked_grade)
+        mock_results_reporter.to_string.assert_called_once()
 
     @patch("desktop.main.get_args")
     @patch("desktop.main.Grader")
     @patch("desktop.main.setup_logger")
+    @patch("desktop.main.extract_student_id_from_path", side_effect=os.path.basename)
     def test_09_glob_project_root_grades_each_match(
-        self, _mock_logger: MagicMock, mock_grader: MagicMock, mock_get_args: MagicMock
+        self,
+        _mock_extract_student_id: MagicMock,
+        _mock_logger: MagicMock,
+        mock_grader: MagicMock,
+        mock_get_args: MagicMock,
     ) -> None:
         """Test that a glob project_root grades every matched directory, using its name as the run id."""
         # Arrange

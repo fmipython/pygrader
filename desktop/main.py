@@ -118,7 +118,7 @@ def run_grader() -> None:
         try:
             grade = grader.grade(project_root, run_id)
 
-        except GraderError as error:
+        except GraderError:
             logger.error("Grading failed for project %s", project_root)
             continue
 

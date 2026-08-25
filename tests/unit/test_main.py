@@ -5,7 +5,9 @@ import tempfile
 import unittest
 from unittest.mock import MagicMock, call, patch
 
+import grader.utils.constants as const
 from desktop.main import build_reporter, expand_project_root, resolve_project_root, run_grader
+from grader.exceptions import GraderError
 from grader.models.grading_result import GradingResult
 from grader.utils.results_reporter import CSVResultsReporter, JSONResultsReporter, PlainTextResultsReporter
 
@@ -351,6 +353,81 @@ class TestRunGrader(unittest.TestCase):
                 mock_grader.return_value.grade.call_args_list,
                 [call(student_a, "student_a"), call(student_b, "student_b")],
             )
+
+    @patch("desktop.main.get_args")
+    @patch("desktop.main.Grader")
+    @patch("desktop.main.setup_logger")
+    @patch("desktop.main.extract_student_id_from_path", side_effect=os.path.basename)
+    def test_10_grader_error_for_one_project_does_not_stop_the_batch(
+        self,
+        _mock_extract_student_id: MagicMock,
+        mock_setup_logger: MagicMock,
+        mock_grader: MagicMock,
+        mock_get_args: MagicMock,
+    ) -> None:
+        """Test that a GraderError for one project is logged and grading continues with the next one."""
+        # Arrange
+        with tempfile.TemporaryDirectory() as batch_dir:
+            student_a = os.path.join(batch_dir, "student_a")
+            student_b = os.path.join(batch_dir, "student_b")
+            os.makedirs(student_a)
+            os.makedirs(student_b)
+
+            mock_get_args.return_value = {
+                "student_id": "test_student",
+                "project_root": os.path.join(batch_dir, "*"),
+                "config": "/path/to/config",
+                "report_format": "text",
+                "verbosity": 1,
+                "suppress_info": False,
+                "keep_venv": False,
+                "skip_venv_creation": False,
+            }
+            mock_grader.return_value.grade.side_effect = [
+                GraderError("boom"),
+                GradingResult("student_b", 0, 0, []),
+            ]
+
+            # Act
+            run_grader()
+
+            # Assert
+            self.assertEqual(mock_grader.return_value.grade.call_count, 2)
+            mock_setup_logger.return_value.error.assert_called_once()
+
+    @patch("desktop.main.get_args")
+    @patch("desktop.main.Grader")
+    @patch("desktop.main.setup_logger")
+    @patch("desktop.main.shutil.rmtree")
+    @patch("desktop.main.os.path.exists")
+    def test_11_work_dir_is_removed_when_present(
+        self,
+        mock_exists: MagicMock,
+        mock_rmtree: MagicMock,
+        _mock_logger: MagicMock,
+        mock_grader: MagicMock,
+        mock_get_args: MagicMock,
+    ) -> None:
+        """Test that run_grader removes the WORK_DIR temp directory when it exists after grading."""
+        # Arrange
+        mock_get_args.return_value = {
+            "student_id": "test_student",
+            "project_root": "/path/to/project",
+            "config": "/path/to/config",
+            "report_format": "text",
+            "verbosity": 1,
+            "suppress_info": False,
+            "keep_venv": False,
+            "skip_venv_creation": False,
+        }
+        mock_exists.return_value = True
+        mock_grader.return_value.grade.return_value = GradingResult("test_student", 0, 0, [])
+
+        # Act
+        run_grader()
+
+        # Assert
+        mock_rmtree.assert_called_once_with(const.WORK_DIR)
 
 
 class TestExpandProjectRoot(unittest.TestCase):

@@ -4,8 +4,9 @@ import os
 import unittest
 from unittest.mock import MagicMock, patch
 
+import grader.utils.constants as const
 from grader.checks.abstract_check import NonScoredCheck, ScoredCheck
-from grader.exceptions import CheckError, InvalidConfigError, InvalidProjectRootError
+from grader.exceptions import CheckError, InvalidCheckError, InvalidConfigError, InvalidProjectRootError
 from grader.grader import Grader
 from grader.models.check_result import NonScoredCheckResult, ScoredCheckResult
 
@@ -320,3 +321,52 @@ class TestGrader(unittest.TestCase):
         self.assertEqual(mock_create_checks.call_count, 2)
         graded_project_roots = [call.args[1] for call in mock_create_checks.call_args_list]
         self.assertEqual(graded_project_roots, [first_project_path, second_project_path])
+
+    def test_13_missing_config_path_raises(self) -> None:
+        """Test that Grader raises InvalidConfigError when no config_path is provided at all."""
+        # Act & Assert
+        with self.assertRaises(InvalidConfigError):
+            Grader(config_path=None, logger=MagicMock())
+
+    @patch("grader.grader.create_checks")
+    def test_14_run_checks_error_is_logged_and_reraised(self, mock_create_checks: MagicMock) -> None:
+        """Test that an InvalidCheckError from __run_checks is logged and re-raised by grade()."""
+        # Arrange
+        sample_config_path = os.path.join("config", "full_single_point.json")
+        sample_project_path = os.path.join("/tmp", "project_root")
+        os.makedirs(sample_project_path, exist_ok=True)
+
+        mock_create_checks.side_effect = InvalidCheckError("Unknown check name: bogus")
+        mock_logger = MagicMock()
+        grader = Grader(config_path=sample_config_path, logger=mock_logger)
+
+        # Act & Assert
+        with self.assertRaises(InvalidCheckError):
+            grader.grade(sample_project_path, "student_id")
+
+        os.rmdir(sample_project_path)
+
+        mock_logger.error.assert_called_once()
+        mock_logger.exception.assert_called_once()
+
+    @patch("grader.grader.create_checks")
+    def test_15_cleanup_removes_existing_coverage_file(self, mock_create_checks: MagicMock) -> None:
+        """Test that grade() removes a leftover coverage file from the project root after running."""
+        # Arrange
+        sample_config_path = os.path.join("config", "full_single_point.json")
+        sample_project_path = os.path.join("/tmp", "project_root")
+        os.makedirs(sample_project_path, exist_ok=True)
+        coverage_file_path = os.path.join(sample_project_path, const.COVERAGE_FILE)
+        with open(coverage_file_path, "w", encoding="utf-8"):
+            pass
+
+        mock_create_checks.return_value = ([], [])
+        grader = Grader(config_path=sample_config_path, logger=MagicMock())
+
+        # Act
+        grader.grade(sample_project_path, "student_id")
+
+        # Assert
+        self.assertFalse(os.path.exists(coverage_file_path))
+
+        os.rmdir(sample_project_path)

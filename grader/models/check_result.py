@@ -1,5 +1,7 @@
+"""Dataclasses representing the result of a check."""
+
 from dataclasses import dataclass
-from typing import Generic, Optional, TypeVar
+from typing import Generic, TypeVar
 
 T = TypeVar("T")
 

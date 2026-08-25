@@ -1,3 +1,5 @@
+"""Dataclasses representing the result of a grading operation."""
+
 from dataclasses import dataclass
 
 from grader.models.check_result import CheckResult

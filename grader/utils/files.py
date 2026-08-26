@@ -98,9 +98,12 @@ def unzip_archive(archive_path: str, target_directory: Optional[str] = None) -> 
     :param target_directory: The path to the target directory where the archive will be unzipped.
     :return: The path to the target directory.
     """
-    # TODO - Batch processing could result in multiple archives with the same name
-    archive_stem = Path(archive_path).stem
-    working_directory = target_directory or os.path.join(const.WORK_DIR, archive_stem)
+    archive_path_obj = Path(archive_path)
+    archive_stem = archive_path_obj.stem
+    # Batch processing gives every submission's archive the same filename (e.g. "project.zip"),
+    # so the parent directory name (unique per submission) is included to keep extractions apart.
+    submission_dir = archive_path_obj.parent.name
+    working_directory = target_directory or os.path.join(const.WORK_DIR, submission_dir, archive_stem)
 
     with zipfile.ZipFile(archive_path, "r") as zip_ref:
         zip_ref.extractall(working_directory)

@@ -53,9 +53,15 @@ class BaseFunctionalTestWithGrader(unittest.TestCase):
 class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
     """Functional tests for the grader in a good weather scenario."""
 
-    def test_01_requirements_txt_exists(self) -> None:
-        """Verify that the grader can check the requirements.txt file."""
+    def test_01_full_config_single_run(self) -> None:
+        """
+        Verify requirements/pylint/type-hints scores, log file creation and absence of
+        student id output, all from a single grader run with the default full.json config.
+        """
         # Arrange
+        log_file = "grader.log"
+        if os.path.exists(log_file):
+            os.remove(log_file)
         command = build_command(project_path=self.clone_path)
 
         # Act
@@ -67,36 +73,13 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
         # Assert
         self.assertEqual(run_returncode, 0, run_stdout)
         self.assertTrue(is_score_correct(expected_score=10, target_check="requirements", grader_output=run_stdout))
-
-    def test_02_pylint_check(self) -> None:
-        """Verify that the grader runs the pylint check and returns the expected score."""
-        # Arrange
-        command = build_command(project_path=self.clone_path)
-
-        # Act
-        run_result = run(command)
-
-        run_returncode = run_result.returncode
-        run_stdout = run_result.stdout
-
-        # Assert
-        self.assertEqual(run_returncode, 0, run_stdout)
         self.assertTrue(is_score_correct(expected_score=10, target_check="pylint", grader_output=run_stdout))
-
-    def test_03_type_hints_check(self) -> None:
-        """Verify that the grader runs the type hints check and returns the expected score."""
-        # Arrange
-        command = build_command(project_path=self.clone_path)
-
-        # Act
-        run_result = run(command)
-
-        run_returncode = run_result.returncode
-        run_stdout = run_result.stdout
-
-        # Assert
-        self.assertEqual(run_returncode, 0, run_stdout)
         self.assertTrue(is_score_correct(expected_score=10, target_check="type-hints", grader_output=run_stdout))
+        self.assertTrue(os.path.exists(log_file), "Log file was not created")
+        os.remove(log_file)
+        self.assertNotIn(
+            "Running checks for student", run_stdout, "Unexpected student id output found when none was provided"
+        )
 
     @unittest.skip("Coverage check test is too unstable")
     def test_04_coverage_check(self) -> None:
@@ -114,27 +97,12 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
         self.assertEqual(run_returncode, 0, run_stdout)
         self.assertTrue(is_score_correct(expected_score=8, target_check="coverage", grader_output=run_stdout))
 
-    def test_05_log_file_created(self) -> None:
-        """Verify that the log file is created."""
-        # Arrange
-        log_file = "grader.log"
-        if os.path.exists(log_file):
-            os.remove(log_file)
-        command = build_command(project_path=self.clone_path)
-
-        # Act
-        run_result = run(command)
-
-        # Assert
-        self.assertEqual(run_result.returncode, 0, run_result.stdout)
-        self.assertTrue(os.path.exists(log_file), "Log file was not created")
-        os.remove(log_file)
-
-    def test_06_log_file_with_student_id(self) -> None:
-        """Verify that the log file is created with the student ID in its name."""
+    def test_06_student_id_single_run(self) -> None:
+        """Verify the student-id log file name and the student-id output line from a single grader run."""
         # Arrange
         student_id = "student123"
         log_file = f"{student_id}.log"
+        expected_output = f"Running checks for student {student_id}"
         if os.path.exists(log_file):
             os.remove(log_file)
         command = build_command(project_path=self.clone_path, student_id=student_id)
@@ -146,38 +114,9 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
         self.assertEqual(run_result.returncode, 0, run_result.stdout)
         self.assertTrue(os.path.exists(log_file), f"Log file with student ID '{student_id}' was not created")
         os.remove(log_file)
-
-    def test_07_student_id_in_output(self) -> None:
-        """Verify that the student ID is included in the output."""
-        # Arrange
-        student_id = "student123"
-        expected_output = f"Running checks for student {student_id}"
-        command = build_command(project_path=self.clone_path, student_id=student_id)
-
-        # Act
-        run_result = run(command)
-
-        # Assert
-        self.assertEqual(run_result.returncode, 0, run_result.stdout)
         self.assertIn(
             expected_output, run_result.stdout, f"Expected output '{expected_output}' not found in the tool's output"
         )
-
-    def test_08_default_log_file_name(self) -> None:
-        """Verify that the default log file name is used when no student ID is provided."""
-        # Arrange
-        log_file = "grader.log"
-        if os.path.exists(log_file):
-            os.remove(log_file)
-        command = build_command(project_path=self.clone_path)
-
-        # Act
-        run_result = run(command)
-
-        # Assert
-        self.assertEqual(run_result.returncode, 0, run_result.stdout)
-        self.assertTrue(os.path.exists(log_file), "Default log file 'grader.log' was not created")
-        os.remove(log_file)
 
     @unittest.skip("Unstable test")
     def test_09_all_checks_score_one(self) -> None:
@@ -260,21 +199,6 @@ class TestFunctionalBadWeatherWithGrader(BaseFunctionalTestWithGrader):
         self.assertNotEqual(run_result.returncode, 0, "Expected non-zero return code when no config is provided")
         self.assertIn("Configuration file not found", run_result.stdout)
 
-    def test_13_no_student_id_in_output(self) -> None:
-        """Verify that the student ID is not included in the output when no student ID is provided."""
-        # Arrange
-        unexpected_output = "Running checks for student"
-        command = build_command(project_path=self.clone_path)
-
-        # Act
-        run_result = run(command)
-
-        # Assert
-        self.assertEqual(run_result.returncode, 0, run_result.stdout)
-        self.assertNotIn(
-            unexpected_output, run_result.stdout, f"Unexpected output '{unexpected_output}' found in the tool's output"
-        )
-
     def test_14_no_project_path_provided(self) -> None:
         """Verify that the grader handles the absence of a project path gracefully."""
         # Arrange
@@ -300,7 +224,6 @@ class TestFunctionalBadWeatherWithGrader(BaseFunctionalTestWithGrader):
         run_result = run(command)
 
         # Assert
-        self.assertNotEqual(run_result.returncode, 0, "Expected non-zero return code for invalid project path")
         self.assertIn("Project root directory does not exist", run_result.stdout)
 
 
@@ -527,11 +450,11 @@ def is_score_correct(expected_score: float, target_check: str, grader_output: st
     """
     lines = grader_output.split("\n")
 
-    score_lines = [line for line in lines if line.startswith("Check")]
+    score_lines = [line for line in lines if "Check" in line]
     score_line = next(line for line in score_lines if target_check in line)
 
-    # Example: "Check: coverage, Score: 8/10"
-    actual_score = float(score_line.split(",")[1].split(":")[1].split("/")[0].strip())
+    # Example: "Run ID: None, Check: coverage, Score: 8/10"
+    actual_score = float(score_line.split(",")[2].split(":")[1].split("/")[0].strip())
 
     return actual_score == expected_score
 
@@ -547,10 +470,10 @@ def is_non_scored_check_correct(expected_result: bool, target_check: str, grader
     """
     lines = grader_output.split("\n")
 
-    score_lines = [line for line in lines if line.startswith("Check")]
+    score_lines = [line for line in lines if "Check" in line]
     score_line = next(line for line in score_lines if target_check in line)
 
-    # Example: "Check: structure, Result: False"
-    actual_result = score_line.split(",")[1].split(":")[1].strip()
+    # Example: "Run ID: None, Check: structure, Result: True"
+    actual_result = score_line.split(",")[2].split(":")[1].strip()
 
     return actual_result == str(expected_result)

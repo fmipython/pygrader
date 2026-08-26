@@ -414,6 +414,116 @@ class TestZipFileOnSampleProject(BaseFunctionalTestWithSampleProject):
         )
 
 
+class TestMultipleProjectsSupport(BaseFunctionalTestWithSampleProject):
+    """
+    Functional tests for grading several submissions in one run via a glob project_root.
+
+    Submissions are laid out the way a Moodle bulk download does:
+    ``<batch_dir>/<student_id>-<name>_<number>_assignsubmission_file/<archive>.zip``, since
+    that's the shape ``desktop.utils.extract_student_id_from_path`` expects.
+    """
+
+    def setUp(self) -> None:
+        """Set up the sample project checkout plus a scratch directory for batch fixtures."""
+        super().setUp()
+        self.batch_dir = Path(self.clone_path).parent / "batch_projects"
+        if self.batch_dir.exists():
+            shutil.rmtree(self.batch_dir)
+        self.batch_dir.mkdir(parents=True)
+
+    def tearDown(self) -> None:
+        """Clean up the batch scratch directory in addition to the sample project checkout."""
+        if self.batch_dir.exists():
+            shutil.rmtree(self.batch_dir)
+        super().tearDown()
+
+    def test_01_same_filename_archives_are_graded_independently(self) -> None:
+        """
+        Verify each submission is graded with its own folder-derived student id and its own
+        score, even though every submission's archive shares the same filename - the common
+        case when grading a Moodle bulk download.
+        """
+        # Arrange
+        clean_source = Path(self.clone_path)
+        _zip_directory(
+            clean_source, self.batch_dir / "CLEANID-Student_One_11111_assignsubmission_file" / "project.zip"
+        )
+
+        broken_source = self.batch_dir / "_broken_source"
+        shutil.copytree(clean_source, broken_source)
+        (broken_source / "src" / "bad_lint.py").write_text(
+            "import os,sys,re,json,time,random,string,math,collections,itertools\n"
+            "x=1\n"
+            "y=2\n"
+            "z=3\n"
+            "def f(a,b):\n"
+            " return a+b\n"
+            "def g(a,b):\n"
+            " return a-b\n"
+            "class c:\n"
+            " def m(self,a):\n"
+            "  return a\n"
+            "try:\n"
+            " pass\n"
+            "except:\n"
+            " pass\n"
+        )
+        _zip_directory(
+            broken_source, self.batch_dir / "BROKENID-Student_Two_22222_assignsubmission_file" / "project.zip"
+        )
+
+        command = build_command(project_path=str(self.batch_dir / "*" / "project.zip"), config_file="only_pylint.json")
+
+        # Act
+        run_result = run(command)
+
+        # Assert
+        self.assertEqual(run_result.returncode, 0, run_result.stdout)
+        self.assertTrue(
+            is_score_correct_for_run(
+                expected_score=1, target_check="pylint", run_id="CLEANID", grader_output=run_result.stdout
+            ),
+            "Clean submission did not keep its own pylint score",
+        )
+        self.assertTrue(
+            is_score_correct_for_run(
+                expected_score=0, target_check="pylint", run_id="BROKENID", grader_output=run_result.stdout
+            ),
+            "Broken submission did not get its own (lower) pylint score - archives may be overwriting each other",
+        )
+
+    def test_02_venv_failure_for_one_project_does_not_stop_the_batch(self) -> None:
+        """Verify that a submission whose dependencies fail to install doesn't block the rest of the batch."""
+        # Arrange
+        good_source = Path(self.clone_path)
+        _zip_directory(good_source, self.batch_dir / "GOODID-Student_One_11111_assignsubmission_file" / "project.zip")
+
+        bad_source = self.batch_dir / "_bad_source"
+        shutil.copytree(good_source, bad_source)
+        with open(bad_source / "requirements.txt", "a", encoding="utf-8") as requirements_file:
+            requirements_file.write("\nthis-package-definitely-does-not-exist-pygrader-test==999.999.999\n")
+        _zip_directory(bad_source, self.batch_dir / "BADID-Student_Two_22222_assignsubmission_file" / "project.zip")
+
+        command = build_command(project_path=str(self.batch_dir / "*" / "project.zip"), config_file="only_pylint.json")
+
+        # Act
+        run_result = run(command)
+
+        # Assert
+        self.assertEqual(run_result.returncode, 0, run_result.stdout)
+        self.assertTrue(
+            is_score_correct_for_run(
+                expected_score=1, target_check="pylint", run_id="GOODID", grader_output=run_result.stdout
+            ),
+            "Good submission was not graded despite the other submission's venv failure",
+        )
+        self.assertNotIn(
+            "Run ID: BADID",
+            run_result.stdout,
+            "Submission with an unresolvable dependency should not have produced any results",
+        )
+
+
 def build_command(
     project_path: Optional[str], config_file: str = "full.json", student_id: Optional[str] = None
 ) -> list[str]:
@@ -437,6 +547,44 @@ def build_command(
     if student_id is not None:
         command += ["--student-id", student_id]
     return command
+
+
+def _zip_directory(source_dir: Path, zip_path: Path) -> None:
+    """
+    Zip the contents of a directory, creating the archive's parent directory if needed.
+
+    :param source_dir: The directory whose contents should be zipped.
+    :param zip_path: The destination path for the zip archive.
+    """
+    zip_path.parent.mkdir(parents=True, exist_ok=True)
+    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zip_file:
+        for entry in source_dir.rglob("*"):
+            if entry.is_file():
+                zip_file.write(entry, entry.relative_to(source_dir))
+
+
+def is_score_correct_for_run(expected_score: float, target_check: str, run_id: str, grader_output: str) -> bool:
+    """
+    Check if the score for a specific check, within a specific run, matches the expected score.
+
+    Unlike :func:`is_score_correct`, this scopes the lookup to a single run id, which is
+    required when the output contains results for several projects (batch/glob grading).
+
+    :param expected_score: The expected score for the check.
+    :param target_check: The name of the check to verify.
+    :param run_id: The run id (e.g. student id) whose result should be checked.
+    :param grader_output: The output from the grader.
+    :return: True if the score matches, False otherwise.
+    """
+    lines = grader_output.split("\n")
+
+    prefix = f"Run ID: {run_id}, Check: {target_check},"
+    score_line = next(line for line in lines if line.startswith(prefix))
+
+    # Example: "Run ID: CLEANID, Check: pylint, Score: 1/1"
+    actual_score = float(score_line.split(",")[2].split(":")[1].split("/")[0].strip())
+
+    return actual_score == expected_score
 
 
 def is_score_correct(expected_score: float, target_check: str, grader_output: str) -> bool:

@@ -58,7 +58,7 @@ def expand_project_root(pattern: str) -> list[str]:
     if not any(char in pattern for char in "*?["):
         return [pattern]
 
-    return sorted(glob.glob(pattern)) or [pattern]
+    return sorted(glob.glob(pattern, recursive=True)) or [pattern]
 
 
 def resolve_project_root(path: str) -> str:

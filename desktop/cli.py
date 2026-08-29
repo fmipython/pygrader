@@ -36,7 +36,18 @@ def get_args() -> dict[str, Any]:
     parser.add_argument(
         "--keep-venv", action="store_true", help="Keep the virtual environment after grading", default=False
     )
+    parser.add_argument(
+        "--checks",
+        type=str,
+        help="Comma-separated list of check names to run (matching the 'name' field in the config). "
+        "Runs all checks from the config if omitted.",
+    )
 
     parser.add_argument("--version", action="version", help="Show the version of the tool", version=VERSION)
 
-    return parser.parse_args().__dict__
+    args = parser.parse_args().__dict__
+
+    if args["checks"] is not None:
+        args["checks"] = [name.strip() for name in args["checks"].split(",") if name.strip()]
+
+    return args

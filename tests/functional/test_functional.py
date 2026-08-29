@@ -160,6 +160,26 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
         for check in ["requirements", "type-hints", "coverage"]:
             self.assertNotIn(f"Check: {check}", run_stdout, f"Unexpected check '{check}' was executed")
 
+    def test_13_checks_flag_selects_subset(self) -> None:
+        """Verify that --checks limits execution to the requested checks from the full config."""
+        # Arrange
+        command = build_command(project_path=self.clone_path, checks=["requirements"])
+
+        # Act
+        run_result = run(command)
+
+        run_returncode = run_result.returncode
+        run_stdout = run_result.stdout
+
+        # Assert
+        self.assertEqual(run_returncode, 0, run_stdout)
+        self.assertTrue(
+            is_score_correct(expected_score=10, target_check="requirements", grader_output=run_stdout),
+            "Requirements check did not have the expected score of 10",
+        )
+        for check in ["pylint", "type-hints", "coverage"]:
+            self.assertNotIn(f"Check: {check}", run_stdout, f"Unexpected check '{check}' was executed")
+
 
 @unittest.skipIf(os.name == "nt", "Test skipped on Windows")
 class TestFunctionalBadWeatherWithGrader(BaseFunctionalTestWithGrader):
@@ -525,7 +545,10 @@ class TestMultipleProjectsSupport(BaseFunctionalTestWithSampleProject):
 
 
 def build_command(
-    project_path: Optional[str], config_file: str = "full.json", student_id: Optional[str] = None
+    project_path: Optional[str],
+    config_file: str = "full.json",
+    student_id: Optional[str] = None,
+    checks: Optional[list[str]] = None,
 ) -> list[str]:
     """
     Build the command to run the grader with the specified configuration and project path.
@@ -533,6 +556,7 @@ def build_command(
     :param project_path: The path to the project to be graded.
     :param config_file: The configuration file to use, defaults to "full.json".
     :param student_id: The ID of the student being graded, defaults to None.
+    :param checks: The names of the checks to run, defaults to None (runs all checks).
     :return: A list of command-line arguments to run the grader.
     """
     python_binary = "python3" if os.name == "posix" else "python"
@@ -546,6 +570,8 @@ def build_command(
         command += [project_path]
     if student_id is not None:
         command += ["--student-id", student_id]
+    if checks is not None:
+        command += ["--checks", ",".join(checks)]
     return command
 
 

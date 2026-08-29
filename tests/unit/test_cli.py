@@ -41,6 +41,24 @@ class TestGetArgs(unittest.TestCase):
         expected = ("verbosity", 2)
         self.assertIn(expected, get_args().items())
 
+    @patch("sys.argv", ["cli.py", "path/to/project", "--checks", "pylint,coverage"])
+    def test_06_checks_argument(self) -> None:
+        """Test 06: Test that the checks argument is parsed into a list of names."""
+        expected = ("checks", ["pylint", "coverage"])
+        self.assertIn(expected, get_args().items())
+
+    @patch("sys.argv", ["cli.py", "path/to/project"])
+    def test_07_checks_argument_omitted(self) -> None:
+        """Test 07: Test that the checks argument defaults to None when omitted."""
+        expected = ("checks", None)
+        self.assertIn(expected, get_args().items())
+
+    @patch("sys.argv", ["cli.py", "path/to/project", "--checks", " pylint ,  coverage "])
+    def test_08_checks_argument_strips_whitespace(self) -> None:
+        """Test 08: Test that whitespace around check names is stripped."""
+        expected = ("checks", ["pylint", "coverage"])
+        self.assertIn(expected, get_args().items())
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -2,7 +2,7 @@
 
 import os
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import ANY, MagicMock, patch
 
 import grader.utils.constants as const
 from grader.checks.abstract_check import NonScoredCheck, ScoredCheck
@@ -370,3 +370,41 @@ class TestGrader(unittest.TestCase):
         self.assertFalse(os.path.exists(coverage_file_path))
 
         os.rmdir(sample_project_path)
+
+    @patch("grader.grader.create_checks")
+    def test_16_selected_checks_forwarded_to_create_checks(self, mock_create_checks: MagicMock) -> None:
+        """Test that selected_checks passed to Grader is forwarded to create_checks."""
+        # Arrange
+        sample_config_path = os.path.join("config", "full_single_point.json")
+        sample_project_path = os.path.join("/tmp", "project_root")
+        os.makedirs(sample_project_path, exist_ok=True)
+
+        mock_create_checks.return_value = ([], [])
+        grader = Grader(config_path=sample_config_path, logger=MagicMock(), selected_checks=["pylint", "coverage"])
+
+        # Act
+        grader.grade(sample_project_path, "student_id")
+
+        os.rmdir(sample_project_path)
+
+        # Assert
+        mock_create_checks.assert_called_once_with(ANY, sample_project_path, selected_checks=["pylint", "coverage"])
+
+    @patch("grader.grader.create_checks")
+    def test_17_selected_checks_defaults_to_none(self, mock_create_checks: MagicMock) -> None:
+        """Test that create_checks receives selected_checks=None when Grader is not given a selection."""
+        # Arrange
+        sample_config_path = os.path.join("config", "full_single_point.json")
+        sample_project_path = os.path.join("/tmp", "project_root")
+        os.makedirs(sample_project_path, exist_ok=True)
+
+        mock_create_checks.return_value = ([], [])
+        grader = Grader(config_path=sample_config_path, logger=MagicMock())
+
+        # Act
+        grader.grade(sample_project_path, "student_id")
+
+        os.rmdir(sample_project_path)
+
+        # Assert
+        mock_create_checks.assert_called_once_with(ANY, sample_project_path, selected_checks=None)

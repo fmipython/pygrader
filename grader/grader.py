@@ -31,6 +31,7 @@ class Grader:
         config_path: Optional[str] = None,
         is_keeping_venv: bool = False,
         is_skipping_venv_creation: bool = False,
+        selected_checks: Optional[list[str]] = None,
     ):
         """
         Initialize the Grader.
@@ -39,12 +40,14 @@ class Grader:
         :param config_path: Optional path to configuration file.
         :param is_keeping_venv: Whether to keep the virtual environment after grading.
         :param is_skipping_venv_creation: Whether to skip virtual environment creation.
+        :param selected_checks: If provided, only checks with a matching name will be run.
         """
         self.__logger = logger or setup_logger()
 
         self.__logger.info("Python project grader, %s", const.VERSION)
         self.__is_keeping_venv = is_keeping_venv
         self.__is_skipping_venv_creation = is_skipping_venv_creation
+        self.__selected_checks = selected_checks
         try:
             if config_path is None:
                 raise InvalidConfigError("No configuration source provided")
@@ -61,6 +64,7 @@ class Grader:
         self.__logger.debug("Configuration file: %s", config_path)
         self.__logger.debug("Keeping virtual environment: %s", is_keeping_venv)
         self.__logger.debug("Skipping virtual environment creation: %s", is_skipping_venv_creation)
+        self.__logger.debug("Selected checks: %s", selected_checks)
         self.__logger.debug("PYTHONPATH: %s", os.environ.get("PYTHONPATH", "Not set"))
 
     def grade(self, project_root: str, run_id: str) -> GradingResult:
@@ -100,7 +104,9 @@ class Grader:
         :param project_root: The root directory of the project to grade.
         :return: A list of CheckResult objects containing the results of the checks.
         """
-        non_venv_checks, venv_checks = create_checks(self.__config, project_root)
+        non_venv_checks, venv_checks = create_checks(
+            self.__config, project_root, selected_checks=self.__selected_checks
+        )
 
         scores = [self.__run_check(check) for check in non_venv_checks]
 

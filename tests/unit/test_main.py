@@ -76,6 +76,7 @@ class TestRunGrader(unittest.TestCase):
             "suppress_info": False,
             "keep_venv": False,
             "skip_venv_creation": False,
+            "checks": None,
         }
         # Act
         with patch("desktop.main.Grader"), patch("desktop.main.setup_logger"):
@@ -98,6 +99,7 @@ class TestRunGrader(unittest.TestCase):
             "suppress_info": False,
             "keep_venv": False,
             "skip_venv_creation": False,
+            "checks": None,
         }
 
         expected_suppress_info = True
@@ -125,6 +127,7 @@ class TestRunGrader(unittest.TestCase):
             "suppress_info": False,
             "keep_venv": False,
             "skip_venv_creation": False,
+            "checks": None,
         }
 
         expected_suppress_info = True
@@ -151,6 +154,7 @@ class TestRunGrader(unittest.TestCase):
             "suppress_info": True,
             "keep_venv": False,
             "skip_venv_creation": False,
+            "checks": None,
         }
 
         expected_suppress_info = True
@@ -177,6 +181,7 @@ class TestRunGrader(unittest.TestCase):
             "suppress_info": False,
             "keep_venv": False,
             "skip_venv_creation": False,
+            "checks": None,
         }
 
         expected_suppress_info = False
@@ -207,6 +212,7 @@ class TestRunGrader(unittest.TestCase):
             "suppress_info": expected_suppress_info,
             "keep_venv": False,
             "skip_venv_creation": False,
+            "checks": None,
         }
 
         # Act
@@ -231,6 +237,7 @@ class TestRunGrader(unittest.TestCase):
         expected_config_path = "/path/to/config"
         expected_keep_venv = False
         expected_skip_venv_creation = False
+        expected_checks = ["pylint", "coverage"]
 
         mock_get_args.return_value = {
             "student_id": expected_student_id,
@@ -241,6 +248,7 @@ class TestRunGrader(unittest.TestCase):
             "suppress_info": False,
             "keep_venv": expected_keep_venv,
             "skip_venv_creation": expected_skip_venv_creation,
+            "checks": expected_checks,
         }
 
         # Act
@@ -252,6 +260,7 @@ class TestRunGrader(unittest.TestCase):
             is_keeping_venv=expected_keep_venv,
             is_skipping_venv_creation=expected_skip_venv_creation,
             config_path=expected_config_path,
+            selected_checks=expected_checks,
         )
         mock_grader.return_value.grade.assert_called_once_with(expected_project_root, expected_student_id)
 
@@ -270,6 +279,7 @@ class TestRunGrader(unittest.TestCase):
             "suppress_info": False,
             "keep_venv": False,
             "skip_venv_creation": False,
+            "checks": None,
         }
         # Act
         with patch("desktop.main.Grader"), patch("desktop.main.setup_logger"):
@@ -301,6 +311,7 @@ class TestRunGrader(unittest.TestCase):
             "suppress_info": False,
             "keep_venv": False,
             "skip_venv_creation": False,
+            "checks": None,
         }
         mock_build_reporter.return_value = mock_results_reporter
 
@@ -343,6 +354,7 @@ class TestRunGrader(unittest.TestCase):
                 "suppress_info": False,
                 "keep_venv": False,
                 "skip_venv_creation": False,
+                "checks": None,
             }
 
             # Act
@@ -382,6 +394,7 @@ class TestRunGrader(unittest.TestCase):
                 "suppress_info": False,
                 "keep_venv": False,
                 "skip_venv_creation": False,
+                "checks": None,
             }
             mock_grader.return_value.grade.side_effect = [
                 GraderError("boom"),
@@ -419,6 +432,7 @@ class TestRunGrader(unittest.TestCase):
             "suppress_info": False,
             "keep_venv": False,
             "skip_venv_creation": False,
+            "checks": None,
         }
         mock_exists.return_value = True
         mock_grader.return_value.grade.return_value = GradingResult("test_student", 0, 0, [])

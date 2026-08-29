@@ -194,3 +194,50 @@ class TestChecksFactory(unittest.TestCase):
         self.assertEqual(len(non_venv_checks), 1)
         check = non_venv_checks[0]
         self.assertEqual(check.env_vars, {})
+
+    def test_13_selected_checks_filters_subset(self) -> None:
+        """Test that selected_checks limits the built checks to the matching subset."""
+        # Arrange
+        config = {
+            "checks": [
+                {"name": "requirements", "max_points": 10, "is_venv_required": False},
+                {"name": "pylint", "max_points": 10, "is_venv_required": True},
+                {"name": "coverage", "max_points": 10, "is_venv_required": True},
+            ]
+        }
+        project_root = "test_project"
+
+        # Act
+        non_venv_checks, venv_checks = create_checks(config, project_root, selected_checks=["requirements", "pylint"])
+
+        # Assert
+        self.assertEqual([check.name for check in non_venv_checks], ["requirements"])
+        self.assertEqual([check.name for check in venv_checks], ["pylint"])
+
+    def test_14_selected_checks_none_runs_everything(self) -> None:
+        """Test that selected_checks=None keeps the current full-run behavior."""
+        # Arrange
+        config = {
+            "checks": [
+                {"name": "requirements", "max_points": 10, "is_venv_required": False},
+                {"name": "pylint", "max_points": 10, "is_venv_required": True},
+            ]
+        }
+        project_root = "test_project"
+
+        # Act
+        non_venv_checks, venv_checks = create_checks(config, project_root, selected_checks=None)
+
+        # Assert
+        self.assertEqual(len(non_venv_checks), 1)
+        self.assertEqual(len(venv_checks), 1)
+
+    def test_15_selected_checks_unknown_name_raises(self) -> None:
+        """Test that requesting an unknown check name raises InvalidCheckError."""
+        # Arrange
+        config = {"checks": [{"name": "coverage", "max_points": 10, "is_venv_required": False}]}
+        project_root = "test_project"
+
+        # Act & Assert
+        with self.assertRaises(InvalidCheckError):
+            create_checks(config, project_root, selected_checks=["pylintt"])

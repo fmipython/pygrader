@@ -106,6 +106,7 @@ def run_grader() -> None:
         is_keeping_venv=args["keep_venv"],
         is_skipping_venv_creation=args["skip_venv_creation"],
         config_path=args["config"],
+        selected_checks=args["checks"],
     )
 
     reporter = build_reporter(args["report_format"], is_verbose=args["verbosity"] >= 1)

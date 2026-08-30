@@ -77,7 +77,7 @@ def __filter_checks(checks: list[dict], selected_checks: list[str]) -> list[dict
     available_names = {check["name"] for check in checks if "name" in check}
     unknown = set(selected_checks) - available_names
 
-    if unknown:
+    if len(unknown) > 0:
         raise InvalidCheckError(
             f"Unknown check(s) requested: {', '.join(sorted(unknown))}. "
             f"Available in config: {', '.join(sorted(available_names))}"

@@ -81,7 +81,9 @@ def resolve_project_root(path: str) -> str:
         if directory.is_dir() and directory.name not in const.IGNORE_DIRS
     ]
 
-    if len(subdirs) == 1:
+    file_extensions = {file.suffix for file in project_root_dir.iterdir() if file.is_file()}
+
+    if len(subdirs) == 1 and ".py" not in file_extensions:
         project_root = str(subdirs[0])
 
     return project_root

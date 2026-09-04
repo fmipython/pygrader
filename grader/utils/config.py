@@ -5,7 +5,7 @@ from pathlib import Path
 
 from cove_sdk import JSONItem
 
-from grader.exceptions import ExternalResourceError, InvalidConfigError
+from grader.exceptions import InvalidConfigError, ResourceError
 from grader.utils.external_resources import (
     download_file_from_url,
     fetch_from_cove,
@@ -28,7 +28,7 @@ def load_config(config_path: str) -> dict:
     if is_resource_remote(config_path):
         try:
             config_path = download_file_from_url(config_path)
-        except ExternalResourceError as exc:
+        except ResourceError as exc:
             raise InvalidConfigError(f"Could not load configuration from {config_path}") from exc
 
     config = read_from_file(config_path)
@@ -63,7 +63,7 @@ def load_from_cove(cove_uri: str) -> dict:
     """
     try:
         result = fetch_from_cove(cove_uri)
-    except ExternalResourceError as exc:
+    except ResourceError as exc:
         raise InvalidConfigError(f"Could not load configuration from Cove URI: {cove_uri}") from exc
 
     if not isinstance(result, JSONItem):

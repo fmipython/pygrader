@@ -5,7 +5,7 @@ from json import JSONDecodeError
 from unittest.mock import MagicMock, patch
 
 from grader.checks.structure_check import StructureCheck
-from grader.exceptions import CheckError, ExternalResourceError
+from grader.exceptions import CheckError, ResourceError
 from grader.models.check_result import NonScoredCheckResult
 
 
@@ -287,7 +287,7 @@ class TestStructureCheck(unittest.TestCase):
     def test_16_load_structure_file_remote_download_fails(self, mock_download: MagicMock) -> None:
         """Verify that run raises CheckError when the remote structure file cannot be downloaded."""
         # Arrange
-        mock_download.side_effect = ExternalResourceError("Error downloading file")
+        mock_download.side_effect = ResourceError("Error downloading file")
         structure_check = StructureCheck(
             "structure", "sample_dir", "https://example.com/structure.json", is_venv_required=False
         )
@@ -349,7 +349,7 @@ class TestStructureCheckFromCove(unittest.TestCase):
     def test_03_cove_fetch_error_raises_check_error(self, mock_fetch_json: MagicMock) -> None:
         """Verify that an ExternalResourceError from Cove is wrapped in a CheckError."""
         # Arrange
-        mock_fetch_json.side_effect = ExternalResourceError("Cove resource not found")
+        mock_fetch_json.side_effect = ResourceError("Cove resource not found")
 
         # Act & Assert
         with self.assertRaises(CheckError) as context:

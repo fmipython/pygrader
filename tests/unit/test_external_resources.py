@@ -8,7 +8,7 @@ import requests
 from cove_sdk import BaseItem, JSONItem, PythonItem
 from cove_sdk.exceptions import CoveAPIError, URIParseError
 
-from grader.exceptions import ExternalResourceError
+from grader.exceptions import ResourceError
 from grader.utils.constants import TEMP_FILES_DIR
 from grader.utils.external_resources import (
     download_file_from_url,
@@ -187,7 +187,7 @@ class TestFetchFromCove(unittest.TestCase):
 
         # Act & Assert
         with patch.dict("os.environ", env_without_key, clear=True):
-            with self.assertRaises(ExternalResourceError):
+            with self.assertRaises(ResourceError):
                 fetch_from_cove("cove://example/resource")
 
     @patch("grader.utils.external_resources.fetch_uri")
@@ -198,7 +198,7 @@ class TestFetchFromCove(unittest.TestCase):
 
         # Act & Assert
         with patch.dict("os.environ", {"COVE_API_KEY": "test_key"}):
-            with self.assertRaises(ExternalResourceError):
+            with self.assertRaises(ResourceError):
                 fetch_from_cove("cove://example/resource")
 
     @patch("grader.utils.external_resources.fetch_uri")
@@ -209,7 +209,7 @@ class TestFetchFromCove(unittest.TestCase):
 
         # Act & Assert
         with patch.dict("os.environ", {"COVE_API_KEY": "test_key"}):
-            with self.assertRaises(ExternalResourceError):
+            with self.assertRaises(ResourceError):
                 fetch_from_cove("cove://example/resource")
 
     @patch("grader.utils.external_resources.fetch_uri")
@@ -220,7 +220,7 @@ class TestFetchFromCove(unittest.TestCase):
 
         # Act & Assert
         with patch.dict("os.environ", {"COVE_API_KEY": "test_key"}):
-            with self.assertRaises(ExternalResourceError):
+            with self.assertRaises(ResourceError):
                 fetch_from_cove("cove://example/resource")
 
     @patch("grader.utils.external_resources.fetch_uri")
@@ -245,10 +245,10 @@ class TestFetchJsonFromCove(unittest.TestCase):
     def test_01_fetch_from_cove_raises_error_propagates(self, mock_fetch: MagicMock) -> None:
         """Test that an ExternalResourceError from fetch_from_cove propagates."""
         # Arrange
-        mock_fetch.side_effect = ExternalResourceError("fetch failed")
+        mock_fetch.side_effect = ResourceError("fetch failed")
 
         # Act & Assert
-        with self.assertRaises(ExternalResourceError):
+        with self.assertRaises(ResourceError):
             fetch_json_from_cove("cove://example/resource")
 
     @patch("grader.utils.external_resources.fetch_from_cove")
@@ -258,7 +258,7 @@ class TestFetchJsonFromCove(unittest.TestCase):
         mock_fetch.return_value = MagicMock(spec=BaseItem)
 
         # Act & Assert
-        with self.assertRaises(ExternalResourceError):
+        with self.assertRaises(ResourceError):
             fetch_json_from_cove("cove://example/resource")
 
     @patch("grader.utils.external_resources.fetch_from_cove")
@@ -284,10 +284,10 @@ class TestDownloadPythonFileFromCove(unittest.TestCase):
     def test_01_fetch_from_cove_raises_error_propagates(self, mock_fetch: MagicMock) -> None:
         """Test that an ExternalResourceError from fetch_from_cove propagates."""
         # Arrange
-        mock_fetch.side_effect = ExternalResourceError("fetch failed")
+        mock_fetch.side_effect = ResourceError("fetch failed")
 
         # Act & Assert
-        with self.assertRaises(ExternalResourceError):
+        with self.assertRaises(ResourceError):
             download_python_file_from_cove("cove://example/resource")
 
     @patch("grader.utils.external_resources.fetch_from_cove")
@@ -297,7 +297,7 @@ class TestDownloadPythonFileFromCove(unittest.TestCase):
         mock_fetch.return_value = MagicMock(spec=BaseItem)
 
         # Act & Assert
-        with self.assertRaises(ExternalResourceError):
+        with self.assertRaises(ResourceError):
             download_python_file_from_cove("cove://example/resource")
 
     @patch("os.makedirs")

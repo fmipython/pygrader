@@ -9,9 +9,10 @@ import logging
 from typing import Optional
 
 from grader.checks.abstract_check import NonScoredCheck
-from grader.exceptions import CheckError, ExternalResourceError
+from grader.exceptions import CheckError, ResourceError
 from grader.models.check_result import NonScoredCheckResult
 from grader.utils.external_resources import (
+    Resource,
     download_file_from_url,
     fetch_json_from_cove,
     is_resource_cove,
@@ -104,22 +105,10 @@ class StructureCheck(NonScoredCheck):
         :return: The raw structure contents
         :rtype: dict
         """
-        if is_resource_cove(source):
-            try:
-                return fetch_json_from_cove(source)
-            except ExternalResourceError as error:
-                raise CheckError(f"Cannot read structure file: {error}") from error
-
-        if is_resource_remote(source):
-            try:
-                source = download_file_from_url(source)
-            except ExternalResourceError as error:
-                raise CheckError(f"Cannot read structure file: {error}") from error
-
         try:
-            with open(source, "r", encoding="utf-8") as file_pointer:
-                return json.load(file_pointer)
+            structure_file = Resource(source).read()
+            return json.loads(structure_file)
+        except ResourceError as error:
+            raise CheckError(f"Cannot read structure file: {error}") from error
         except json.JSONDecodeError as error:
             raise CheckError(f"Invalid structure file: {error}") from error
-        except OSError as error:
-            raise CheckError(f"Cannot read structure file: {error}") from error

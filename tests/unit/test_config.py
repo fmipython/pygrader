@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 
 from cove_sdk import BaseItem, JSONItem
 
-from grader.exceptions import ExternalResourceError, InvalidConfigError
+from grader.exceptions import InvalidConfigError, ResourceError
 from grader.utils.config import load_config, load_from_cove
 
 
@@ -40,7 +40,7 @@ class TestConfig(unittest.TestCase):
         """Test if an exception during remote resource download is handled properly."""
         # Arrange
         mock_is_remote.return_value = True
-        mock_download.side_effect = ExternalResourceError("Download failed")
+        mock_download.side_effect = ResourceError("Download failed")
 
         sample_config_path = "http://example.com/config.json"
 
@@ -108,7 +108,7 @@ class TestLoadFromCove(unittest.TestCase):
     def test_01_fetch_from_cove_raises_error_wrapped_in_invalid_config(self, mock_fetch: MagicMock) -> None:
         """Test that an ExternalResourceError is wrapped in InvalidConfigError."""
         # Arrange
-        mock_fetch.side_effect = ExternalResourceError("fetch failed")
+        mock_fetch.side_effect = ResourceError("fetch failed")
 
         # Act & Assert
         with self.assertRaises(InvalidConfigError):

@@ -1,6 +1,6 @@
 [project]
 name = "pygrader"
-version = "1.13.2"
+version = "2.0.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -20,7 +20,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 # List only the directory/package you want to include
-packages = ["grader", "grader.checks", "grader.utils", "config"]
+packages = ["grader", "grader.checks", "grader.utils", "grader.models", "config"]
 
 [tool.setuptools.package-data]
 config = ["grader_requirements.txt", "mypy_type_hints_2024.ini", "2024.pylintrc"]

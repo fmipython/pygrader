@@ -72,6 +72,14 @@ python3 pygrader.py -c CONFIG_PATH PROJECT_PATH
 
 Where `PROJECT_PATH` is the path to the project you want to grade and `CONFIG_PATH` is the path to the configuration you want to use.
 
+`PROJECT_PATH` can also be a glob pattern matching several projects (e.g. one folder per student, each holding a zip archive downloaded in bulk from Moodle), in which case each match is graded separately, using the student ID parsed from its path as the run ID:
+
+```bash
+uv run pygrader.py --report-format json -c ./config/projects_2026_summer.json "/home/lyubolp/downloaded_projects/**/*.zip"
+```
+
+Note that `**` here is not a recursive glob (only one directory level is matched) - quote the pattern so your shell doesn't expand it first and pygrader can match it itself.
+
 ## Configuration
 
 The grader supports configuration files in JSON format.

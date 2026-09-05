@@ -94,6 +94,7 @@ All check types support these common properties:
     - ``coverage`` - Checks test coverage
     - ``tests`` - Runs unit tests
     - ``structure`` - Validates project file structure
+    - ``spec`` - Grades the project against a markdown specification using an LLM
 
 ``max_points`` (optional)
     The maximum score that can be awarded for this check.
@@ -235,6 +236,43 @@ Example with a Cove URI:
         "is_venv_required": false,
         "structure_file": "cove://fmi-python/project-structure"
     }
+
+Spec Check
+""""""""""
+
+Grades the project's source against a markdown specification using an LLM, via an
+OpenAI-compatible chat completions endpoint (`OpenRouter <https://openrouter.ai>`_ by default).
+The specification is passed via the check's ``assets`` list (see ``assets`` above) and
+must be the first entry.
+
+``model`` (optional)
+    The model id to grade with, as accepted by the completions endpoint.
+    Default: ``anthropic/claude-opus-5``.
+
+``base_url`` (optional)
+    The base URL of the OpenAI-compatible chat completions API.
+    Default: ``https://openrouter.ai/api/v1``.
+
+``api_key_env`` (optional)
+    The environment variable holding the API key for ``base_url``.
+    Default: ``OPENROUTER_API_KEY``.
+
+Example:
+
+.. code-block:: json
+
+    {
+        "name": "spec",
+        "max_points": 10,
+        "is_venv_required": false,
+        "assets": [
+            "${{config_dir}}/spec.md"
+        ]
+    }
+
+.. note::
+    A single spec file is shared across every project in a batch run - per-project spec
+    resolution is not supported yet.
 
 Project Structure Configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

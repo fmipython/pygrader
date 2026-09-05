@@ -7,6 +7,7 @@ from grader.checks.coverage_check import CoverageCheck
 from grader.checks.pylint_check import PylintCheck
 from grader.checks.requirements_check import RequirementsCheck
 from grader.checks.run_tests_check import RunTestsCheck
+from grader.checks.spec_check import SpecCheck
 from grader.checks.structure_check import StructureCheck
 from grader.checks.type_hints_check import TypeHintsCheck
 from grader.exceptions import InvalidCheckError, InvalidConfigError
@@ -19,6 +20,7 @@ NAME_TO_CHECK: dict[str, type[AbstractCheck]] = {
     "type-hints": TypeHintsCheck,
     "structure": StructureCheck,
     "tests": RunTestsCheck,
+    "spec": SpecCheck,
 }
 
 

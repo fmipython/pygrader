@@ -5,7 +5,6 @@ import logging
 import os
 from enum import Enum
 from pathlib import Path
-from typing import Optional
 from urllib.parse import urlparse
 
 import requests
@@ -24,25 +23,41 @@ load_dotenv()
 
 
 class ResourceType(Enum):
+    """Enum for resource types."""
+
     LOCAL = 0
     REMOTE = 1
     COVE = 2
 
 
 class Resource:
+    """Class that handles resources in the grader, regardless of their origin."""
+
     def __init__(self, source: str):
+        """
+        Create the resource.
+
+        Actual content is not loaded until read() is called, to avoid unnecessary downloads.
+        :param source: Local path, URL or Cove URI to the resource
+        """
         self._source = source
-        self._content: Optional[str] = None
+        self._content: str | None = None
         self._type = Resource._sniff_resource_type(self._source)
         self._filename = ""
 
     def read(self) -> str:
+        """Read the content of the resource."""
         if self._content is None:
             self._content, self._filename = self._download(self._source, self._type)
 
         return self._content
 
     def to_file(self) -> str:
+        """
+        Write the content of the resource to a temporary file and return the path to it.
+
+        If the resource is already a local file, returns the path to it.
+        """
         if self._type == ResourceType.LOCAL:
             return self._source
 

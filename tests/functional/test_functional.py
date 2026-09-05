@@ -5,7 +5,6 @@ import shutil
 import unittest
 import zipfile
 from pathlib import Path
-from typing import Optional
 
 import grader.utils.constants as const
 from grader.utils.process import run
@@ -55,8 +54,9 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
 
     def test_01_full_config_single_run(self) -> None:
         """
-        Verify requirements/pylint/type-hints scores, log file creation and absence of
-        student id output, all from a single grader run with the default full.json config.
+        Verify requirements/pylint/type-hints scores, log file creation and absence of student id output.
+
+        All from a single grader run with the default full.json config.
         """
         # Arrange
         log_file = "grader.log"
@@ -461,8 +461,9 @@ class TestMultipleProjectsSupport(BaseFunctionalTestWithSampleProject):
 
     def test_01_same_filename_archives_are_graded_independently(self) -> None:
         """
-        Verify each submission is graded with its own folder-derived student id and its own
-        score, even though every submission's archive shares the same filename - the common
+        Verify each submission is graded with its own folder-derived student id and its own score.
+
+        This holds even though every submission's archive shares the same filename - the common
         case when grading a Moodle bulk download.
         """
         # Arrange
@@ -545,10 +546,10 @@ class TestMultipleProjectsSupport(BaseFunctionalTestWithSampleProject):
 
 
 def build_command(
-    project_path: Optional[str],
+    project_path: str | None,
     config_file: str = "full.json",
-    student_id: Optional[str] = None,
-    checks: Optional[list[str]] = None,
+    student_id: str | None = None,
+    checks: list[str] | None = None,
 ) -> list[str]:
     """
     Build the command to run the grader with the specified configuration and project path.

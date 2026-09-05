@@ -138,36 +138,32 @@ class TestFetchFromCove(unittest.TestCase):
         """Test that a missing COVE_API_KEY raises ResourceError."""
         env_without_key = {k: v for k, v in os.environ.items() if k != "COVE_API_KEY"}
 
-        with patch.dict("os.environ", env_without_key, clear=True):
-            with self.assertRaises(ResourceError):
-                Resource._fetch_from_cove("cove://example/resource")
+        with patch.dict("os.environ", env_without_key, clear=True), self.assertRaises(ResourceError):
+            Resource._fetch_from_cove("cove://example/resource")
 
     @patch("grader.utils.external_resources.fetch_uri")
     def test_02_fetch_uri_raises_cove_api_error(self, mock_fetch: MagicMock) -> None:
         """Test that a CoveAPIError from fetch_uri is wrapped in ResourceError."""
         mock_fetch.side_effect = CoveAPIError("API error", detail="some detail")
 
-        with patch.dict("os.environ", {"COVE_API_KEY": "test_key"}):
-            with self.assertRaises(ResourceError):
-                Resource._fetch_from_cove("cove://example/resource")
+        with patch.dict("os.environ", {"COVE_API_KEY": "test_key"}), self.assertRaises(ResourceError):
+            Resource._fetch_from_cove("cove://example/resource")
 
     @patch("grader.utils.external_resources.fetch_uri")
     def test_03_fetch_uri_raises_uri_parse_error(self, mock_fetch: MagicMock) -> None:
         """Test that a URIParseError from fetch_uri is wrapped in ResourceError."""
         mock_fetch.side_effect = URIParseError("Parse error")
 
-        with patch.dict("os.environ", {"COVE_API_KEY": "test_key"}):
-            with self.assertRaises(ResourceError):
-                Resource._fetch_from_cove("cove://example/resource")
+        with patch.dict("os.environ", {"COVE_API_KEY": "test_key"}), self.assertRaises(ResourceError):
+            Resource._fetch_from_cove("cove://example/resource")
 
     @patch("grader.utils.external_resources.fetch_uri")
     def test_04_fetch_uri_returns_none_raises_error(self, mock_fetch: MagicMock) -> None:
         """Test that None returned from fetch_uri raises ResourceError."""
         mock_fetch.return_value = None
 
-        with patch.dict("os.environ", {"COVE_API_KEY": "test_key"}):
-            with self.assertRaises(ResourceError):
-                Resource._fetch_from_cove("cove://example/resource")
+        with patch.dict("os.environ", {"COVE_API_KEY": "test_key"}), self.assertRaises(ResourceError):
+            Resource._fetch_from_cove("cove://example/resource")
 
     @patch("grader.utils.external_resources.fetch_uri")
     def test_05_json_item_returns_dumped_json_and_filename(self, mock_fetch: MagicMock) -> None:
@@ -203,9 +199,8 @@ class TestFetchFromCove(unittest.TestCase):
         """Test that an unrecognized Cove item type raises ResourceError."""
         mock_fetch.return_value = MagicMock(spec=BaseItem)
 
-        with patch.dict("os.environ", {"COVE_API_KEY": "test_key"}):
-            with self.assertRaises(ResourceError):
-                Resource._fetch_from_cove("cove://example/resource")
+        with patch.dict("os.environ", {"COVE_API_KEY": "test_key"}), self.assertRaises(ResourceError):
+            Resource._fetch_from_cove("cove://example/resource")
 
 
 class TestResourceDownloadDispatch(unittest.TestCase):

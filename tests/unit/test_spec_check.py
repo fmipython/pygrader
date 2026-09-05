@@ -2,7 +2,6 @@
 
 import json
 import unittest
-from typing import Optional
 from unittest.mock import MagicMock, patch
 
 import requests
@@ -12,7 +11,7 @@ from grader.exceptions import CheckError, ResourceError
 from grader.models.check_result import ScoredCheckResult
 
 
-def _make_response(status_code: int = 200, json_body: Optional[dict] = None, text: str = "") -> MagicMock:
+def _make_response(status_code: int = 200, json_body: dict | None = None, text: str = "") -> MagicMock:
     """Build a MagicMock standing in for a requests.Response."""
     response = MagicMock()
     response.status_code = status_code
@@ -101,9 +100,8 @@ class TestSpecCheck(unittest.TestCase):
 
     def test_04_missing_api_key_raises_check_error(self) -> None:
         """Verify that a missing API key environment variable raises a CheckError."""
-        with patch.dict("os.environ", {}, clear=True):
-            with self.assertRaises(CheckError):
-                self.spec_check.run()
+        with patch.dict("os.environ", {}, clear=True), self.assertRaises(CheckError):
+            self.spec_check.run()
 
     def test_05_missing_assets_raises_check_error(self) -> None:
         """Verify that running without a configured spec asset raises a CheckError."""
@@ -133,10 +131,9 @@ class TestSpecCheck(unittest.TestCase):
         self._mock_source(mocked_find_all_source_files, {})
         mocked_post.return_value = _make_response(500, text="internal error")
 
-        with patch.dict("os.environ", {"OPENROUTER_API_KEY": "test_key"}):
-            # Act & Assert
-            with self.assertRaises(CheckError) as context:
-                self.spec_check.run()
+        # Act & Assert
+        with patch.dict("os.environ", {"OPENROUTER_API_KEY": "test_key"}), self.assertRaises(CheckError) as context:
+            self.spec_check.run()
 
         self.assertIn("500", str(context.exception))
 
@@ -150,10 +147,9 @@ class TestSpecCheck(unittest.TestCase):
         self._mock_source(mocked_find_all_source_files, {})
         mocked_post.side_effect = requests.ConnectionError("network down")
 
-        with patch.dict("os.environ", {"OPENROUTER_API_KEY": "test_key"}):
-            # Act & Assert
-            with self.assertRaises(CheckError):
-                self.spec_check.run()
+        # Act & Assert
+        with patch.dict("os.environ", {"OPENROUTER_API_KEY": "test_key"}), self.assertRaises(CheckError):
+            self.spec_check.run()
 
     @patch("grader.checks.spec_check.requests.post")
     @patch("grader.checks.spec_check.find_all_source_files")
@@ -165,10 +161,9 @@ class TestSpecCheck(unittest.TestCase):
         self._mock_source(mocked_find_all_source_files, {})
         mocked_post.return_value = _make_response(200, {"error": {"message": "no credits"}})
 
-        with patch.dict("os.environ", {"OPENROUTER_API_KEY": "test_key"}):
-            # Act & Assert
-            with self.assertRaises(CheckError):
-                self.spec_check.run()
+        # Act & Assert
+        with patch.dict("os.environ", {"OPENROUTER_API_KEY": "test_key"}), self.assertRaises(CheckError):
+            self.spec_check.run()
 
     @patch("grader.checks.spec_check.requests.post")
     @patch("grader.checks.spec_check.find_all_source_files")
@@ -178,14 +173,11 @@ class TestSpecCheck(unittest.TestCase):
         """Verify that non-JSON model output raises a CheckError."""
         # Arrange
         self._mock_source(mocked_find_all_source_files, {})
-        mocked_post.return_value = _make_response(
-            200, {"choices": [{"message": {"content": "not json at all"}}]}
-        )
+        mocked_post.return_value = _make_response(200, {"choices": [{"message": {"content": "not json at all"}}]})
 
-        with patch.dict("os.environ", {"OPENROUTER_API_KEY": "test_key"}):
-            # Act & Assert
-            with self.assertRaises(CheckError):
-                self.spec_check.run()
+        # Act & Assert
+        with patch.dict("os.environ", {"OPENROUTER_API_KEY": "test_key"}), self.assertRaises(CheckError):
+            self.spec_check.run()
 
     @patch("grader.checks.spec_check.requests.post")
     @patch("grader.checks.spec_check.find_all_source_files")

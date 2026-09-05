@@ -4,7 +4,6 @@ import logging
 import os
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Optional
 
 from grader.checks.abstract_check import ScoredCheck
 from grader.exceptions import CheckError, ResourceError
@@ -30,7 +29,7 @@ class TestId:
 
     def pretty(self, is_passing: bool) -> str:
         """Return a pretty formatted test result message."""
-        return f"Test {str(self)} {'passed' if is_passing else 'failed'}."
+        return f"Test {self!s} {'passed' if is_passing else 'failed'}."
 
 
 class RunTestsCheck(ScoredCheck):
@@ -48,9 +47,9 @@ class RunTestsCheck(ScoredCheck):
         is_venv_required: bool,
         tests_path: list[str],
         default_test_score: float = 0.0,
-        test_score_mapping: Optional[dict[str, float]] = None,
-        env_vars: Optional[dict[str, str]] = None,
-        assets: Optional[list[str]] = None,
+        test_score_mapping: dict[str, float] | None = None,
+        env_vars: dict[str, str] | None = None,
+        assets: list[str] | None = None,
     ):
         """
         Initialize the RunTestsCheck class.

@@ -107,7 +107,7 @@ class CSVResultsReporter(ResultsReporter):
         """
         Convert the results to a CSV string.
 
-        Each check result is emitted as its own row, followed by a per-run Total row.
+        Each check result is emitted as its own row.
 
         :return: A string representation of the results in CSV format.
         """

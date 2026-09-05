@@ -4,8 +4,8 @@ Module containing the type hints check.
 It calls mypy as a subprocess to generate a report and then read from the report.
 """
 
+import itertools
 import logging
-from typing import Optional
 
 from grader.checks.abstract_check import ScoredCheck
 from grader.exceptions import CheckError
@@ -25,8 +25,8 @@ class TypeHintsCheck(ScoredCheck):
         project_root: str,
         max_points: int,
         is_venv_required: bool,
-        env_vars: Optional[dict[str, str]] = None,
-        assets: Optional[list[str]] = None,
+        env_vars: dict[str, str] | None = None,
+        assets: list[str] | None = None,
     ):
         """
         Initialize the type hints check.
@@ -120,7 +120,7 @@ class TypeHintsCheck(ScoredCheck):
         step = self.__mypy_max_score / (self._max_points + 1)
         steps = [i * step for i in range(self._max_points + 2)]
 
-        regions = list(zip(steps, steps[1:]))
+        regions = list(itertools.pairwise(steps))
 
         for score, (start, end) in enumerate(regions):
             if round(start, 2) <= round(mypy_score, 2) < round(end, 2):

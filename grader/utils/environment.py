@@ -1,12 +1,11 @@
 """Module for handling environment variable management and merging."""
 
 import os
-from typing import Optional
 
 
 def merge_environment_variables(
-    global_env: Optional[dict[str, str]],
-    check_env: Optional[dict[str, str]],
+    global_env: dict[str, str] | None,
+    check_env: dict[str, str] | None,
 ) -> dict[str, str]:
     """
     Merge environment variables with the following priority (highest to lowest).

@@ -1,7 +1,5 @@
 """Factory for creating the checks objects."""
 
-from typing import Optional
-
 from grader.checks.abstract_check import AbstractCheck
 from grader.checks.coverage_check import CoverageCheck
 from grader.checks.pylint_check import PylintCheck
@@ -25,7 +23,7 @@ NAME_TO_CHECK: dict[str, type[AbstractCheck]] = {
 
 
 def create_checks(
-    config: dict, project_root: str, selected_checks: Optional[list[str]] = None
+    config: dict, project_root: str, selected_checks: list[str] | None = None
 ) -> tuple[list[AbstractCheck], list[AbstractCheck]]:
     """
     Build two lists, containing the non-venv checks and the venv checks.
@@ -104,8 +102,7 @@ def __create_check(project_root: str, expected_keys: set[str], check: dict, glob
     other_args = {**check}
     del other_args["name"]
 
-    if "environment" in other_args:
-        del other_args["environment"]
+    other_args.pop("environment", None)
 
     other_args["env_vars"] = merged_env
 

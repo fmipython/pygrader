@@ -3,7 +3,6 @@
 import os
 import shutil
 from logging import Logger
-from typing import Optional
 
 import grader.utils.constants as const
 from grader.checks.abstract_check import AbstractCheck, NonScoredCheck, ScoredCheck
@@ -27,11 +26,11 @@ class Grader:
 
     def __init__(
         self,
-        logger: Optional[Logger] = None,
-        config_path: Optional[str] = None,
+        logger: Logger | None = None,
+        config_path: str | None = None,
         is_keeping_venv: bool = False,
         is_skipping_venv_creation: bool = False,
-        selected_checks: Optional[list[str]] = None,
+        selected_checks: list[str] | None = None,
     ):
         """
         Initialize the Grader.
@@ -56,9 +55,9 @@ class Grader:
             self.__config = load_config(config_path)
 
             self.__logger.debug(f"Config contents: {self.__config}")
-        except InvalidConfigError as exc:
+        except InvalidConfigError:
             self.__logger.error("Error with the configuration file")
-            self.__logger.exception(exc)
+            self.__logger.exception("Error with the configuration file")
             raise
 
         self.__logger.debug("Configuration file: %s", config_path)
@@ -85,9 +84,9 @@ class Grader:
 
         try:
             scores = self.__run_checks(project_root)
-        except (InvalidCheckError, VirtualEnvironmentError) as error:
+        except (InvalidCheckError, VirtualEnvironmentError):
             self.__logger.error("Grading failed for project %s", project_root)
-            self.__logger.exception(error)
+            self.__logger.exception("Grading failed for project %s", project_root)
             raise
         finally:
             self.__cleanup(project_root)

@@ -2,7 +2,6 @@
 
 import unittest
 from subprocess import CompletedProcess
-from typing import Optional
 from unittest.mock import MagicMock, patch
 
 from grader.checks.coverage_check import CoverageCheck
@@ -39,7 +38,7 @@ class TestCoverageCheck(unittest.TestCase):
         """Test that a failed coverage report logs an error and returns a score of 0.0."""
 
         # Arrange
-        def mocked_run_side_effect(*args: list, **_: dict) -> Optional[CompletedProcess]:
+        def mocked_run_side_effect(*args: list, **_: dict) -> CompletedProcess | None:
             if "run" in args[0]:
                 return CompletedProcess(args=["coverage", "run"], returncode=0)
             if "report" in args[0]:
@@ -183,7 +182,7 @@ class TestCoverageCheck(unittest.TestCase):
         """Test that the coverage report is read properly and returns the correct score."""
 
         # Arrange
-        def mocked_run_side_effect(*args: list, **_: dict) -> Optional[CompletedProcess]:
+        def mocked_run_side_effect(*args: list, **_: dict) -> CompletedProcess | None:
             if "run" in args[0]:
                 return CompletedProcess(args=["coverage", "run"], returncode=0)
             if "report" in args[0]:

@@ -8,7 +8,6 @@ OpenAI-compatible chat completions endpoint (OpenRouter by default).
 import json
 import logging
 import os
-from typing import Optional
 
 import requests
 from dotenv import load_dotenv
@@ -54,8 +53,8 @@ class SpecCheck(ScoredCheck):
         project_root: str,
         max_points: int,
         is_venv_required: bool = False,
-        env_vars: Optional[dict[str, str]] = None,
-        assets: Optional[list[str]] = None,
+        env_vars: dict[str, str] | None = None,
+        assets: list[str] | None = None,
         model: str = "anthropic/claude-opus-5",
         base_url: str = "https://openrouter.ai/api/v1",
         api_key_env: str = "OPENROUTER_API_KEY",

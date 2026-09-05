@@ -87,9 +87,8 @@ class TestsVirtualEnvironment(unittest.TestCase):
         patched_run.return_value = subprocess.CompletedProcess([], 1)
 
         # Act & Assert
-        with self.assertRaises(VirtualEnvironmentError):
-            with VirtualEnvironment(self.__sample_root_dir_path):
-                pass
+        with self.assertRaises(VirtualEnvironmentError), VirtualEnvironment(self.__sample_root_dir_path):
+            pass
 
     def test_05_install_requirements(self) -> None:
         """Verify that the VirtualEnvironment class installs the requirements."""
@@ -131,9 +130,8 @@ class TestsVirtualEnvironment(unittest.TestCase):
         patched_run.side_effect = custom_run_behavior
 
         # Act & Assert
-        with self.assertRaises(VirtualEnvironmentError):
-            with VirtualEnvironment(self.__sample_root_dir_path):
-                pass
+        with self.assertRaises(VirtualEnvironmentError), VirtualEnvironment(self.__sample_root_dir_path):
+            pass
 
     def test_07_install_grader_requirements(self) -> None:
         """Verify that the VirtualEnvironment class installs the grader requirements."""
@@ -169,9 +167,8 @@ class TestsVirtualEnvironment(unittest.TestCase):
         patched_run.side_effect = custom_run_behavior
 
         # Act & Assert
-        with self.assertRaises(VirtualEnvironmentError):
-            with VirtualEnvironment(self.__sample_root_dir_path):
-                pass
+        with self.assertRaises(VirtualEnvironmentError), VirtualEnvironment(self.__sample_root_dir_path):
+            pass
 
     def test_09_teardown(self) -> None:
         """Verify that the VirtualEnvironment class removes the virtual environment when the context manager is exited."""

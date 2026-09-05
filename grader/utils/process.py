@@ -3,7 +3,6 @@
 import logging
 import os
 import subprocess
-from typing import Optional
 
 # from grader.utils.logger import VERBOSE
 
@@ -11,7 +10,7 @@ logger = logging.getLogger("grader")
 
 
 def run(
-    command: list[str], current_directory: Optional[str] = None, env_vars: Optional[dict[str, str]] = None
+    command: list[str], current_directory: str | None = None, env_vars: dict[str, str] | None = None
 ) -> subprocess.CompletedProcess[str]:
     """
     Execute a command in the terminal.

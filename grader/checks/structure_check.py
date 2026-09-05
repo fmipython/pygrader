@@ -6,7 +6,6 @@ It checks if the project structure is correct.
 
 import json
 import logging
-from typing import Optional
 
 from grader.checks.abstract_check import NonScoredCheck
 from grader.exceptions import CheckError, ResourceError
@@ -28,8 +27,8 @@ class StructureCheck(NonScoredCheck):
         structure_file: str,
         is_fatal: bool = False,
         is_venv_required: bool = False,
-        env_vars: Optional[dict[str, str]] = None,
-        assets: Optional[list[str]] = None,
+        env_vars: dict[str, str] | None = None,
+        assets: list[str] | None = None,
     ):
         """
         Initialize the structure check.

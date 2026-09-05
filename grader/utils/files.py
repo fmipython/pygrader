@@ -3,7 +3,6 @@
 import os
 import zipfile
 from pathlib import Path
-from typing import Optional
 
 import grader.utils.constants as const
 from grader.utils.structure_validator import StructureValidator
@@ -35,7 +34,7 @@ def find_all_source_files(project_root_dir: str) -> list[str]:
     return [file for file in all_files if file not in test_files]
 
 
-def find_all_test_files(tests_directory: Optional[str] = None) -> list[str]:
+def find_all_test_files(tests_directory: str | None = None) -> list[str]:
     """
     Find all test files in the project directory.
 
@@ -49,7 +48,7 @@ def find_all_test_files(tests_directory: Optional[str] = None) -> list[str]:
     return test_structure.get_matching_files(tests_directory)
 
 
-def get_tests_directory_name(project_root_dir: str) -> Optional[str]:
+def get_tests_directory_name(project_root_dir: str) -> str | None:
     """
     Check if the project directory contains a tests directory.
 
@@ -90,7 +89,7 @@ def is_path_zip(path: str) -> bool:
     return zipfile.is_zipfile(path)
 
 
-def unzip_archive(archive_path: str, target_directory: Optional[str] = None) -> str:
+def unzip_archive(archive_path: str, target_directory: str | None = None) -> str:
     """
     Unzip the archive containing the project.
 

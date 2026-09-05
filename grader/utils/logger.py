@@ -3,14 +3,13 @@
 import logging
 import sys
 from logging.handlers import RotatingFileHandler
-from typing import Optional
 
 VERBOSE = 15
 MAX_LOG_FILES = 20
 logging.addLevelName(VERBOSE, "VERBOSE")
 
 
-def setup_logger(filename: Optional[str] = None, verbosity: int = 0, suppress_info: bool = False) -> logging.Logger:
+def setup_logger(filename: str | None = None, verbosity: int = 0, suppress_info: bool = False) -> logging.Logger:
     """
     Set up the logger with the given verbosity level and student id.
 

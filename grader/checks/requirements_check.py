@@ -7,7 +7,6 @@ It checks if requirements.txt exists in the project root.
 import logging
 import os
 from pathlib import Path
-from typing import Optional
 
 from grader.checks.abstract_check import ScoredCheck
 from grader.exceptions import VirtualEnvironmentError
@@ -28,8 +27,8 @@ class RequirementsCheck(ScoredCheck):
         max_points: int,
         is_venv_required: bool,
         is_checking_install: bool = False,
-        env_vars: Optional[dict[str, str]] = None,
-        assets: Optional[list[str]] = None,
+        env_vars: dict[str, str] | None = None,
+        assets: list[str] | None = None,
     ):
         """
         Initialize the requirements check.

@@ -1,13 +1,10 @@
 """Dataclasses representing the result of a check."""
 
 from dataclasses import dataclass
-from typing import Generic, TypeVar
-
-T = TypeVar("T")
 
 
 @dataclass
-class CheckResult(Generic[T]):
+class CheckResult[T]:
     """Class representing the result of a check."""
 
     name: str

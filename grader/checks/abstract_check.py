@@ -6,10 +6,9 @@ Each check should inherit from this class.
 
 import logging
 from abc import ABC, abstractmethod
-from typing import Generic, Optional
 
 from grader.exceptions import CheckError
-from grader.models.check_result import CheckResult, T
+from grader.models.check_result import CheckResult
 from grader.utils.external_resources import Resource
 from grader.utils.logger import VERBOSE
 from grader.utils.virtual_environment import VirtualEnvironment
@@ -17,7 +16,7 @@ from grader.utils.virtual_environment import VirtualEnvironment
 logger = logging.getLogger("grader")
 
 
-class AbstractCheck(ABC, Generic[T]):
+class AbstractCheck[T](ABC):
     """Each check has a name and a project root path."""
 
     def __init__(
@@ -25,8 +24,8 @@ class AbstractCheck(ABC, Generic[T]):
         name: str,
         project_root: str,
         is_venv_required: bool = False,
-        env_vars: Optional[dict[str, str]] = None,
-        assets: Optional[list[str]] = None,
+        env_vars: dict[str, str] | None = None,
+        assets: list[str] | None = None,
     ):
         """
         Initialize the check.
@@ -63,7 +62,7 @@ class AbstractCheck(ABC, Generic[T]):
         return self._name
 
     @property
-    def env_vars(self) -> Optional[dict[str, str]]:
+    def env_vars(self) -> dict[str, str] | None:
         """
         Get the environment variables for the check.
 
@@ -113,8 +112,8 @@ class ScoredCheck(AbstractCheck[float]):
         max_points: int,
         project_root: str,
         is_venv_requred: bool = False,
-        env_vars: Optional[dict[str, str]] = None,
-        assets: Optional[list[str]] = None,
+        env_vars: dict[str, str] | None = None,
+        assets: list[str] | None = None,
     ):
         """
         Initialize the scored check.
@@ -144,8 +143,8 @@ class NonScoredCheck(AbstractCheck[bool]):
         project_root: str,
         is_fatal: bool,
         is_venv_requred: bool = False,
-        env_vars: Optional[dict[str, str]] = None,
-        assets: Optional[list[str]] = None,
+        env_vars: dict[str, str] | None = None,
+        assets: list[str] | None = None,
     ):
         """
         Initialize the non-scored check.

@@ -7,7 +7,6 @@ Calls all the checks, and stores their results.
 import glob
 import os
 import shutil
-import sys
 import zipfile
 from pathlib import Path
 

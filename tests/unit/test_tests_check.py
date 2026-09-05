@@ -32,7 +32,7 @@ class TestDownloadTest(unittest.TestCase):
 
         # Assert
         mock_resource_cls.assert_called_once_with(path)
-        self.assertEqual(check._RunTestsCheck__tests_path, ["/tmp/test_file.py"])
+        self.assertEqual(check._RunTestsCheck__tests_path, ["/tmp/test_file.py"])  # type: ignore[attr-defined]
 
     @patch("grader.checks.run_tests_check.Resource")
     def test_02_mixed_paths_processed_correctly(self, mock_resource_cls: MagicMock) -> None:
@@ -57,7 +57,7 @@ class TestDownloadTest(unittest.TestCase):
 
         # Assert
         self.assertEqual(
-            check._RunTestsCheck__tests_path,
+            check._RunTestsCheck__tests_path,  # type: ignore[attr-defined]
             ["/tmp/test_cove.py", "/tmp/test_remote.py", local_path],
         )
 

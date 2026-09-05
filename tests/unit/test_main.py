@@ -403,11 +403,10 @@ class TestRunGrader(unittest.TestCase):
             ]
 
             # Act
-            with self.assertRaises(SystemExit) as context:
-                run_grader()
+            return_code = run_grader()
 
             # Assert
-            self.assertEqual(context.exception.code, 1)
+            self.assertEqual(return_code, 1)
             self.assertEqual(mock_grader.return_value.grade.call_count, 2)
             mock_setup_logger.return_value.error.assert_called_once()
 
@@ -447,11 +446,10 @@ class TestRunGrader(unittest.TestCase):
             mock_grader.return_value.grade.return_value = GradingResult("student_b", 0, 0, [])
 
             # Act
-            with self.assertRaises(SystemExit) as context:
-                run_grader()
+            return_code = run_grader()
 
             # Assert
-            self.assertEqual(context.exception.code, 1)
+            self.assertEqual(return_code, 1)
             self.assertEqual(mock_grader.return_value.grade.call_count, 1)
             mock_setup_logger.return_value.error.assert_called_once()
 

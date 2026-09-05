@@ -267,9 +267,8 @@ class TestGrader(unittest.TestCase):
         grader = Grader(config_path=sample_config_path, logger=MagicMock())
 
         # Act & Assert
-        with tempfile.TemporaryDirectory() as sample_project_path:
-            with self.assertRaises(TypeError):
-                grader.grade(sample_project_path, "student_id")
+        with tempfile.TemporaryDirectory() as sample_project_path, self.assertRaises(TypeError):
+            grader.grade(sample_project_path, "student_id")
 
     @patch("grader.grader.create_checks")
     def test_12_one_grader_grades_multiple_projects(self, mock_create_checks: MagicMock) -> None:
@@ -307,9 +306,8 @@ class TestGrader(unittest.TestCase):
         grader = Grader(config_path=sample_config_path, logger=mock_logger)
 
         # Act & Assert
-        with tempfile.TemporaryDirectory() as sample_project_path:
-            with self.assertRaises(InvalidCheckError):
-                grader.grade(sample_project_path, "student_id")
+        with tempfile.TemporaryDirectory() as sample_project_path, self.assertRaises(InvalidCheckError):
+            grader.grade(sample_project_path, "student_id")
 
         mock_logger.error.assert_called_once()
         mock_logger.exception.assert_called_once()

@@ -206,9 +206,7 @@ class TestStructureCheck(unittest.TestCase):
 
     @patch("grader.utils.structure_validator.StructureValidator.is_structure_valid")
     @patch("grader.checks.structure_check.Resource")
-    def test_11_load_structure_file_valid(
-        self, mock_resource_cls: MagicMock, mock_structure_valid: MagicMock
-    ) -> None:
+    def test_11_load_structure_file_valid(self, mock_resource_cls: MagicMock, mock_structure_valid: MagicMock) -> None:
         """Verify that run correctly processes a valid structure file."""
         # Arrange
         raw_structure = {

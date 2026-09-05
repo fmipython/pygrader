@@ -11,7 +11,7 @@ from urllib.parse import urlparse
 import requests
 
 # from cove_sdk._uri import is_cove_uri
-from cove_sdk import BaseItem, JSONItem, PythonItem, fetch_uri, is_cove_uri
+from cove_sdk import JSONItem, PythonItem, fetch_uri, is_cove_uri
 from cove_sdk.exceptions import CoveAPIError, URIParseError
 from dotenv import load_dotenv
 
@@ -46,10 +46,11 @@ class Resource:
         if self._type == ResourceType.LOCAL:
             return self._source
 
+        content = self.read()
         file_path = os.path.join(TEMP_FILES_DIR, self._filename)
 
         with open(file_path, "w+", encoding="utf-8") as file:
-            file.write(self.read())
+            file.write(content)
 
         return file_path
 
@@ -151,144 +152,3 @@ class Resource:
                 return result.python_value, f"{result.key}.py"
             case _:
                 raise ResourceError("Cove result is unknown")
-
-
-def is_resource_remote(resource_path: str) -> bool:
-    """
-    Check if a file is a remote resource.
-
-    :param resource_path: The path to the resource
-    :return: True if the resource is a remote resource, False otherwise
-    """
-    parsed_url = urlparse(resource_path)
-    return parsed_url.scheme in ["http", "https", "ftp"]
-
-
-def is_resource_cove(resource_path: str) -> bool:
-    """
-    Check if a file is a Cove resource.
-
-    :param resource_path: The path to the resource
-    :return: True if the resource is a Cove resource, False otherwise
-    """
-    return is_cove_uri(resource_path)
-
-
-def download_file_from_url(url: str, filename: Optional[str] = None) -> str:
-    """
-    Download a file from a URL and save it in temp_files under the pygrader root directory.
-
-    :param url: The URL to download the file from
-    :param filename: Optional filename to save as. If not provided, uses the last part of the URL path.
-    :return: The path to the saved file
-    """
-    logger.log(VERBOSE, "Downloading file from %s", url)
-
-    os.makedirs(TEMP_FILES_DIR, exist_ok=True)
-
-    if filename is None:
-        filename = os.path.basename(urlparse(url).path) or "downloaded_file"
-    file_path = os.path.join(TEMP_FILES_DIR, filename)
-
-    token = os.getenv("github_token")
-
-    if token is not None:
-        headers = {
-            "Authorization": f"token {token}",
-            "Accept": "application/vnd.github.v3.raw",
-        }
-    else:
-        headers = {}
-
-    try:
-        response = requests.get(url, stream=True, timeout=30, headers=headers)
-        response.raise_for_status()
-    except requests.RequestException as exc:
-        raise ResourceError(f"Error downloading file from {url}") from exc
-
-    with open(file_path, "wb") as file:
-        for chunk in response.iter_content(chunk_size=8192):
-            if chunk:
-                file.write(chunk)
-
-    # If a token is not passed, content is returned in a different way
-    # Github stuff
-
-    with open(file_path, "r") as file:
-        try:
-            parsed = json.load(file)
-        except json.JSONDecodeError:
-            pass
-        else:
-            if "download_url" in parsed:
-                return download_file_from_url(parsed["download_url"], filename)
-
-    return file_path
-
-
-# TODO - This is similar to the download_file_from_url
-def download_python_file_from_cove(cove_uri: str, filename: Optional[str] = None) -> str:
-    """
-    Download a file from a Cove URI and save it in temp_files under the pygrader root directory.
-
-    :param cove_uri: The Cove URI to download the file from
-    :return: The path to the saved file
-    """
-    logger.log(VERBOSE, "Downloading file from Cove URI %s", cove_uri)
-
-    os.makedirs(TEMP_FILES_DIR, exist_ok=True)
-
-    result = fetch_from_cove(cove_uri)
-
-    if not isinstance(result, PythonItem):
-        raise ResourceError(f"Cove resource is not a Python item: {cove_uri}")
-
-    if filename is None:
-        filename = result.key
-
-    file_path = os.path.join(TEMP_FILES_DIR, f"{filename}.py")
-
-    with open(file_path, "w+", encoding="utf-8") as file:
-        file.write(result.python_value)
-
-    return file_path
-
-
-def fetch_json_from_cove(cove_uri: str) -> dict:
-    """
-    Fetch a JSON resource from a Cove URI.
-
-    :param cove_uri: The Cove URI to fetch the JSON from
-    :raises ExternalResourceError: If the resource cannot be fetched or is not a JSON item
-    :return: The contents of the JSON item
-    """
-    logger.log(VERBOSE, "Fetching JSON from Cove URI %s", cove_uri)
-
-    result = fetch_from_cove(cove_uri)
-
-    if not isinstance(result, JSONItem):
-        raise ResourceError(f"Cove resource is not a JSON item: {cove_uri}")
-
-    return result.json_value
-
-
-def fetch_from_cove(cove_uri: str) -> BaseItem:
-    """
-    Fetch a resource from a cove URI.
-
-    Handle error cases and return the result as a BaseItem.
-
-    :return: The fetched resource as a BaseItem
-    """
-    if "COVE_API_KEY" not in os.environ:
-        raise ResourceError("COVE_API_KEY environment variable is not set, required to fetch Cove resources")
-
-    try:
-        result = fetch_uri(cove_uri, api_key=os.environ["COVE_API_KEY"])
-    except (CoveAPIError, URIParseError) as exc:
-        raise ResourceError(f"Error parsing Cove URI: {cove_uri}") from exc
-
-    if result is None:
-        raise ResourceError(f"Cove resource not found: {cove_uri}")
-
-    return result

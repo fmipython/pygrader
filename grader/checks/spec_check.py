@@ -107,13 +107,17 @@ class SpecCheck(ScoredCheck):
 
         Test files are excluded, matching :func:`find_all_source_files`.
 
+        :raises CheckError: If a source file cannot be read or is not valid UTF-8.
         :return: The concatenated source, one section per file.
         """
         chunks = []
         for path in find_all_source_files(self._project_root):
             relative_path = os.path.relpath(path, self._project_root)
-            with open(path, "r", encoding="utf-8") as file_pointer:
-                chunks.append(f"# === {relative_path} ===\n{file_pointer.read()}")
+            try:
+                with open(path, "r", encoding="utf-8") as file_pointer:
+                    chunks.append(f"# === {relative_path} ===\n{file_pointer.read()}")
+            except (OSError, UnicodeDecodeError) as error:
+                raise CheckError(f"Cannot read source file {relative_path}: {error}") from error
 
         return "\n\n".join(chunks)
 

@@ -7,6 +7,8 @@ Calls all the checks, and stores their results.
 import glob
 import os
 import shutil
+import sys
+import zipfile
 from pathlib import Path
 
 import grader.utils.constants as const
@@ -89,7 +91,7 @@ def resolve_project_root(path: str) -> str:
     return project_root
 
 
-def run_grader() -> None:
+def run_grader() -> int:
     """Run the grader application."""
     args = get_args()
     is_suppressing_info = args["report_format"] == "json" or args["report_format"] == "csv" or args["suppress_info"]
@@ -113,8 +115,15 @@ def run_grader() -> None:
 
     reporter = build_reporter(args["report_format"], is_verbose=args["verbosity"] >= 1)
 
+    has_failure = False
+
     for path in matched_paths:
-        project_root = resolve_project_root(path)
+        try:
+            project_root = resolve_project_root(path)
+        except (OSError, zipfile.BadZipFile) as error:
+            logger.error("Could not resolve project root for %s: %s", path, error)
+            has_failure = True
+            continue
 
         run_id: str = extract_student_id_from_path(path) if is_batch else args["student_id"]
 
@@ -123,6 +132,7 @@ def run_grader() -> None:
 
         except GraderError:
             logger.error("Grading failed for project %s", project_root)
+            has_failure = True
             continue
 
         reporter.add_result(grade)
@@ -132,3 +142,5 @@ def run_grader() -> None:
 
     if os.path.exists(const.WORK_DIR):
         shutil.rmtree(const.WORK_DIR)
+
+    return 1 if has_failure else 0

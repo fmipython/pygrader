@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from grader.checks.abstract_check import ScoredCheck
-from grader.exceptions import CheckError
+from grader.exceptions import CheckError, ResourceError
 from grader.models.check_result import ScoredCheckResult
 from grader.utils import process
 from grader.utils.constants import PYTEST_ARGS, PYTEST_PATH, PYTEST_ROOT_DIR_ARG
@@ -177,7 +177,10 @@ class RunTestsCheck(ScoredCheck):
     def _pre_run(self) -> None:
         super()._pre_run()
 
-        self.__tests_path = [Resource(path).to_file() for path in self.__tests_path]
+        try:
+            self.__tests_path = [Resource(path).to_file() for path in self.__tests_path]
+        except ResourceError as error:
+            raise CheckError(f"Cannot fetch test file: {error}") from error
 
     def __calculate_score(self, passed_tests: list[TestId], failed_tests: list[TestId]) -> tuple[float, float, float]:
         """

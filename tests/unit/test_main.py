@@ -3,6 +3,7 @@
 import os
 import tempfile
 import unittest
+import zipfile
 from unittest.mock import MagicMock, call, patch
 
 import grader.utils.constants as const
@@ -402,10 +403,56 @@ class TestRunGrader(unittest.TestCase):
             ]
 
             # Act
-            run_grader()
+            with self.assertRaises(SystemExit) as context:
+                run_grader()
 
             # Assert
+            self.assertEqual(context.exception.code, 1)
             self.assertEqual(mock_grader.return_value.grade.call_count, 2)
+            mock_setup_logger.return_value.error.assert_called_once()
+
+    @patch("desktop.main.get_args")
+    @patch("desktop.main.Grader")
+    @patch("desktop.main.setup_logger")
+    @patch("desktop.main.extract_student_id_from_path", side_effect=os.path.basename)
+    @patch("desktop.main.resolve_project_root")
+    def test_10b_bad_zip_for_one_project_does_not_stop_the_batch(
+        self,
+        mock_resolve_project_root: MagicMock,
+        _mock_extract_student_id: MagicMock,
+        mock_setup_logger: MagicMock,
+        mock_grader: MagicMock,
+        mock_get_args: MagicMock,
+    ) -> None:
+        """Test that a corrupted zip for one project is logged and grading continues with the next one."""
+        # Arrange
+        with tempfile.TemporaryDirectory() as batch_dir:
+            student_a = os.path.join(batch_dir, "student_a")
+            student_b = os.path.join(batch_dir, "student_b")
+            os.makedirs(student_a)
+            os.makedirs(student_b)
+
+            mock_get_args.return_value = {
+                "student_id": "test_student",
+                "project_root": os.path.join(batch_dir, "*"),
+                "config": "/path/to/config",
+                "report_format": "text",
+                "verbosity": 1,
+                "suppress_info": False,
+                "keep_venv": False,
+                "skip_venv_creation": False,
+                "checks": None,
+            }
+            mock_resolve_project_root.side_effect = [zipfile.BadZipFile("boom"), student_b]
+            mock_grader.return_value.grade.return_value = GradingResult("student_b", 0, 0, [])
+
+            # Act
+            with self.assertRaises(SystemExit) as context:
+                run_grader()
+
+            # Assert
+            self.assertEqual(context.exception.code, 1)
+            self.assertEqual(mock_grader.return_value.grade.call_count, 1)
             mock_setup_logger.return_value.error.assert_called_once()
 
     @patch("desktop.main.get_args")

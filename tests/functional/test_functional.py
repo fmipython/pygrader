@@ -393,7 +393,9 @@ class TestRemoteTests(BaseFunctionalTestWithSampleProject):
         """
         # Arrange
         path_to_tests = os.path.join(self.clone_path, "tests", "test_sample_code.py")
-        os.remove(path_to_tests)
+
+        if os.path.exists(path_to_tests):
+            os.remove(path_to_tests)
 
         command = build_command(project_path=self.clone_path, config_file="tests.json")
 
@@ -465,9 +467,7 @@ class TestMultipleProjectsSupport(BaseFunctionalTestWithSampleProject):
         """
         # Arrange
         clean_source = Path(self.clone_path)
-        _zip_directory(
-            clean_source, self.batch_dir / "CLEANID-Student_One_11111_assignsubmission_file" / "project.zip"
-        )
+        _zip_directory(clean_source, self.batch_dir / "CLEANID-Student_One_11111_assignsubmission_file" / "project.zip")
 
         broken_source = self.batch_dir / "_broken_source"
         shutil.copytree(clean_source, broken_source)
@@ -559,11 +559,10 @@ def build_command(
     :param checks: The names of the checks to run, defaults to None (runs all checks).
     :return: A list of command-line arguments to run the grader.
     """
-    python_binary = "python3" if os.name == "posix" else "python"
     grader_entrypoint = "pygrader.py"
 
     full_config_path = os.path.join(const.CONFIG_DIR, config_file)
-    base_command = [python_binary, os.path.join(const.ROOT_DIR, grader_entrypoint)]
+    base_command = ["uv", "run", os.path.join(const.ROOT_DIR, grader_entrypoint)]
 
     command = base_command + ["--config", full_config_path]
     if project_path is not None:
@@ -624,7 +623,9 @@ def is_score_correct(expected_score: float, target_check: str, grader_output: st
     """
     lines = grader_output.split("\n")
 
-    score_lines = [line for line in lines if "Check" in line]
+    score_lines = [line for line in lines if "Check:" in line and "Score:" in line]
+
+    print(score_lines)
     score_line = next(line for line in score_lines if target_check in line)
 
     # Example: "Run ID: None, Check: coverage, Score: 8/10"

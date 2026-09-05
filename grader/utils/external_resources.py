@@ -43,6 +43,9 @@ class Resource:
         return self._content
 
     def to_file(self) -> str:
+        if self._type == ResourceType.LOCAL:
+            return self._source
+
         file_path = os.path.join(TEMP_FILES_DIR, self._filename)
 
         with open(file_path, "w+", encoding="utf-8") as file:

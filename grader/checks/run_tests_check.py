@@ -12,6 +12,7 @@ from grader.models.check_result import ScoredCheckResult
 from grader.utils import process
 from grader.utils.constants import PYTEST_ARGS, PYTEST_PATH, PYTEST_ROOT_DIR_ARG
 from grader.utils.external_resources import (
+    Resource,
     download_file_from_url,
     download_python_file_from_cove,
     is_resource_cove,
@@ -179,10 +180,7 @@ class RunTestsCheck(ScoredCheck):
     def _pre_run(self) -> None:
         super()._pre_run()
 
-        # TODO - This will be similar to config.py:load_config
-        # A function that handles different types of resources should be introduced.
-
-        self.__tests_path = [RunTestsCheck.__download_test(path) for path in self.__tests_path]
+        self.__tests_path = [Resource(path).to_file() for path in self.__tests_path]
 
     def __calculate_score(self, passed_tests: list[TestId], failed_tests: list[TestId]) -> tuple[float, float, float]:
         """
@@ -228,19 +226,3 @@ class RunTestsCheck(ScoredCheck):
 
         logger.debug("Test %s::%s scored %.2f", test_class, test_name, score)
         return score
-
-    @staticmethod
-    def __download_test(path: str) -> str:
-        """
-        Download a test file from a remote URL and save it in temp_files under the pygrader root directory.
-
-        :param path: The URL to download the test file from
-        :return: The path to the saved test file
-        """
-        if is_resource_cove(path):
-            return download_python_file_from_cove(path)
-
-        if is_resource_remote(path):
-            return download_file_from_url(path)
-
-        return path

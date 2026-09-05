@@ -11,13 +11,7 @@ from typing import Optional
 from grader.checks.abstract_check import NonScoredCheck
 from grader.exceptions import CheckError, ResourceError
 from grader.models.check_result import NonScoredCheckResult
-from grader.utils.external_resources import (
-    Resource,
-    download_file_from_url,
-    fetch_json_from_cove,
-    is_resource_cove,
-    is_resource_remote,
-)
+from grader.utils.external_resources import Resource
 from grader.utils.logger import VERBOSE
 from grader.utils.structure_validator import StructureValidator
 

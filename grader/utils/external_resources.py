@@ -48,6 +48,7 @@ class Resource:
 
         content = self.read()
         file_path = os.path.join(TEMP_FILES_DIR, self._filename)
+        os.makedirs(TEMP_FILES_DIR, exist_ok=True)
 
         with open(file_path, "w+", encoding="utf-8") as file:
             file.write(content)

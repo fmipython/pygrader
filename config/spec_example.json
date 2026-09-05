@@ -1,0 +1,12 @@
+{
+  "checks": [
+    {
+      "name": "spec",
+      "max_points": 10,
+      "is_venv_required": false,
+      "assets": [
+        "${{config_dir}}/spec.md"
+      ]
+    }
+  ]
+}

@@ -7,6 +7,8 @@
 - Refactored ResultsReporter classes to support multiple projects
 - Allow running only select checks
 - When project is zipped without a directory, pygrader no longer fails to grade
+- Introduce assets
+- Add spec check, grading a project against a markdown specification via an LLM
 
 ## 1.13.0
 

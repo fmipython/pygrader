@@ -15,6 +15,7 @@ Current supported set of checks are:
 - Code coverage (via pytest & coverage)
 - Run the code against certain tests
 - If the project has a requirements.txt/pyproject.toml file
+- Grade the project against a markdown specification, using an LLM
 
 The tool supports configuration files, where you can specify the score for each check.
 

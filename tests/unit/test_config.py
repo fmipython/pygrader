@@ -1,140 +1,76 @@
 """Unit tests for the config module."""
 
 import unittest
-import unittest.mock
-from unittest.mock import MagicMock, patch
-
-from cove_sdk import BaseItem, JSONItem
+from unittest.mock import MagicMock, mock_open, patch
 
 from grader.exceptions import InvalidConfigError, ResourceError
-from grader.utils.config import load_config, load_from_cove
+from grader.utils.config import load_config, read_from_file
 
 
-class TestConfig(unittest.TestCase):
-    """Unit tests for the config module."""
+class TestLoadConfig(unittest.TestCase):
+    """Unit tests for load_config."""
 
-    @patch("grader.utils.config.is_resource_remote")
-    @patch("grader.utils.config.download_file_from_url")
-    def test_01_remote_resource_downloaded(self, mock_download: MagicMock, mock_is_remote: MagicMock) -> None:
-        """Test if a remote resource is downloaded successfully."""
-        # Arrange
-        mock_is_remote.return_value = True
-        mock_download.return_value = "file_content"
-
-        sample_config_path = "http://example.com/config.json"
-
-        # Act
-        try:
-            load_config(sample_config_path)
-        except InvalidConfigError:
-            pass
-
-        # Assert
-        mock_download.assert_called_once_with(sample_config_path)
-
-    @patch("grader.utils.config.is_resource_remote")
-    @patch("grader.utils.config.download_file_from_url")
-    def test_02_remote_resource_download_raises_exception(
-        self, mock_download: MagicMock, mock_is_remote: MagicMock
+    @patch("grader.utils.config.read_from_file")
+    @patch("grader.utils.config.Resource")
+    def test_01_resolves_resource_to_file_and_reads_it(
+        self, mock_resource_cls: MagicMock, mock_read_from_file: MagicMock
     ) -> None:
-        """Test if an exception during remote resource download is handled properly."""
+        """Test that load_config resolves the resource to a local path and reads it."""
         # Arrange
-        mock_is_remote.return_value = True
-        mock_download.side_effect = ResourceError("Download failed")
-
         sample_config_path = "http://example.com/config.json"
-
-        # Act & Assert
-        with self.assertRaises(InvalidConfigError):
-            load_config(sample_config_path)
-
-    @patch(
-        "builtins.open",
-        new_callable=unittest.mock.mock_open,
-        read_data='{"key": "value"}',
-    )
-    @patch("grader.utils.config.is_resource_remote")
-    def test_03_local_file_loaded_successfully(self, mock_is_remote: MagicMock, mock_open: MagicMock) -> None:
-        """Test if a local file is loaded successfully."""
-        # Arrange
-        mock_is_remote.return_value = False
-
-        sample_config_path = "config.json"
+        mock_resource_cls.return_value.to_file.return_value = "/tmp/config.json"
+        mock_read_from_file.return_value = {"key": "value"}
 
         # Act
         config = load_config(sample_config_path)
 
         # Assert
         self.assertEqual(config, {"key": "value"})
-        mock_open.assert_called_once_with(sample_config_path, encoding="utf-8")
+        mock_resource_cls.assert_called_once_with(sample_config_path)
+        mock_read_from_file.assert_called_once_with("/tmp/config.json")
 
-    @patch("builtins.open", new_callable=unittest.mock.mock_open)
-    @patch("grader.utils.config.is_resource_remote")
-    def test_04_local_file_not_found(self, mock_is_remote: MagicMock, mock_open: MagicMock) -> None:
-        """Test if a FileNotFoundError for a local file is handled properly."""
+    @patch("grader.utils.config.Resource")
+    def test_02_resource_error_propagates(self, mock_resource_cls: MagicMock) -> None:
+        """Test that a ResourceError from resolving the resource is not swallowed."""
         # Arrange
-        mock_is_remote.return_value = False
-        mock_open.side_effect = FileNotFoundError
-
-        sample_config_path = "non_existent_config.json"
+        mock_resource_cls.return_value.to_file.side_effect = ResourceError("Download failed")
 
         # Act & Assert
-        with self.assertRaises(InvalidConfigError):
-            load_config(sample_config_path)
+        with self.assertRaises(ResourceError):
+            load_config("http://example.com/config.json")
 
-    @patch(
-        "builtins.open",
-        new_callable=unittest.mock.mock_open,
-        read_data='{"key": "value"',
-    )
-    @patch("grader.utils.config.is_resource_remote")
-    def test_05_local_file_invalid_json(self, mock_is_remote: MagicMock, _: MagicMock) -> None:
-        """Test if invalid JSON in a local file is handled properly."""
+
+class TestReadFromFile(unittest.TestCase):
+    """Unit tests for read_from_file."""
+
+    @patch("builtins.open", new_callable=mock_open, read_data='{"key": "value"}')
+    def test_01_local_file_loaded_successfully(self, mock_file: MagicMock) -> None:
+        """Test if a local file is loaded successfully."""
         # Arrange
-        mock_is_remote.return_value = False
-        # The read_data is intentionally malformed JSON
-
-        sample_config_path = "invalid_config.json"
-
-        # Act & Assert
-        with self.assertRaises(InvalidConfigError):
-            load_config(sample_config_path)
-
-
-class TestLoadFromCove(unittest.TestCase):
-    """Unit tests for the load_from_cove function."""
-
-    @patch("grader.utils.config.fetch_from_cove")
-    def test_01_fetch_from_cove_raises_error_wrapped_in_invalid_config(self, mock_fetch: MagicMock) -> None:
-        """Test that an ExternalResourceError is wrapped in InvalidConfigError."""
-        # Arrange
-        mock_fetch.side_effect = ResourceError("fetch failed")
-
-        # Act & Assert
-        with self.assertRaises(InvalidConfigError):
-            load_from_cove("cove://example/config")
-
-    @patch("grader.utils.config.fetch_from_cove")
-    def test_02_non_json_item_raises_invalid_config(self, mock_fetch: MagicMock) -> None:
-        """Test that a non-JSONItem result raises InvalidConfigError."""
-        # Arrange
-        mock_fetch.return_value = MagicMock(spec=BaseItem)
-
-        # Act & Assert
-        with self.assertRaises(InvalidConfigError):
-            load_from_cove("cove://example/config")
-
-    @patch("grader.utils.config.fetch_from_cove")
-    def test_03_returns_json_value_of_json_item(self, mock_fetch: MagicMock) -> None:
-        """Test that the json_value of a JSONItem is returned."""
-        # Arrange
-        expected_config = {"key": "value", "checks": []}
-        mock_item = MagicMock(spec=JSONItem)
-        mock_item.json_value = expected_config
-        mock_fetch.return_value = mock_item
+        sample_config_path = "config.json"
 
         # Act
-        result = load_from_cove("cove://example/config")
+        config = read_from_file(sample_config_path)
 
         # Assert
-        self.assertEqual(result, expected_config)
+        self.assertEqual(config, {"key": "value"})
+        mock_file.assert_called_once_with(sample_config_path, encoding="utf-8")
+
+    @patch("builtins.open", new_callable=mock_open)
+    def test_02_local_file_not_found(self, mock_file: MagicMock) -> None:
+        """Test if a FileNotFoundError for a local file is handled properly."""
+        # Arrange
+        mock_file.side_effect = FileNotFoundError
+
+        # Act & Assert
+        with self.assertRaises(InvalidConfigError):
+            read_from_file("non_existent_config.json")
+
+    @patch("builtins.open", new_callable=mock_open, read_data='{"key": "value"')
+    def test_03_local_file_invalid_json(self, _: MagicMock) -> None:
+        """Test if invalid JSON in a local file is handled properly."""
+        # The read_data is intentionally malformed JSON
+
+        # Act & Assert
+        with self.assertRaises(InvalidConfigError):
+            read_from_file("invalid_config.json")

@@ -11,13 +11,7 @@ from grader.exceptions import CheckError
 from grader.models.check_result import ScoredCheckResult
 from grader.utils import process
 from grader.utils.constants import PYTEST_ARGS, PYTEST_PATH, PYTEST_ROOT_DIR_ARG
-from grader.utils.external_resources import (
-    Resource,
-    download_file_from_url,
-    download_python_file_from_cove,
-    is_resource_cove,
-    is_resource_remote,
-)
+from grader.utils.external_resources import Resource
 from grader.utils.logger import VERBOSE
 
 logger = logging.getLogger("grader")

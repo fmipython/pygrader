@@ -186,3 +186,6 @@ docs/diagrams/out
 **/.DS_Store
 
 .complexipy_cache
+.claude
+.codegraph
+.ruff_cache

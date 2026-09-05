@@ -29,6 +29,7 @@ class StructureCheck(NonScoredCheck):
         is_fatal: bool = False,
         is_venv_required: bool = False,
         env_vars: Optional[dict[str, str]] = None,
+        assets: Optional[list[str]] = None,
     ):
         """
         Initialize the structure check.
@@ -39,8 +40,9 @@ class StructureCheck(NonScoredCheck):
         :param is_fatal: Whether the check is fatal.
         :param is_venv_required: Whether a virtual environment is required.
         :param env_vars: Optional environment variables for the check.
+        :param assets: Optional list of resource sources (paths, URLs or Cove URIs) for the check.
         """
-        super().__init__(name, project_root, is_fatal, is_venv_required, env_vars)
+        super().__init__(name, project_root, is_fatal, is_venv_required, env_vars, assets)
         self.__structure_file = structure_file
 
     def run(self) -> NonScoredCheckResult:

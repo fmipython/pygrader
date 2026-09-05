@@ -33,6 +33,7 @@ class PylintCheck(ScoredCheck):
         is_venv_required: bool,
         pylintrc_path: Optional[str] = None,
         env_vars: Optional[dict[str, str]] = None,
+        assets: Optional[list[str]] = None,
     ):
         """
         Initialize the pylint check.
@@ -43,8 +44,9 @@ class PylintCheck(ScoredCheck):
         :param is_venv_required: Whether a virtual environment is required.
         :param pylintrc_path: Optional path to custom pylintrc configuration.
         :param env_vars: Optional environment variables for the check.
+        :param assets: Optional list of resource sources (paths, URLs or Cove URIs) for the check.
         """
-        super().__init__(name, max_points, project_root, is_venv_required, env_vars)
+        super().__init__(name, max_points, project_root, is_venv_required, env_vars, assets)
         self.__pylint_max_score = 10
         self.__pylintrc_path = pylintrc_path or const.PYLINTRC
 

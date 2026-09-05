@@ -50,6 +50,7 @@ class RunTestsCheck(ScoredCheck):
         default_test_score: float = 0.0,
         test_score_mapping: Optional[dict[str, float]] = None,
         env_vars: Optional[dict[str, str]] = None,
+        assets: Optional[list[str]] = None,
     ):
         """
         Initialize the RunTestsCheck class.
@@ -61,8 +62,10 @@ class RunTestsCheck(ScoredCheck):
         :param tests_path: A list of paths to the test files.
         :param default_test_score: The default score for tests not explicitly mapped.
         :param test_score_mapping: A mapping of test names to their respective scores.
+        :param env_vars: Optional environment variables for the check.
+        :param assets: Optional list of resource sources (paths, URLs or Cove URIs) for the check.
         """
-        super().__init__(name, max_points, project_root, is_venv_required, env_vars)
+        super().__init__(name, max_points, project_root, is_venv_required, env_vars, assets)
         self.__default_test_score = default_test_score
         self.__test_score_mapping = defaultdict(lambda: default_test_score)
 

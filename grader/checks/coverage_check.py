@@ -29,6 +29,7 @@ class CoverageCheck(ScoredCheck):
         max_points: int,
         is_venv_required: bool,
         env_vars: Optional[dict[str, str]] = None,
+        assets: Optional[list[str]] = None,
     ):
         """
         Initialize the coverage check.
@@ -38,8 +39,9 @@ class CoverageCheck(ScoredCheck):
         :param max_points: The maximum points this check can award.
         :param is_venv_required: Whether a virtual environment is required.
         :param env_vars: Optional environment variables for the check.
+        :param assets: Optional list of resource sources (paths, URLs or Cove URIs) for the check.
         """
-        super().__init__(name, max_points, project_root, is_venv_required, env_vars)
+        super().__init__(name, max_points, project_root, is_venv_required, env_vars, assets)
 
         self.__coverage_full_path = COVERAGE_PATH
 

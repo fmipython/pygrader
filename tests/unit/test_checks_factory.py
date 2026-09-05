@@ -241,3 +241,40 @@ class TestChecksFactory(unittest.TestCase):
         # Act & Assert
         with self.assertRaises(InvalidCheckError):
             create_checks(config, project_root, selected_checks=["pylintt"])
+
+    @patch("grader.checks.abstract_check.Resource")
+    def test_16_assets_are_loaded_as_resources(self, mocked_resource: MagicMock) -> None:
+        """Test that a check's "assets" config entries are converted to Resource objects."""
+        # Arrange
+        config = {
+            "checks": [
+                {
+                    "name": "coverage",
+                    "max_points": 10,
+                    "is_venv_required": False,
+                    "assets": ["local_asset.txt", "cove://fmi-python/asset"],
+                }
+            ]
+        }
+        project_root = "test_project"
+
+        # Act
+        non_venv_checks, _ = create_checks(config, project_root)
+
+        # Assert
+        self.assertEqual(len(non_venv_checks), 1)
+        check = non_venv_checks[0]
+        self.assertEqual(check.assets, [mocked_resource.return_value, mocked_resource.return_value])
+
+    def test_17_assets_default_to_empty_list(self) -> None:
+        """Test that a check built without an "assets" key exposes an empty assets list."""
+        # Arrange
+        config = {"checks": [{"name": "coverage", "max_points": 10, "is_venv_required": False}]}
+        project_root = "test_project"
+
+        # Act
+        non_venv_checks, _ = create_checks(config, project_root)
+
+        # Assert
+        self.assertEqual(len(non_venv_checks), 1)
+        self.assertEqual(non_venv_checks[0].assets, [])

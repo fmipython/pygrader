@@ -29,6 +29,7 @@ class RequirementsCheck(ScoredCheck):
         is_venv_required: bool,
         is_checking_install: bool = False,
         env_vars: Optional[dict[str, str]] = None,
+        assets: Optional[list[str]] = None,
     ):
         """
         Initialize the requirements check.
@@ -39,8 +40,9 @@ class RequirementsCheck(ScoredCheck):
         :param is_venv_required: Whether a virtual environment is required.
         :param is_checking_install: Whether to check if dependencies can be installed.
         :param env_vars: Optional environment variables for the check.
+        :param assets: Optional list of resource sources (paths, URLs or Cove URIs) for the check.
         """
-        super().__init__(name, max_points, project_root, is_venv_required, env_vars)
+        super().__init__(name, max_points, project_root, is_venv_required, env_vars, assets)
 
         self.__requirements_path = os.path.join(self._project_root, REQUIREMENTS_FILENAME)
         self.__pyproject_path = os.path.join(self._project_root, PYPROJECT_FILENAME)

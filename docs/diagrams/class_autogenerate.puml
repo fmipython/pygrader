@@ -1,0 +1,161 @@
+@startuml
+
+class Grader {
+    - __project_root
+    - __config
+    - __is_skipping_venv_creation
+    - __is_keeping_venv
+    - __logger
+    + grade(self) : void
+    - __run_check(self, check: AbstractCheck) : CheckResult
+    - __cleanup(self) : void
+}
+
+
+class GraderError {
+}
+
+
+class RequirementsCheck {
+    - __is_checking_install
+    - __pyproject_path
+    - __requirements_path
+    + run(self) : ScoredCheckResult
+}
+
+
+class TypeHintsCheck {
+    - __mypy_max_score
+    - __mypy_arguments
+    - __mypy_binary
+    + run(self) : ScoredCheckResult
+    - __translate_score(self, mypy_score: float) : float
+}
+
+
+class CheckResult {
+}
+
+
+class AbstractCheck {
+    # _env_vars
+    # _is_venv_required
+    # _project_root
+    # _name
+    # _pre_run(self) : void
+}
+
+
+class ScoredCheckResult {
+}
+
+
+class NonScoredCheckResult {
+}
+
+
+class ScoredCheck {
+    # _max_points
+}
+
+
+class NonScoredCheck {
+    # _is_fatal
+}
+
+
+class CheckError {
+}
+
+
+class InvalidCheckError {
+}
+
+
+class PylintCheck {
+    - __pylintrc_path
+    - __pylint_max_score
+    + run(self) : ScoredCheckResult
+    - __translate_score(self, pylint_score: float) : float
+    - __get_pylint_score(self, pylint_output: str) : float
+    - __summarize_output(self, pylint_output: str) : str
+}
+
+
+class PylintCustomReporter {
+    + output
+    + display_messages(self, layout) : void
+    + display_reports(self, layout) : void
+}
+
+
+class CoverageCheck {
+    - __coverage_full_path
+    + run(self) : ScoredCheckResult
+    - __translate_score(self, coverage_score: float) : float
+    - __coverage_run(self) : void
+    - __coverage_report(self) : int
+}
+
+
+class StructureCheck {
+    - __structure_file
+    + run(self) : NonScoredCheckResult
+}
+
+
+class InvalidConfigError {
+}
+
+
+class ExternalResourceError {
+}
+
+
+class VirtualEnvironment {
+    - __is_keeping_existing_venv
+    - __is_keeping_venv_after_run
+    # _venv_path
+    # _project_path
+    # __enter__(self) : VirtualEnvironment
+    # __exit__(self, exc_type, exc_val, exc_tb) : void
+    + setup(self) : void
+    - __remove_existing_venv(self) : void
+    + teardown(self) : void
+}
+
+
+class VirtualEnvironmentError {
+}
+
+
+class StructureValidator {
+    + patterns
+    + required
+    + name
+    + is_structure_valid(self, project_root: str) : bool
+    + get_matching_files(self, project_root: str) : void
+}
+
+
+class ResultsReporter {
+    # _to_file_descriptor(self, content: str, file_descriptor: TextIO) : void
+}
+
+
+class JSONResultsReporter {
+    + display(self, results, verbose: bool, file_descriptor: TextIO) : void
+}
+
+
+class CSVResultsReporter {
+    + display(self, results, verbose: bool, file_descriptor: TextIO) : void
+}
+
+
+class PlainTextResultsReporter {
+    + display(self, results, verbose: bool, file_descriptor: TextIO) : void
+}
+
+
+@enduml

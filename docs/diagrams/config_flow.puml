@@ -1,0 +1,55 @@
+@startuml
+
+actor Caller
+participant "Grader.__init__" as Init
+participant "load_config" as LoadConfig
+participant "Grader.grade" as Grade
+participant "Grader.__run_checks" as RunChecks
+participant "create_checks" as Factory
+participant "__create_check" as CreateCheck
+participant "Check\n(e.g. PylintCheck)" as Check
+participant "VirtualEnvironment" as Venv
+
+Caller -> Init: config_path, is_keeping_venv,\nis_skipping_venv_creation, selected_checks
+activate Init
+Init -> LoadConfig: config_path
+LoadConfig -> Init: config (dict)
+Init -> Init: store __config, __selected_checks,\n__is_keeping_venv, __is_skipping_venv_creation
+deactivate Init
+
+Caller -> Grade: project_root, run_id
+activate Grade
+Grade -> RunChecks: project_root
+activate RunChecks
+
+RunChecks -> Factory: __config, project_root,\nselected_checks=__selected_checks
+activate Factory
+Factory -> Factory: filter checks by selected_checks,\nread global env from config["environment"]
+
+loop for each check entry in config["checks"]
+    Factory -> CreateCheck: project_root, check dict, global_env
+    activate CreateCheck
+    CreateCheck -> CreateCheck: merge global_env with\ncheck["environment"], drop "name"/"environment"
+    CreateCheck -> Check: name, project_root,\n**other_args (incl. env_vars)
+    Check -> CreateCheck: check instance
+    CreateCheck -> Factory: check instance
+    deactivate CreateCheck
+end
+
+Factory -> RunChecks: (non_venv_checks, venv_checks)
+deactivate Factory
+
+RunChecks -> Check: run() [for each non-venv check]
+
+RunChecks -> RunChecks: venv_config = __config.get("venv", {})
+RunChecks -> Venv: project_root, is_keeping_venv_after_run,\n**venv_config
+activate Venv
+RunChecks -> Check: run() [for each venv check]
+deactivate Venv
+
+RunChecks -> Grade: list[CheckResult]
+deactivate RunChecks
+Grade -> Caller: GradingResult
+deactivate Grade
+
+@enduml

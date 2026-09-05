@@ -41,7 +41,7 @@ class AbstractCheck(ABC, Generic[T]):
         self._project_root = project_root
         self._is_venv_required = is_venv_required
         self._env_vars = env_vars
-        self._assets = [Resource(source) for source in (assets or [])]
+        self._assets = [Resource(source) for source in assets] if assets else []
 
     @abstractmethod
     def run(self) -> CheckResult[T]:

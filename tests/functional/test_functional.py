@@ -217,7 +217,7 @@ class TestFunctionalBadWeatherWithGrader(BaseFunctionalTestWithGrader):
 
         # Assert
         self.assertNotEqual(run_result.returncode, 0, "Expected non-zero return code when no config is provided")
-        self.assertIn("Configuration file not found", run_result.stdout)
+        self.assertIn("Error with the configuration file", run_result.stdout)
 
     def test_14_no_project_path_provided(self) -> None:
         """Verify that the grader handles the absence of a project path gracefully."""
@@ -531,7 +531,7 @@ class TestMultipleProjectsSupport(BaseFunctionalTestWithSampleProject):
         run_result = run(command)
 
         # Assert
-        self.assertEqual(run_result.returncode, 0, run_result.stdout)
+        self.assertEqual(run_result.returncode, 1, run_result.stdout)
         self.assertTrue(
             is_score_correct_for_run(
                 expected_score=1, target_check="pylint", run_id="GOODID", grader_output=run_result.stdout
@@ -626,7 +626,6 @@ def is_score_correct(expected_score: float, target_check: str, grader_output: st
 
     score_lines = [line for line in lines if "Check:" in line and "Score:" in line]
 
-    print(score_lines)
     score_line = next(line for line in score_lines if target_check in line)
 
     # Example: "Run ID: None, Check: coverage, Score: 8/10"

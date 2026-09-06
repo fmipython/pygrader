@@ -5,6 +5,7 @@ from grader.checks.coverage_check import CoverageCheck
 from grader.checks.pylint_check import PylintCheck
 from grader.checks.requirements_check import RequirementsCheck
 from grader.checks.run_tests_check import RunTestsCheck
+from grader.checks.spec_check import SpecCheck
 from grader.checks.structure_check import StructureCheck
 from grader.checks.type_hints_check import TypeHintsCheck
 from grader.exceptions import InvalidCheckError, InvalidConfigError
@@ -17,10 +18,13 @@ NAME_TO_CHECK: dict[str, type[AbstractCheck]] = {
     "type-hints": TypeHintsCheck,
     "structure": StructureCheck,
     "tests": RunTestsCheck,
+    "spec": SpecCheck,
 }
 
 
-def create_checks(config: dict, project_root: str) -> tuple[list[AbstractCheck], list[AbstractCheck]]:
+def create_checks(
+    config: dict, project_root: str, selected_checks: list[str] | None = None
+) -> tuple[list[AbstractCheck], list[AbstractCheck]]:
     """
     Build two lists, containing the non-venv checks and the venv checks.
 
@@ -28,8 +32,10 @@ def create_checks(config: dict, project_root: str) -> tuple[list[AbstractCheck],
     :type config: dict
     :param project_root: The root of the project.
     :type project_root: str
+    :param selected_checks: If provided, only checks whose "name" is in this list are built.
+    :type selected_checks: Optional[list[str]]
     :raises InvalidConfigError: If no checks are found in the configuration file.
-    :raises InvalidCheckError: If the check name is unknown.
+    :raises InvalidCheckError: If the check name is unknown, or a requested check is not in the config.
     :return: A tuple containing the non-venv checks and the venv checks.
     :rtype: tuple[list[AbstractCheck], list[AbstractCheck]]
     """
@@ -37,6 +43,9 @@ def create_checks(config: dict, project_root: str) -> tuple[list[AbstractCheck],
         raise InvalidConfigError("No checks found in the configuration file")
 
     checks: list[dict] = config["checks"]
+
+    if selected_checks is not None:
+        checks = __filter_checks(checks, selected_checks)
 
     global_env = config.get("environment", {}).get("variables", {})
 
@@ -56,6 +65,27 @@ def create_checks(config: dict, project_root: str) -> tuple[list[AbstractCheck],
     return non_venv_checks, venv_checks
 
 
+def __filter_checks(checks: list[dict], selected_checks: list[str]) -> list[dict]:
+    """
+    Filter the checks to only those whose "name" is in selected_checks.
+
+    :param checks: The full list of check configurations.
+    :param selected_checks: The names of the checks that should be kept.
+    :raises InvalidCheckError: If a requested check name is not present in the configuration.
+    :return: The filtered list of check configurations, in their original order.
+    """
+    available_names = {check["name"] for check in checks if "name" in check}
+    unknown = set(selected_checks) - available_names
+
+    if len(unknown) > 0:
+        raise InvalidCheckError(
+            f"Unknown check(s) requested: {', '.join(sorted(unknown))}. "
+            f"Available in config: {', '.join(sorted(available_names))}"
+        )
+
+    return [check for check in checks if check.get("name") in selected_checks]
+
+
 def __create_check(project_root: str, expected_keys: set[str], check: dict, global_env: dict) -> AbstractCheck:
     if any(key not in check for key in expected_keys):
         raise InvalidConfigError("Invalid check configuration")
@@ -72,8 +102,7 @@ def __create_check(project_root: str, expected_keys: set[str], check: dict, glob
     other_args = {**check}
     del other_args["name"]
 
-    if "environment" in other_args:
-        del other_args["environment"]
+    other_args.pop("environment", None)
 
     other_args["env_vars"] = merged_env
 

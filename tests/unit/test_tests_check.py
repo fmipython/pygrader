@@ -3,14 +3,14 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from grader.checks.abstract_check import ScoredCheckResult
 from grader.checks.run_tests_check import RunTestsCheck
 from grader.exceptions import CheckError
+from grader.models.check_result import ScoredCheckResult
 from grader.utils.logger import VERBOSE
 
 
 class TestDownloadTest(unittest.TestCase):
-    """Unit tests for the __download_test static method via _pre_run."""
+    """Unit tests for resolving tests_path via Resource in _pre_run."""
 
     def setUp(self) -> None:
         """Set up a RunTestsCheck instance for testing."""
@@ -19,88 +19,34 @@ class TestDownloadTest(unittest.TestCase):
         self.max_points = 10
         self.is_venv_required = False
 
-    @patch("grader.checks.run_tests_check.download_python_file_from_cove")
-    @patch("grader.checks.run_tests_check.is_resource_cove")
-    def test_01_cove_path_calls_download_python_file_from_cove(
-        self, mock_is_cove: MagicMock, mock_download_cove: MagicMock
-    ) -> None:
-        """Test that a Cove URI path delegates to download_python_file_from_cove."""
+    @patch("grader.checks.run_tests_check.Resource")
+    def test_01_path_resolved_via_resource_to_file(self, mock_resource_cls: MagicMock) -> None:
+        """Test that each tests_path entry is resolved through Resource.to_file."""
         # Arrange
-        cove_path = "cove://example/test_file"
-        mock_is_cove.return_value = True
-        mock_download_cove.return_value = "/tmp/test_file.py"
-        check = RunTestsCheck(self.name, self.project_root, self.max_points, self.is_venv_required, [cove_path])
+        path = "cove://example/test_file"
+        mock_resource_cls.return_value.to_file.return_value = "/tmp/test_file.py"
+        check = RunTestsCheck(self.name, self.project_root, self.max_points, self.is_venv_required, [path])
 
         # Act
         check._pre_run()
 
         # Assert
-        mock_download_cove.assert_called_once_with(cove_path)
+        mock_resource_cls.assert_called_once_with(path)
+        self.assertEqual(check._RunTestsCheck__tests_path, ["/tmp/test_file.py"])  # type: ignore[attr-defined]
 
-    @patch("grader.checks.run_tests_check.download_file_from_url")
-    @patch("grader.checks.run_tests_check.is_resource_remote")
-    @patch("grader.checks.run_tests_check.is_resource_cove")
-    def test_02_remote_path_calls_download_file_from_url(
-        self, mock_is_cove: MagicMock, mock_is_remote: MagicMock, mock_download_url: MagicMock
-    ) -> None:
-        """Test that a remote URL path delegates to download_file_from_url."""
-        # Arrange
-        remote_path = "https://example.com/test_file.py"
-        mock_is_cove.return_value = False
-        mock_is_remote.return_value = True
-        mock_download_url.return_value = "/tmp/test_file.py"
-        check = RunTestsCheck(self.name, self.project_root, self.max_points, self.is_venv_required, [remote_path])
-
-        # Act
-        check._pre_run()
-
-        # Assert
-        mock_download_url.assert_called_once_with(remote_path)
-
-    @patch("grader.checks.run_tests_check.is_resource_remote")
-    @patch("grader.checks.run_tests_check.is_resource_cove")
-    def test_03_local_path_returned_unchanged(self, mock_is_cove: MagicMock, mock_is_remote: MagicMock) -> None:
-        """Test that a local path is returned unchanged."""
-        # Arrange
-        local_path = "/path/to/test_file.py"
-        mock_is_cove.return_value = False
-        mock_is_remote.return_value = False
-        check = RunTestsCheck(self.name, self.project_root, self.max_points, self.is_venv_required, [local_path])
-
-        # Act
-        check._pre_run()
-
-        # Assert
-        mock_is_cove.assert_called_once_with(local_path)
-        mock_is_remote.assert_called_once_with(local_path)
-
-    @patch("grader.checks.run_tests_check.download_file_from_url")
-    @patch("grader.checks.run_tests_check.download_python_file_from_cove")
-    @patch("grader.checks.run_tests_check.is_resource_remote")
-    @patch("grader.checks.run_tests_check.is_resource_cove")
-    def test_04_mixed_paths_processed_correctly(
-        self,
-        mock_is_cove: MagicMock,
-        mock_is_remote: MagicMock,
-        mock_download_cove: MagicMock,
-        mock_download_url: MagicMock,
-    ) -> None:
-        """Test that a list with mixed path types is handled correctly."""
+    @patch("grader.checks.run_tests_check.Resource")
+    def test_02_mixed_paths_processed_correctly(self, mock_resource_cls: MagicMock) -> None:
+        """Test that a list with mixed path types is each resolved through Resource.to_file."""
         # Arrange
         cove_path = "cove://example/test_cove"
         remote_path = "https://example.com/test_remote.py"
         local_path = "/path/to/local_test.py"
-
-        def is_cove_side_effect(path: str) -> bool:
-            return path == cove_path
-
-        def is_remote_side_effect(path: str) -> bool:
-            return path == remote_path
-
-        mock_is_cove.side_effect = is_cove_side_effect
-        mock_is_remote.side_effect = is_remote_side_effect
-        mock_download_cove.return_value = "/tmp/test_cove.py"
-        mock_download_url.return_value = "/tmp/test_remote.py"
+        resolved = {
+            cove_path: "/tmp/test_cove.py",
+            remote_path: "/tmp/test_remote.py",
+            local_path: local_path,
+        }
+        mock_resource_cls.side_effect = lambda source: MagicMock(to_file=lambda: resolved[source])
 
         check = RunTestsCheck(
             self.name, self.project_root, self.max_points, self.is_venv_required, [cove_path, remote_path, local_path]
@@ -110,8 +56,10 @@ class TestDownloadTest(unittest.TestCase):
         check._pre_run()
 
         # Assert
-        mock_download_cove.assert_called_once_with(cove_path)
-        mock_download_url.assert_called_once_with(remote_path)
+        self.assertEqual(
+            check._RunTestsCheck__tests_path,  # type: ignore[attr-defined]
+            ["/tmp/test_cove.py", "/tmp/test_remote.py", local_path],
+        )
 
 
 class TestTestsCheck(unittest.TestCase):

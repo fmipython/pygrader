@@ -51,6 +51,32 @@ Root-Level Properties
 ``checks`` (required)
     Array of check objects defining the grading checks to perform.
 
+``venv`` (optional)
+    Configuration for the virtual environment used by checks that require one.
+
+    - ``is_keeping_existing_venv``: Boolean. If ``true``, an existing venv directory in the
+      project is reused instead of being deleted and recreated. Default: ``false``.
+    - ``name``: Custom name for the virtual environment directory, to avoid conflicts with a
+      student's own ``.venv``. Default: ``.venv-pygrader``.
+
+    Example:
+
+    .. code-block:: json
+
+        {
+            "venv": {
+                "is_keeping_existing_venv": true,
+                "name": ".venv-custom"
+            },
+            "checks": [
+                {
+                    "name": "coverage",
+                    "max_points": 5,
+                    "is_venv_required": true
+                }
+            ]
+        }
+
 Check Object Properties
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -68,6 +94,7 @@ All check types support these common properties:
     - ``coverage`` - Checks test coverage
     - ``tests`` - Runs unit tests
     - ``structure`` - Validates project file structure
+    - ``spec`` - Grades the project against a markdown specification using an LLM
 
 ``max_points`` (optional)
     The maximum score that can be awarded for this check.
@@ -80,12 +107,50 @@ All check types support these common properties:
 
 ``environment`` (optional)
     Check-specific environment configuration that overrides global environment variables.
-    
+
     - ``variables``: Object containing key-value pairs of environment variables
 
+``assets`` (optional)
+    Array of resource sources available to the check.
+    Each entry can be a local path, a URL, or a ``cove://`` URI, and is exposed to the
+    check as a ``Resource`` object via the check's ``assets`` property.
+    Cove URIs require the ``COVE_API_KEY`` environment variable.
+
+    Example:
+
+    .. code-block:: json
+
+        {
+            "name": "coverage",
+            "max_points": 5,
+            "is_venv_required": true,
+            "assets": [
+                "${{config_dir}}/reference_data.json",
+                "cove://fmi-python/some-asset"
+            ]
+        }
 
 Check-Specific Properties
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Requirements Check
+""""""""""""""""""
+
+``is_checking_install`` (optional)
+    Boolean indicating whether to also verify that the dependencies listed in
+    ``requirements.txt`` can actually be installed, in addition to checking that the file
+    is present. Default: ``false``.
+
+    Example:
+
+    .. code-block:: json
+
+        {
+            "name": "requirements",
+            "max_points": 1,
+            "is_venv_required": false,
+            "is_checking_install": true
+        }
 
 Pylint Check
 """"""""""""
@@ -142,6 +207,10 @@ Example:
 Structure Check
 """""""""""""""
 
+``is_fatal`` (optional)
+    Boolean indicating whether a failing structure check should abort the rest of the
+    grading run. Default: ``false``.
+
 ``structure_file`` (optional)
     Path, URL or Cove URI to a JSON file defining the required project structure.
     Supports template variables like ``${{config_dir}}``.
@@ -167,6 +236,43 @@ Example with a Cove URI:
         "is_venv_required": false,
         "structure_file": "cove://fmi-python/project-structure"
     }
+
+Spec Check
+""""""""""
+
+Grades the project's source against a markdown specification using an LLM, via an
+OpenAI-compatible chat completions endpoint (`OpenRouter <https://openrouter.ai>`_ by default).
+The specification is passed via the check's ``assets`` list (see ``assets`` above) and
+must be the first entry.
+
+``model`` (optional)
+    The model id to grade with, as accepted by the completions endpoint.
+    Default: ``anthropic/claude-opus-5``.
+
+``base_url`` (optional)
+    The base URL of the OpenAI-compatible chat completions API.
+    Default: ``https://openrouter.ai/api/v1``.
+
+``api_key_env`` (optional)
+    The environment variable holding the API key for ``base_url``.
+    Default: ``OPENROUTER_API_KEY``.
+
+Example:
+
+.. code-block:: json
+
+    {
+        "name": "spec",
+        "max_points": 10,
+        "is_venv_required": false,
+        "assets": [
+            "${{config_dir}}/spec.md"
+        ]
+    }
+
+.. note::
+    A single spec file is shared across every project in a batch run - per-project spec
+    resolution is not supported yet.
 
 Project Structure Configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

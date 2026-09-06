@@ -6,16 +6,11 @@ It checks if the project structure is correct.
 
 import json
 import logging
-from typing import Optional
 
-from grader.checks.abstract_check import NonScoredCheck, NonScoredCheckResult
-from grader.exceptions import CheckError, ExternalResourceError
-from grader.utils.external_resources import (
-    download_file_from_url,
-    fetch_json_from_cove,
-    is_resource_cove,
-    is_resource_remote,
-)
+from grader.checks.abstract_check import NonScoredCheck
+from grader.exceptions import CheckError, ResourceError
+from grader.models.check_result import NonScoredCheckResult
+from grader.utils.external_resources import Resource
 from grader.utils.logger import VERBOSE
 from grader.utils.structure_validator import StructureValidator
 
@@ -32,7 +27,8 @@ class StructureCheck(NonScoredCheck):
         structure_file: str,
         is_fatal: bool = False,
         is_venv_required: bool = False,
-        env_vars: Optional[dict[str, str]] = None,
+        env_vars: dict[str, str] | None = None,
+        assets: list[str] | None = None,
     ):
         """
         Initialize the structure check.
@@ -43,8 +39,9 @@ class StructureCheck(NonScoredCheck):
         :param is_fatal: Whether the check is fatal.
         :param is_venv_required: Whether a virtual environment is required.
         :param env_vars: Optional environment variables for the check.
+        :param assets: Optional list of resource sources (paths, URLs or Cove URIs) for the check.
         """
-        super().__init__(name, project_root, is_fatal, is_venv_required, env_vars)
+        super().__init__(name, project_root, is_fatal, is_venv_required, env_vars, assets)
         self.__structure_file = structure_file
 
     def run(self) -> NonScoredCheckResult:
@@ -103,22 +100,10 @@ class StructureCheck(NonScoredCheck):
         :return: The raw structure contents
         :rtype: dict
         """
-        if is_resource_cove(source):
-            try:
-                return fetch_json_from_cove(source)
-            except ExternalResourceError as error:
-                raise CheckError(f"Cannot read structure file: {error}") from error
-
-        if is_resource_remote(source):
-            try:
-                source = download_file_from_url(source)
-            except ExternalResourceError as error:
-                raise CheckError(f"Cannot read structure file: {error}") from error
-
         try:
-            with open(source, "r", encoding="utf-8") as file_pointer:
-                return json.load(file_pointer)
+            structure_file = Resource(source).read()
+            return json.loads(structure_file)
+        except ResourceError as error:
+            raise CheckError(f"Cannot read structure file: {error}") from error
         except json.JSONDecodeError as error:
             raise CheckError(f"Invalid structure file: {error}") from error
-        except OSError as error:
-            raise CheckError(f"Cannot read structure file: {error}") from error

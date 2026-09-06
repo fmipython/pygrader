@@ -4,18 +4,13 @@ import logging
 import os
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Optional
 
-from grader.checks.abstract_check import ScoredCheck, ScoredCheckResult
-from grader.exceptions import CheckError
+from grader.checks.abstract_check import ScoredCheck
+from grader.exceptions import CheckError, ResourceError
+from grader.models.check_result import ScoredCheckResult
 from grader.utils import process
 from grader.utils.constants import PYTEST_ARGS, PYTEST_PATH, PYTEST_ROOT_DIR_ARG
-from grader.utils.external_resources import (
-    download_file_from_url,
-    download_python_file_from_cove,
-    is_resource_cove,
-    is_resource_remote,
-)
+from grader.utils.external_resources import Resource
 from grader.utils.logger import VERBOSE
 
 logger = logging.getLogger("grader")
@@ -34,7 +29,7 @@ class TestId:
 
     def pretty(self, is_passing: bool) -> str:
         """Return a pretty formatted test result message."""
-        return f"Test {str(self)} {'passed' if is_passing else 'failed'}."
+        return f"Test {self!s} {'passed' if is_passing else 'failed'}."
 
 
 class RunTestsCheck(ScoredCheck):
@@ -52,8 +47,9 @@ class RunTestsCheck(ScoredCheck):
         is_venv_required: bool,
         tests_path: list[str],
         default_test_score: float = 0.0,
-        test_score_mapping: Optional[dict[str, float]] = None,
-        env_vars: Optional[dict[str, str]] = None,
+        test_score_mapping: dict[str, float] | None = None,
+        env_vars: dict[str, str] | None = None,
+        assets: list[str] | None = None,
     ):
         """
         Initialize the RunTestsCheck class.
@@ -65,8 +61,10 @@ class RunTestsCheck(ScoredCheck):
         :param tests_path: A list of paths to the test files.
         :param default_test_score: The default score for tests not explicitly mapped.
         :param test_score_mapping: A mapping of test names to their respective scores.
+        :param env_vars: Optional environment variables for the check.
+        :param assets: Optional list of resource sources (paths, URLs or Cove URIs) for the check.
         """
-        super().__init__(name, max_points, project_root, is_venv_required, env_vars)
+        super().__init__(name, max_points, project_root, is_venv_required, env_vars, assets)
         self.__default_test_score = default_test_score
         self.__test_score_mapping = defaultdict(lambda: default_test_score)
 
@@ -178,10 +176,10 @@ class RunTestsCheck(ScoredCheck):
     def _pre_run(self) -> None:
         super()._pre_run()
 
-        # TODO - This will be similar to config.py:load_config
-        # A function that handles different types of resources should be introduced.
-
-        self.__tests_path = [RunTestsCheck.__download_test(path) for path in self.__tests_path]
+        try:
+            self.__tests_path = [Resource(path).to_file() for path in self.__tests_path]
+        except ResourceError as error:
+            raise CheckError(f"Cannot fetch test file: {error}") from error
 
     def __calculate_score(self, passed_tests: list[TestId], failed_tests: list[TestId]) -> tuple[float, float, float]:
         """
@@ -227,19 +225,3 @@ class RunTestsCheck(ScoredCheck):
 
         logger.debug("Test %s::%s scored %.2f", test_class, test_name, score)
         return score
-
-    @staticmethod
-    def __download_test(path: str) -> str:
-        """
-        Download a test file from a remote URL and save it in temp_files under the pygrader root directory.
-
-        :param path: The URL to download the test file from
-        :return: The path to the saved test file
-        """
-        if is_resource_cove(path):
-            return download_python_file_from_cove(path)
-
-        if is_resource_remote(path):
-            return download_file_from_url(path)
-
-        return path

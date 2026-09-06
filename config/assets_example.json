@@ -1,0 +1,13 @@
+{
+  "checks": [
+    {
+      "name": "coverage",
+      "max_points": 10,
+      "is_venv_required": true,
+      "assets": [
+        "${{config_dir}}/project_structure.json",
+        "cove://fmi-python/some-asset"
+      ]
+    }
+  ]
+}

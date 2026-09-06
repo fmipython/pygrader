@@ -1,0 +1,115 @@
+@startuml
+
+skinparam packageStyle rectangle
+skinparam linetype ortho
+skinparam class {
+    BackgroundColor White
+    BorderColor Black
+}
+left to right direction
+
+package "pygrader" {
+    ["pygrader"]
+    package "desktop" {
+        ["cli"]
+        ["results_reporter"]
+        ["main"]
+    }
+    package "grader" {
+        package "utils" {
+            ["config"]
+            ["environment"]
+            ["files"]
+            ["logger"]
+            ["json_with_templates"]
+            ["virtual_environment"]
+            ["constants"]
+            ["structure_validator"]
+            ["external_resources"]
+            ["process"]
+        }
+        ["grader"]
+        package "checks" {
+            ["structure_check"]
+            ["abstract_check"]
+            ["pylint_check"]
+            ["type_hints_check"]
+            ["coverage_check"]
+            ["run_tests_check"]
+            ["checks_factory"]
+            ["requirements_check"]
+        }
+    }
+}
+
+["requirements_check"] -[#1f77b4]-> ["constants"]
+["requirements_check"] -[#ff7f0e]-> ["virtual_environment"]
+["requirements_check"] -[#2ca02c]-> ["abstract_check"]
+
+["checks_factory"] -[#1f77b4]-> ["requirements_check"]
+["checks_factory"] -[#ff7f0e]-> ["run_tests_check"]
+["checks_factory"] -[#2ca02c]-> ["structure_check"]
+["checks_factory"] -[#d62728]-> ["coverage_check"]
+["checks_factory"] -[#9467bd]-> ["pylint_check"]
+["checks_factory"] -[#8c564b]-> ["config"]
+["checks_factory"] -[#e377c2]-> ["environment"]
+["checks_factory"] -[#7f7f7f]-> ["abstract_check"]
+["checks_factory"] -[#bcbd22]-> ["type_hints_check"]
+
+["grader"] -[#1f77b4]-> ["constants"]
+["grader"] -[#ff7f0e]-> ["config"]
+["grader"] -[#2ca02c]-> ["virtual_environment"]
+["grader"] -[#d62728]-> ["checks_factory"]
+["grader"] -[#9467bd]-> ["abstract_check"]
+
+["main"] -[#1f77b4]-> ["cli"]
+["main"] -[#ff7f0e]-> ["results_reporter"]
+["main"] -[#2ca02c]-> ["logger"]
+["main"] -[#d62728]-> ["constants"]
+["main"] -[#9467bd]-> ["files"]
+["main"] -[#8c564b]-> ["grader"]
+
+["external_resources"] -[#1f77b4]-> ["logger"]
+["external_resources"] -[#ff7f0e]-> ["constants"]
+
+["results_reporter"] -[#1f77b4]-> ["abstract_check"]
+
+["coverage_check"] -[#1f77b4]-> ["abstract_check"]
+["coverage_check"] -[#ff7f0e]-> ["constants"]
+["coverage_check"] -[#2ca02c]-> ["files"]
+["coverage_check"] -[#d62728]-> ["process"]
+
+["virtual_environment"] -[#1f77b4]-> ["process"]
+["virtual_environment"] -[#ff7f0e]-> ["constants"]
+["virtual_environment"] -[#2ca02c]-> ["logger"]
+
+["type_hints_check"] -[#1f77b4]-> ["abstract_check"]
+["type_hints_check"] -[#ff7f0e]-> ["process"]
+["type_hints_check"] -[#2ca02c]-> ["constants"]
+["type_hints_check"] -[#d62728]-> ["files"]
+
+["cli"] -[#1f77b4]-> ["constants"]
+
+["files"] -[#1f77b4]-> ["constants"]
+["files"] -[#ff7f0e]-> ["structure_validator"]
+
+["pylint_check"] -[#1f77b4]-> ["process"]
+["pylint_check"] -[#ff7f0e]-> ["files"]
+["pylint_check"] -[#2ca02c]-> ["constants"]
+["pylint_check"] -[#d62728]-> ["abstract_check"]
+
+["pygrader"] -[#1f77b4]-> ["main"]
+["pygrader"] -[#ff7f0e]-> ["grader"]
+
+["config"] -[#1f77b4]-> ["external_resources"]
+["config"] -[#ff7f0e]-> ["json_with_templates"]
+
+["abstract_check"] -[#1f77b4]-> ["virtual_environment"]
+["abstract_check"] -[#ff7f0e]-> ["logger"]
+
+["structure_check"] -[#1f77b4]-> ["external_resources"]
+["structure_check"] -[#ff7f0e]-> ["abstract_check"]
+["structure_check"] -[#2ca02c]-> ["structure_validator"]
+["structure_check"] -[#d62728]-> ["logger"]
+
+@enduml

@@ -4,7 +4,6 @@ import os
 import shutil
 import unittest
 import zipfile
-from typing import TypeAlias
 from unittest.mock import MagicMock, patch
 
 from grader.utils.files import (
@@ -286,7 +285,7 @@ class TestGetTestsDirectoryName(unittest.TestCase):
 class TestFindAllFilesUnderDirectory(unittest.TestCase):
     """Test cases for the find_all_files_under_directory function."""
 
-    DirectoryStructure: TypeAlias = list[tuple[str, list[str], list[str]]]
+    type DirectoryStructure = list[tuple[str, list[str], list[str]]]
 
     def __init__(self, methodName: str = "runTest") -> None:
         """
@@ -458,7 +457,7 @@ class TestUnzipArchive(unittest.TestCase):
     def test_03_invalid_zip_file(self, mock_exists: MagicMock) -> None:
         """Verify that unzip_archive raises an exception for an invalid zip file."""
         archive_path = "/fake/path/invalid.zip"
-        with self.assertRaises(Exception):
+        with self.assertRaises(zipfile.BadZipFile):
             unzip_archive(archive_path)
         self.assertTrue(mock_exists.called)
 

@@ -3,17 +3,18 @@
 It uses the pylint python library directly to run the check.
 """
 
+import itertools
 import logging
 import os
 import re
 from io import StringIO
-from typing import Optional
 
 from pylint.reporters.text import TextReporter
 
 import grader.utils.constants as const
-from grader.checks.abstract_check import ScoredCheck, ScoredCheckResult
+from grader.checks.abstract_check import ScoredCheck
 from grader.exceptions import CheckError
+from grader.models.check_result import ScoredCheckResult
 
 # import grader.utils.files as files
 from grader.utils import files, process
@@ -30,8 +31,9 @@ class PylintCheck(ScoredCheck):
         project_root: str,
         max_points: int,
         is_venv_required: bool,
-        pylintrc_path: Optional[str] = None,
-        env_vars: Optional[dict[str, str]] = None,
+        pylintrc_path: str | None = None,
+        env_vars: dict[str, str] | None = None,
+        assets: list[str] | None = None,
     ):
         """
         Initialize the pylint check.
@@ -42,8 +44,9 @@ class PylintCheck(ScoredCheck):
         :param is_venv_required: Whether a virtual environment is required.
         :param pylintrc_path: Optional path to custom pylintrc configuration.
         :param env_vars: Optional environment variables for the check.
+        :param assets: Optional list of resource sources (paths, URLs or Cove URIs) for the check.
         """
-        super().__init__(name, max_points, project_root, is_venv_required, env_vars)
+        super().__init__(name, max_points, project_root, is_venv_required, env_vars, assets)
         self.__pylint_max_score = 10
         self.__pylintrc_path = pylintrc_path or const.PYLINTRC
 
@@ -106,7 +109,7 @@ class PylintCheck(ScoredCheck):
         step = self.__pylint_max_score / (self._max_points + 1)
         steps = [i * step for i in range(self._max_points + 2)]
 
-        regions = list(zip(steps, steps[1:]))
+        regions = list(itertools.pairwise(steps))
 
         for score, (start, end) in enumerate(regions):
             if round(start, 2) <= round(pylint_score, 2) < round(end, 2):
@@ -173,8 +176,6 @@ class PylintCustomReporter(TextReporter):
 
     def display_messages(self, layout) -> None:  # type: ignore
         """Suppress all output (custom reporter behavior)."""
-        pass
 
     def display_reports(self, layout) -> None:  # type: ignore
         """Suppress all report output (custom reporter behavior)."""
-        pass

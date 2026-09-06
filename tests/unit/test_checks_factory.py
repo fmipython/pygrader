@@ -194,3 +194,87 @@ class TestChecksFactory(unittest.TestCase):
         self.assertEqual(len(non_venv_checks), 1)
         check = non_venv_checks[0]
         self.assertEqual(check.env_vars, {})
+
+    def test_13_selected_checks_filters_subset(self) -> None:
+        """Test that selected_checks limits the built checks to the matching subset."""
+        # Arrange
+        config = {
+            "checks": [
+                {"name": "requirements", "max_points": 10, "is_venv_required": False},
+                {"name": "pylint", "max_points": 10, "is_venv_required": True},
+                {"name": "coverage", "max_points": 10, "is_venv_required": True},
+            ]
+        }
+        project_root = "test_project"
+
+        # Act
+        non_venv_checks, venv_checks = create_checks(config, project_root, selected_checks=["requirements", "pylint"])
+
+        # Assert
+        self.assertEqual([check.name for check in non_venv_checks], ["requirements"])
+        self.assertEqual([check.name for check in venv_checks], ["pylint"])
+
+    def test_14_selected_checks_none_runs_everything(self) -> None:
+        """Test that selected_checks=None keeps the current full-run behavior."""
+        # Arrange
+        config = {
+            "checks": [
+                {"name": "requirements", "max_points": 10, "is_venv_required": False},
+                {"name": "pylint", "max_points": 10, "is_venv_required": True},
+            ]
+        }
+        project_root = "test_project"
+
+        # Act
+        non_venv_checks, venv_checks = create_checks(config, project_root, selected_checks=None)
+
+        # Assert
+        self.assertEqual(len(non_venv_checks), 1)
+        self.assertEqual(len(venv_checks), 1)
+
+    def test_15_selected_checks_unknown_name_raises(self) -> None:
+        """Test that requesting an unknown check name raises InvalidCheckError."""
+        # Arrange
+        config = {"checks": [{"name": "coverage", "max_points": 10, "is_venv_required": False}]}
+        project_root = "test_project"
+
+        # Act & Assert
+        with self.assertRaises(InvalidCheckError):
+            create_checks(config, project_root, selected_checks=["pylintt"])
+
+    @patch("grader.checks.abstract_check.Resource")
+    def test_16_assets_are_loaded_as_resources(self, mocked_resource: MagicMock) -> None:
+        """Test that a check's "assets" config entries are converted to Resource objects."""
+        # Arrange
+        config = {
+            "checks": [
+                {
+                    "name": "coverage",
+                    "max_points": 10,
+                    "is_venv_required": False,
+                    "assets": ["local_asset.txt", "cove://fmi-python/asset"],
+                }
+            ]
+        }
+        project_root = "test_project"
+
+        # Act
+        non_venv_checks, _ = create_checks(config, project_root)
+
+        # Assert
+        self.assertEqual(len(non_venv_checks), 1)
+        check = non_venv_checks[0]
+        self.assertEqual(check.assets, [mocked_resource.return_value, mocked_resource.return_value])
+
+    def test_17_assets_default_to_empty_list(self) -> None:
+        """Test that a check built without an "assets" key exposes an empty assets list."""
+        # Arrange
+        config = {"checks": [{"name": "coverage", "max_points": 10, "is_venv_required": False}]}
+        project_root = "test_project"
+
+        # Act
+        non_venv_checks, _ = create_checks(config, project_root)
+
+        # Assert
+        self.assertEqual(len(non_venv_checks), 1)
+        self.assertEqual(non_venv_checks[0].assets, [])

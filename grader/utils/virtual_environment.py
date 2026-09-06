@@ -5,6 +5,7 @@ from __future__ import annotations  # Python 3.14 will fix this
 import logging
 import os
 import shutil
+from typing import Self
 
 import grader.utils.constants as const
 from grader.exceptions import VirtualEnvironmentError
@@ -44,7 +45,7 @@ class VirtualEnvironment:
         self.__is_keeping_venv_after_run = is_keeping_venv_after_run
         self.__is_keeping_existing_venv = is_keeping_existing_venv
 
-    def __enter__(self) -> VirtualEnvironment:
+    def __enter__(self) -> Self:
         """Enter the context manager and set up the virtual environment."""
         self.setup()
         VirtualEnvironment.is_initialized = True

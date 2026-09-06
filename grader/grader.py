@@ -3,19 +3,19 @@
 import os
 import shutil
 from logging import Logger
-from typing import Optional
 
 import grader.utils.constants as const
-from grader.checks.abstract_check import (
-    AbstractCheck,
-    CheckResult,
-    NonScoredCheck,
-    NonScoredCheckResult,
-    ScoredCheck,
-    ScoredCheckResult,
-)
+from grader.checks.abstract_check import AbstractCheck, NonScoredCheck, ScoredCheck
 from grader.checks.checks_factory import create_checks
-from grader.exceptions import CheckError, InvalidConfigError, InvalidProjectRootError
+from grader.exceptions import (
+    CheckError,
+    InvalidCheckError,
+    InvalidConfigError,
+    InvalidProjectRootError,
+    VirtualEnvironmentError,
+)
+from grader.models.check_result import CheckResult, NonScoredCheckResult, ScoredCheckResult
+from grader.models.grading_result import GradingResult
 from grader.utils.config import load_config
 from grader.utils.logger import setup_logger
 from grader.utils.virtual_environment import VirtualEnvironment
@@ -26,28 +26,27 @@ class Grader:
 
     def __init__(
         self,
-        run_id: str,
-        project_root: str,
-        logger: Optional[Logger] = None,
-        config_path: Optional[str] = None,
+        logger: Logger | None = None,
+        config_path: str | None = None,
         is_keeping_venv: bool = False,
         is_skipping_venv_creation: bool = False,
+        selected_checks: list[str] | None = None,
     ):
         """
         Initialize the Grader.
 
-        :param run_id: The ID of the current run.
-        :param project_root: The root directory of the project to grade.
         :param logger: The logger instance for output.
         :param config_path: Optional path to configuration file.
         :param is_keeping_venv: Whether to keep the virtual environment after grading.
         :param is_skipping_venv_creation: Whether to skip virtual environment creation.
+        :param selected_checks: If provided, only checks with a matching name will be run.
         """
-        self.__logger = logger or setup_logger(run_id)
+        self.__logger = logger or setup_logger()
 
         self.__logger.info("Python project grader, %s", const.VERSION)
         self.__is_keeping_venv = is_keeping_venv
         self.__is_skipping_venv_creation = is_skipping_venv_creation
+        self.__selected_checks = selected_checks
         try:
             if config_path is None:
                 raise InvalidConfigError("No configuration source provided")
@@ -56,32 +55,57 @@ class Grader:
             self.__config = load_config(config_path)
 
             self.__logger.debug(f"Config contents: {self.__config}")
-        except InvalidConfigError as exc:
+        except InvalidConfigError:
             self.__logger.error("Error with the configuration file")
-            self.__logger.exception(exc)
+            self.__logger.exception("Error with the configuration file")
             raise
 
-        if run_id is not None:
-            self.__logger.info("Running checks for student %s", run_id)
-
-        self.__logger.debug("Project root: %s", project_root)
         self.__logger.debug("Configuration file: %s", config_path)
         self.__logger.debug("Keeping virtual environment: %s", is_keeping_venv)
         self.__logger.debug("Skipping virtual environment creation: %s", is_skipping_venv_creation)
+        self.__logger.debug("Selected checks: %s", selected_checks)
         self.__logger.debug("PYTHONPATH: %s", os.environ.get("PYTHONPATH", "Not set"))
 
-        self.__project_root = project_root
-        if not os.path.exists(self.__project_root):
+    def grade(self, project_root: str, run_id: str) -> GradingResult:
+        """
+        Run all checks against a project and return their results.
+
+        :param project_root: The root directory of the project to grade.
+        :param run_id: Optional ID of the current run, used for logging.
+        :return: A list of CheckResult objects containing the results of the checks.
+        """
+        if run_id is not None:
+            self.__logger.info("Running checks for student %s", run_id)
+        self.__logger.debug("Project root: %s", project_root)
+
+        if not os.path.exists(project_root):
             self.__logger.error("Project root directory does not exist")
             raise InvalidProjectRootError("Project root directory does not exist")
 
-    def grade(self) -> list[CheckResult]:
-        """
-        Run all checks and return their results.
+        try:
+            scores = self.__run_checks(project_root)
+        except (InvalidCheckError, VirtualEnvironmentError):
+            self.__logger.error("Grading failed for project %s", project_root)
+            self.__logger.exception("Grading failed for project %s", project_root)
+            raise
+        finally:
+            self.__cleanup(project_root)
 
+        total_score = sum(score.result for score in scores if isinstance(score, ScoredCheckResult))
+        max_score = sum(score.max_score for score in scores if isinstance(score, ScoredCheckResult))
+
+        return GradingResult(run_id, total_score, max_score, scores)
+
+    def __run_checks(self, project_root: str) -> list[CheckResult]:
+        """
+        Run all checks against a project and return their results.
+
+        :param project_root: The root directory of the project to grade.
         :return: A list of CheckResult objects containing the results of the checks.
         """
-        non_venv_checks, venv_checks = create_checks(self.__config, self.__project_root)
+        non_venv_checks, venv_checks = create_checks(
+            self.__config, project_root, selected_checks=self.__selected_checks
+        )
 
         scores = [self.__run_check(check) for check in non_venv_checks]
 
@@ -91,13 +115,11 @@ class Grader:
         venv_config = self.__config.get("venv", {})
 
         with VirtualEnvironment(
-            self.__project_root,
+            project_root,
             is_keeping_venv_after_run=self.__is_keeping_venv,
             **venv_config,
         ):
             scores += [self.__run_check(check) for check in venv_checks]
-
-        self.__cleanup()
 
         return scores
 
@@ -126,15 +148,17 @@ class Grader:
         self.__logger.debug("Check result: %s", check_result)
         return check_result
 
-    def __cleanup(self) -> None:
+    def __cleanup(self, project_root: str) -> None:
         """
         Cleanup temporary files created during the grading process.
 
         This is called at the end of grading to ensure no temporary files are left behind.
+
+        :param project_root: The root directory of the project that was graded.
         """
         shutil.rmtree(const.TEMP_FILES_DIR, ignore_errors=True)
 
-        coverage_file_full_path = os.path.join(self.__project_root, const.COVERAGE_FILE)
+        coverage_file_full_path = os.path.join(project_root, const.COVERAGE_FILE)
         if os.path.exists(coverage_file_full_path):
             os.remove(coverage_file_full_path)
-        shutil.rmtree(os.path.join(self.__project_root, const.PYTEST_CACHE), ignore_errors=True)
+        shutil.rmtree(os.path.join(project_root, const.PYTEST_CACHE), ignore_errors=True)

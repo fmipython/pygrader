@@ -4,11 +4,12 @@ Module containing the type hints check.
 It calls mypy as a subprocess to generate a report and then read from the report.
 """
 
+import itertools
 import logging
-from typing import Optional
 
-from grader.checks.abstract_check import ScoredCheck, ScoredCheckResult
+from grader.checks.abstract_check import ScoredCheck
 from grader.exceptions import CheckError
+from grader.models.check_result import ScoredCheckResult
 from grader.utils import files, process
 from grader.utils.constants import MYPY_LINE_COUNT_REPORT, MYPY_PATH, MYPY_TYPE_HINT_CONFIG, REPORTS_TEMP_DIR
 
@@ -24,7 +25,8 @@ class TypeHintsCheck(ScoredCheck):
         project_root: str,
         max_points: int,
         is_venv_required: bool,
-        env_vars: Optional[dict[str, str]] = None,
+        env_vars: dict[str, str] | None = None,
+        assets: list[str] | None = None,
     ):
         """
         Initialize the type hints check.
@@ -34,8 +36,9 @@ class TypeHintsCheck(ScoredCheck):
         :param max_points: The maximum points this check can award.
         :param is_venv_required: Whether a virtual environment is required.
         :param env_vars: Optional environment variables for the check.
+        :param assets: Optional list of resource sources (paths, URLs or Cove URIs) for the check.
         """
-        super().__init__(name, max_points, project_root, is_venv_required, env_vars)
+        super().__init__(name, max_points, project_root, is_venv_required, env_vars, assets)
 
         self.__mypy_binary = MYPY_PATH
         self.__mypy_arguments = ["--config-file", MYPY_TYPE_HINT_CONFIG, "--linecount-report", REPORTS_TEMP_DIR]
@@ -117,7 +120,7 @@ class TypeHintsCheck(ScoredCheck):
         step = self.__mypy_max_score / (self._max_points + 1)
         steps = [i * step for i in range(self._max_points + 2)]
 
-        regions = list(zip(steps, steps[1:]))
+        regions = list(itertools.pairwise(steps))
 
         for score, (start, end) in enumerate(regions):
             if round(start, 2) <= round(mypy_score, 2) < round(end, 2):

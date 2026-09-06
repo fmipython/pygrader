@@ -7,6 +7,7 @@ from grader.exceptions import GraderError
 
 if __name__ == "__main__":
     try:
-        run_grader()
+        rc = run_grader()
+        sys.exit(rc)
     except GraderError:
         sys.exit(1)

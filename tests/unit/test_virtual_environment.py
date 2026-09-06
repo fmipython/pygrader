@@ -26,7 +26,7 @@ class TestsVirtualEnvironment(unittest.TestCase):
         """
         self.__sample_root_dir_path = "sample_root_dir"
         self.__sample_package_name = "pylint"
-        self.__sample_package_version = "3.3.3"
+        self.__sample_package_version = "4.0.8"
         super().__init__(methodName)
 
     def setUp(self) -> None:
@@ -87,9 +87,8 @@ class TestsVirtualEnvironment(unittest.TestCase):
         patched_run.return_value = subprocess.CompletedProcess([], 1)
 
         # Act & Assert
-        with self.assertRaises(VirtualEnvironmentError):
-            with VirtualEnvironment(self.__sample_root_dir_path):
-                pass
+        with self.assertRaises(VirtualEnvironmentError), VirtualEnvironment(self.__sample_root_dir_path):
+            pass
 
     def test_05_install_requirements(self) -> None:
         """Verify that the VirtualEnvironment class installs the requirements."""
@@ -104,6 +103,9 @@ class TestsVirtualEnvironment(unittest.TestCase):
             pip_run_result = run([pip_full_path, "freeze"])
 
             is_expected_package_installed = self.__sample_package_name in pip_run_result.stdout
+            print(self.__sample_package_name)
+            print(self.__sample_package_version)
+            print(pip_run_result.stdout)
             is_version_correct = self.__sample_package_version in pip_run_result.stdout
 
         # Assert
@@ -128,9 +130,8 @@ class TestsVirtualEnvironment(unittest.TestCase):
         patched_run.side_effect = custom_run_behavior
 
         # Act & Assert
-        with self.assertRaises(VirtualEnvironmentError):
-            with VirtualEnvironment(self.__sample_root_dir_path):
-                pass
+        with self.assertRaises(VirtualEnvironmentError), VirtualEnvironment(self.__sample_root_dir_path):
+            pass
 
     def test_07_install_grader_requirements(self) -> None:
         """Verify that the VirtualEnvironment class installs the grader requirements."""
@@ -142,7 +143,7 @@ class TestsVirtualEnvironment(unittest.TestCase):
             pip_run_result = run([pip_full_path, "freeze"])
 
             is_expected_package_installed = "coverage" in pip_run_result.stdout
-            is_version_correct = "7.6.10" in pip_run_result.stdout
+            is_version_correct = "7.16.0" in pip_run_result.stdout
 
         # Assert
         self.assertTrue(is_expected_package_installed)
@@ -166,9 +167,8 @@ class TestsVirtualEnvironment(unittest.TestCase):
         patched_run.side_effect = custom_run_behavior
 
         # Act & Assert
-        with self.assertRaises(VirtualEnvironmentError):
-            with VirtualEnvironment(self.__sample_root_dir_path):
-                pass
+        with self.assertRaises(VirtualEnvironmentError), VirtualEnvironment(self.__sample_root_dir_path):
+            pass
 
     def test_09_teardown(self) -> None:
         """Verify that the VirtualEnvironment class removes the virtual environment when the context manager is exited."""

@@ -26,6 +26,7 @@ pygrader/
 │   │   ├── pylint_check.py           # Linting checks
 │   │   ├── requirements_check.py     # Dependency validation
 │   │   ├── run_tests_check.py        # Test execution
+│   │   ├── spec_check.py             # LLM grading against a markdown spec
 │   │   ├── structure_check.py        # Project structure validation
 │   │   └── type_hints_check.py       # Type hint checking (mypy)
 │   └── utils/                # Shared utilities

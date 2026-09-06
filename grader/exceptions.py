@@ -25,5 +25,5 @@ class VirtualEnvironmentError(GraderError):
     """Exception raised when an error occurs during the virtual environment setup."""
 
 
-class ExternalResourceError(GraderError):
+class ResourceError(GraderError):
     """Custom exception for external resource errors."""

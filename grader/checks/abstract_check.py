@@ -6,30 +6,17 @@ Each check should inherit from this class.
 
 import logging
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from typing import Generic, Optional, TypeVar
 
 from grader.exceptions import CheckError
+from grader.models.check_result import CheckResult
+from grader.utils.external_resources import Resource
 from grader.utils.logger import VERBOSE
 from grader.utils.virtual_environment import VirtualEnvironment
 
 logger = logging.getLogger("grader")
 
 
-T = TypeVar("T")
-
-
-@dataclass
-class CheckResult(Generic[T]):
-    """Class representing the result of a check."""
-
-    name: str
-    result: T
-    info: str
-    error: str
-
-
-class AbstractCheck(ABC, Generic[T]):
+class AbstractCheck[T](ABC):
     """Each check has a name and a project root path."""
 
     def __init__(
@@ -37,7 +24,8 @@ class AbstractCheck(ABC, Generic[T]):
         name: str,
         project_root: str,
         is_venv_required: bool = False,
-        env_vars: Optional[dict[str, str]] = None,
+        env_vars: dict[str, str] | None = None,
+        assets: list[str] | None = None,
     ):
         """
         Initialize the check.
@@ -46,11 +34,13 @@ class AbstractCheck(ABC, Generic[T]):
         :param project_root: The root directory of the project.
         :param is_venv_required: Whether a virtual environment is required.
         :param env_vars: Optional environment variables for the check.
+        :param assets: Optional list of resource sources (paths, URLs or Cove URIs) for the check.
         """
         self._name = name
         self._project_root = project_root
         self._is_venv_required = is_venv_required
         self._env_vars = env_vars
+        self._assets = [Resource(source) for source in assets] if assets else []
 
     @abstractmethod
     def run(self) -> CheckResult[T]:
@@ -72,7 +62,7 @@ class AbstractCheck(ABC, Generic[T]):
         return self._name
 
     @property
-    def env_vars(self) -> Optional[dict[str, str]]:
+    def env_vars(self) -> dict[str, str] | None:
         """
         Get the environment variables for the check.
 
@@ -80,6 +70,16 @@ class AbstractCheck(ABC, Generic[T]):
         :rtype: Optional[dict[str, str]]
         """
         return self._env_vars
+
+    @property
+    def assets(self) -> list[Resource]:
+        """
+        Get the assets for the check.
+
+        :returns: The assets for the check.
+        :rtype: list[Resource]
+        """
+        return self._assets
 
     @staticmethod
     def is_running_within_venv() -> bool:
@@ -103,18 +103,6 @@ class AbstractCheck(ABC, Generic[T]):
         logger.log(VERBOSE, "Running %s", self.name)
 
 
-@dataclass
-class ScoredCheckResult(CheckResult[T]):
-    """Class representing the result of a scored check."""
-
-    max_score: int
-
-
-@dataclass
-class NonScoredCheckResult(CheckResult[bool]):
-    """Class representing the result of a non-scored check."""
-
-
 class ScoredCheck(AbstractCheck[float]):
     """Each scored check has a maximum amount of points."""
 
@@ -124,7 +112,8 @@ class ScoredCheck(AbstractCheck[float]):
         max_points: int,
         project_root: str,
         is_venv_requred: bool = False,
-        env_vars: Optional[dict[str, str]] = None,
+        env_vars: dict[str, str] | None = None,
+        assets: list[str] | None = None,
     ):
         """
         Initialize the scored check.
@@ -134,8 +123,9 @@ class ScoredCheck(AbstractCheck[float]):
         :param project_root: The root directory of the project.
         :param is_venv_requred: Whether a virtual environment is required.
         :param env_vars: Optional environment variables for the check.
+        :param assets: Optional list of resource sources (paths, URLs or Cove URIs) for the check.
         """
-        super().__init__(name, project_root, is_venv_requred, env_vars)
+        super().__init__(name, project_root, is_venv_requred, env_vars, assets)
         self._max_points = max_points
 
     @property
@@ -153,7 +143,8 @@ class NonScoredCheck(AbstractCheck[bool]):
         project_root: str,
         is_fatal: bool,
         is_venv_requred: bool = False,
-        env_vars: Optional[dict[str, str]] = None,
+        env_vars: dict[str, str] | None = None,
+        assets: list[str] | None = None,
     ):
         """
         Initialize the non-scored check.
@@ -163,8 +154,9 @@ class NonScoredCheck(AbstractCheck[bool]):
         :param is_fatal: Whether the check is fatal.
         :param is_venv_requred: Whether a virtual environment is required.
         :param env_vars: Optional environment variables for the check.
+        :param assets: Optional list of resource sources (paths, URLs or Cove URIs) for the check.
         """
-        super().__init__(name, project_root, is_venv_requred, env_vars)
+        super().__init__(name, project_root, is_venv_requred, env_vars, assets)
         self._is_fatal = is_fatal
 
     @property

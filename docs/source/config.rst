@@ -5,22 +5,23 @@ The grader supports configuration files in JSON format.
 These configuration files define the checks to be performed on student submissions, 
 along with their parameters and scoring criteria.
 
+The file passed via ``--config`` can be a local path, an ``http``/``https``/``ftp`` URL,
+or a ``cove://`` URI pointing to a JSON item (requires the ``COVE_API_KEY`` environment variable).
+
 Configuration Schema
 --------------------
 
-Root Structure
-~~~~~~~~~~~~~~
+There are two kinds of JSON files:
 
-The configuration file has two possible root-level structures:
+1. **Grading configuration** - The file passed via ``--config``, with a ``checks`` array
+2. **Project structure configuration** - A separate file referenced by the ``structure`` check
 
-1. **Check-based configuration** - The most common format with a ``checks`` array
-2. **Project structure configuration** - For defining required file patterns
-
-Check-Based Configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Grading Configuration
+~~~~~~~~~~~~~~~~~~~~~
 
 The root object must contain a key called ``checks`` with an array of check objects.
-Optionally, it can also include an ``environment`` object for global environment variables.
+Optionally, it can also include ``environment`` and ``venv`` objects.
+Unknown root-level keys are silently ignored, so double-check spelling.
 
 .. code-block:: json
 
@@ -59,6 +60,9 @@ Root-Level Properties
     - ``name``: Custom name for the virtual environment directory, to avoid conflicts with a
       student's own ``.venv``. Default: ``.venv-pygrader``.
 
+    Any other key inside ``venv`` makes the run fail. The venv is only created if at least one
+    check has ``is_venv_required`` set to ``true``.
+
     Example:
 
     .. code-block:: json
@@ -83,7 +87,8 @@ Check Object Properties
 Common Properties
 ^^^^^^^^^^^^^^^^^
 
-All check types support these common properties:
+All check types support these common properties. Any key not listed here or under the
+check's own section is rejected and makes the run fail.
 
 ``name`` (required)
     The name/type of the check to perform. Supported values:
@@ -96,14 +101,15 @@ All check types support these common properties:
     - ``structure`` - Validates project file structure
     - ``spec`` - Grades the project against a markdown specification using an LLM
 
-``max_points`` (optional)
+``max_points`` (required for all checks except ``structure``)
     The maximum score that can be awarded for this check.
     Can be an integer or float value.
-    Some checks (like ``structure``) may not require this field.
+    The ``structure`` check is pass/fail and does not accept this field.
 
 ``is_venv_required`` (required)
     Boolean indicating if the check should be run within a virtual environment.
-    Can be a boolean value or a string ``"false"`` or ``"true"``.
+    Must be a JSON boolean (``true``/``false``). Strings are not parsed - ``"false"``
+    is a non-empty string and is treated as ``true``.
 
 ``environment`` (optional)
     Check-specific environment configuration that overrides global environment variables.
@@ -156,9 +162,11 @@ Pylint Check
 """"""""""""
 
 ``pylintrc_path`` (optional)
-    Path to a custom pylint configuration file.
+    Local path to a custom pylint configuration file.
     Supports template variables like ``${{config_dir}}``.
-    
+    URLs and Cove URIs are not supported. Default: the bundled ``config/2024.pylintrc``.
+    If the file does not exist, pylint runs with its own defaults.
+
     Example:
     
     .. code-block:: json
@@ -173,12 +181,14 @@ Pylint Check
 Tests Check
 """""""""""
 
-``tests_path`` (optional)
-    Array of paths or URLs to test files to run.
-    Can be local file paths or URLs to remote test files.
+``tests_path`` (required)
+    Array of test files to run.
+    Each entry can be a local path, a URL, or a ``cove://`` URI pointing to a Python item
+    (requires the ``COVE_API_KEY`` environment variable).
 
 ``default_test_score`` (optional)
     Default score assigned to each test if not specified in ``test_score_mapping``.
+    Default: ``0``.
 
 ``test_score_mapping`` (optional)
     Object mapping test class or test function names to their point values.
@@ -208,10 +218,13 @@ Structure Check
 """""""""""""""
 
 ``is_fatal`` (optional)
-    Boolean indicating whether a failing structure check should abort the rest of the
-    grading run. Default: ``false``.
+    Boolean marking the check as fatal. Default: ``false``.
 
-``structure_file`` (optional)
+    .. note::
+        The flag is stored on the check but not acted upon yet - a failing structure check
+        does not currently abort the grading run.
+
+``structure_file`` (required)
     Path, URL or Cove URI to a JSON file defining the required project structure.
     Supports template variables like ``${{config_dir}}``.
     Can be a local path, a URL to a remote structure definition, or a ``cove://`` URI
@@ -236,6 +249,11 @@ Example with a Cove URI:
         "is_venv_required": false,
         "structure_file": "cove://fmi-python/project-structure"
     }
+
+Type Hints and Coverage Checks
+""""""""""""""""""""""""""""""
+
+The ``type-hints`` and ``coverage`` checks take no options beyond the common properties.
 
 Spec Check
 """"""""""
@@ -350,6 +368,9 @@ Configuration files support template variables for dynamic path resolution:
 ``${{config_dir}}``
     Expands to the directory containing the configuration file.
     Useful for referencing other config files relative to the main config.
+    For remote and Cove configs, this is the temporary directory the config was downloaded to.
+
+Any other ``${{...}}`` placeholder in the file is an error.
 
 Example:
 

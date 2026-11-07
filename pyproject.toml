@@ -1,10 +1,11 @@
 [project]
 name = "pygrader"
-version = "2.0.0"
+version = "2.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "complexipy>=8.0.0",
     "dotenv>=0.9.9",
     "py-cove @ git+https://github.com/lyubolp/py-cove.git",
     "pylint>=4.0.8",
@@ -23,6 +24,7 @@ build-backend = "setuptools.build_meta"
 packages = ["grader", "grader.checks", "grader.utils", "grader.models", "config"]
 
 [tool.setuptools.package-data]
+grader = ["py.typed"]
 config = ["grader_requirements.txt", "mypy_type_hints_2024.ini", "2024.pylintrc"]
 
 [tool.complexipy]
@@ -40,7 +42,7 @@ py-cove = { git = "https://github.com/lyubolp/py-cove", rev = "v1.4.0" }
 
 [dependency-groups]
 dev = [
-    "complexipy>=8.0.0",
+    "pytest>=9.1.1",
     "coverage>=7.16.0",
     "mypy>=2.3.1",
     "myst-parser>=5.1.0",

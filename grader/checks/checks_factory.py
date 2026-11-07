@@ -1,6 +1,7 @@
 """Factory for creating the checks objects."""
 
 from grader.checks.abstract_check import AbstractCheck
+from grader.checks.complexity_check import ComplexityCheck
 from grader.checks.coverage_check import CoverageCheck
 from grader.checks.pylint_check import PylintCheck
 from grader.checks.requirements_check import RequirementsCheck
@@ -19,6 +20,7 @@ NAME_TO_CHECK: dict[str, type[AbstractCheck]] = {
     "structure": StructureCheck,
     "tests": RunTestsCheck,
     "spec": SpecCheck,
+    "complexity": ComplexityCheck,
 }
 
 

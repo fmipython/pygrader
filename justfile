@@ -10,7 +10,7 @@ init:
 lint:
     uv run ruff check {{project_content}} --fix
     uv run ruff format {{project_content}}
-    uv run mypy {{project_content}} --ignore-missing-imports
+    uv run mypy {{project_content}}
     uv run complexipy .
 
 # Tests

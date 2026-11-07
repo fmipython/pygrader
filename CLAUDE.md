@@ -8,7 +8,7 @@ This document provides context and guidelines for Claude Sonnet 4.5 when working
 
 ### Key Information
 - **Language**: Python 3.10+
-- **Version**: 1.7.1
+- **Version**: 2.1.0
 - **License**: GPL-3.0
 - **Architecture**: Modular check-based system with CLI and web interfaces
 - **Current Branch**: `show-check-results` (default: `main`)
@@ -163,8 +163,8 @@ The `Grader` class (`grader/grader.py`) orchestrates:
 - **Line Length**: Follow project conventions
 
 ### Testing
-- **Framework**: unittest with coverage (not pytest)
-- **Test Runner**: `uv run -m unittest` or `just test`
+- **Framework**: pytest with coverage (plain `assert`, `pytest.raises`, `caplog`/`log_output` fixture; `unittest.mock` for mocking)
+- **Test Runner**: `uv run pytest` or `just test`
 - **Unit Tests**: `tests/unit/test_*.py` - test individual components (~20 seconds for the whole suite)
 - **Functional Tests**: `tests/functional/test_functional.py` - end-to-end tests
 - **Coverage Target**: 85% minimum (enforced by `just coverage`)
@@ -190,10 +190,10 @@ The `Grader` class (`grader/grader.py`) orchestrates:
 - **Run Specific Tests**: 
   ```bash
   # Run specific test class
-  uv run python -m unittest tests.unit.test_pylint_check.TestPylintCheck -v
+  uv run pytest tests/unit/test_pylint_check.py::TestPylintCheck -v
   
   # Run specific test method
-  uv run python -m unittest tests.unit.test_pylint_check.TestPylintCheck.test_01_pylint_called -v
+  uv run pytest tests/unit/test_pylint_check.py::TestPylintCheck::test_01_pylint_called -v
   ```
 
 ### Adding New Checks
@@ -261,8 +261,8 @@ just unit_tests                       # Unit tests only
 just functional_tests                 # Functional tests only
 
 # Manual test execution
-uv run -m unittest discover -s tests/unit -p "test_*.py" -v
-uv run -m unittest discover -s tests/functional -p "test_*.py"
+uv run pytest tests/unit -v
+uv run pytest tests/functional
 ```
 
 #### Coverage Analysis
@@ -270,7 +270,7 @@ uv run -m unittest discover -s tests/functional -p "test_*.py"
 just coverage                         # Run tests with coverage (85% minimum)
 
 # Manual coverage
-uv run coverage run --source=grader,desktop -m unittest discover -s tests/unit -p "test_*.py"
+uv run coverage run --source=grader,desktop -m pytest tests/unit
 uv run coverage report -m --fail-under 85 --sort=cover
 uv run coverage lcov -o lcov.info     # Generate lcov report
 ```

@@ -1,6 +1,5 @@
 """Unit tests for the RequirementsCheck class in the requirements_check module."""
 
-import unittest
 from unittest.mock import MagicMock, patch
 
 from grader.checks.requirements_check import RequirementsCheck
@@ -8,13 +7,12 @@ from grader.exceptions import VirtualEnvironmentError
 from grader.models.check_result import ScoredCheckResult
 
 
-class TestRequirementsCheck(unittest.TestCase):
+class TestRequirementsCheck:
     """Unit tests for the RequirementsCheck class."""
 
-    def setUp(self) -> None:
+    def setup_method(self) -> None:
         """Set up the test case environment."""
         self.requirements_check = RequirementsCheck("requirements", "sample_dir", 1, is_venv_required=False)
-        return super().setUp()
 
     @patch("pathlib.Path.exists")
     def test_01_requirements_exist(self, mocked_exists: MagicMock) -> None:
@@ -27,7 +25,7 @@ class TestRequirementsCheck(unittest.TestCase):
         actual_score = self.requirements_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        assert expected_score == actual_score
 
     @patch("pathlib.Path.exists")
     def test_02_requirements_does_not_exist(self, mocked_exists: MagicMock) -> None:
@@ -46,7 +44,7 @@ class TestRequirementsCheck(unittest.TestCase):
         actual_score = self.requirements_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        assert expected_score == actual_score
 
     @patch("grader.checks.requirements_check.VirtualEnvironment")
     @patch("pathlib.Path.exists")
@@ -74,7 +72,7 @@ class TestRequirementsCheck(unittest.TestCase):
         actual_score = requirements_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        assert expected_score == actual_score
         mocked_venv_class.assert_called_once_with("sample_dir", is_keeping_existing_venv=True)
         mocked_venv_instance.__enter__.assert_called_once()
         mocked_venv_instance.__exit__.assert_called_once()
@@ -106,7 +104,7 @@ class TestRequirementsCheck(unittest.TestCase):
         actual_score = requirements_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        assert expected_score == actual_score
         mocked_venv_class.assert_called_once_with("sample_dir", is_keeping_existing_venv=True)
         mocked_venv_instance.__enter__.assert_called_once()
         mocked_venv_instance.__exit__.assert_not_called()
@@ -133,7 +131,7 @@ class TestRequirementsCheck(unittest.TestCase):
         actual_score = requirements_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        assert expected_score == actual_score
         mocked_venv_class.assert_not_called()
 
     @patch("grader.checks.requirements_check.VirtualEnvironment")
@@ -164,5 +162,5 @@ class TestRequirementsCheck(unittest.TestCase):
         actual_score = requirements_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        assert expected_score == actual_score
         mocked_venv_class.assert_not_called()

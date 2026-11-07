@@ -1,21 +1,20 @@
 """Unit tests for the environment module in the grader.utils package."""
 
 import os
-import unittest
 from unittest.mock import MagicMock, patch
 
 from grader.utils.environment import merge_environment_variables
 
 
-class TestEnvironmentMerging(unittest.TestCase):
+class TestEnvironmentMerging:
     """Unit tests for the merge_environment_variables function."""
 
-    def setUp(self) -> None:
+    def setup_method(self) -> None:
         """Set up test environment."""
         # Save original environment
         self.original_env = dict(os.environ)
 
-    def tearDown(self) -> None:
+    def teardown_method(self) -> None:
         """Restore original environment."""
         os.environ.clear()
         os.environ.update(self.original_env)
@@ -26,7 +25,7 @@ class TestEnvironmentMerging(unittest.TestCase):
         result = merge_environment_variables(None, None)
 
         # Assert
-        self.assertEqual(result, {})
+        assert result == {}
 
     @patch("os.environ")
     def test_02_both_empty_returns_none(self, existing_env: MagicMock) -> None:
@@ -38,7 +37,7 @@ class TestEnvironmentMerging(unittest.TestCase):
         result = merge_environment_variables({}, {})
 
         # Assert
-        self.assertEqual(result, {})
+        assert result == {}
 
     def test_03_global_only(self) -> None:
         """Test that only global environment variables are merged with system env."""
@@ -50,9 +49,9 @@ class TestEnvironmentMerging(unittest.TestCase):
         result = merge_environment_variables(global_env, None)
 
         # Assert
-        self.assertIsNotNone(result)
-        self.assertEqual(result["SYSTEM_VAR"], "system_value")
-        self.assertEqual(result["GLOBAL_VAR"], "global_value")
+        assert result is not None
+        assert result["SYSTEM_VAR"] == "system_value"
+        assert result["GLOBAL_VAR"] == "global_value"
 
     def test_04_check_only(self) -> None:
         """Test that only check-specific environment variables are merged with system env."""
@@ -64,9 +63,9 @@ class TestEnvironmentMerging(unittest.TestCase):
         result = merge_environment_variables(None, check_env)
 
         # Assert
-        self.assertIsNotNone(result)
-        self.assertEqual(result["SYSTEM_VAR"], "system_value")
-        self.assertEqual(result["CHECK_VAR"], "check_value")
+        assert result is not None
+        assert result["SYSTEM_VAR"] == "system_value"
+        assert result["CHECK_VAR"] == "check_value"
 
     def test_05_check_overrides_global(self) -> None:
         """Test that check-specific variables override global variables."""
@@ -79,8 +78,8 @@ class TestEnvironmentMerging(unittest.TestCase):
         result = merge_environment_variables(global_env, check_env)
 
         # Assert
-        self.assertIsNotNone(result)
-        self.assertEqual(result["API_KEY"], "check_key")
+        assert result is not None
+        assert result["API_KEY"] == "check_key"
 
     def test_06_global_overrides_system(self) -> None:
         """Test that global variables override system variables."""
@@ -92,8 +91,8 @@ class TestEnvironmentMerging(unittest.TestCase):
         result = merge_environment_variables(global_env, None)
 
         # Assert
-        self.assertIsNotNone(result)
-        self.assertEqual(result["API_KEY"], "global_key")
+        assert result is not None
+        assert result["API_KEY"] == "global_key"
 
     def test_07_check_overrides_system(self) -> None:
         """Test that check-specific variables override system variables."""
@@ -105,8 +104,8 @@ class TestEnvironmentMerging(unittest.TestCase):
         result = merge_environment_variables(None, check_env)
 
         # Assert
-        self.assertIsNotNone(result)
-        self.assertEqual(result["API_KEY"], "check_key")
+        assert result is not None
+        assert result["API_KEY"] == "check_key"
 
     def test_08_complete_merge_priority(self) -> None:
         """
@@ -134,13 +133,9 @@ class TestEnvironmentMerging(unittest.TestCase):
         result = merge_environment_variables(global_env, check_env)
 
         # Assert
-        self.assertIsNotNone(result)
-        self.assertEqual(result["VAR1"], "system_1")  # System only
-        self.assertEqual(result["VAR2"], "global_2")  # Global overrides system
-        self.assertEqual(result["VAR3"], "check_3")  # Check overrides global and system
-        self.assertEqual(result["VAR4"], "global_4")  # Global only
-        self.assertEqual(result["VAR5"], "check_5")  # Check only
-
-
-if __name__ == "__main__":
-    unittest.main()
+        assert result is not None
+        assert result["VAR1"] == "system_1"
+        assert result["VAR2"] == "global_2"
+        assert result["VAR3"] == "check_3"
+        assert result["VAR4"] == "global_4"
+        assert result["VAR5"] == "check_5"

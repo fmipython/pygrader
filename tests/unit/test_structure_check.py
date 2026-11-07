@@ -1,21 +1,22 @@
 """Unit tests for the StructureCheck class in the structure_check module."""
 
 import json
-import unittest
+from collections.abc import Callable
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 from grader.checks.structure_check import StructureCheck
 from grader.exceptions import CheckError, ResourceError
 from grader.models.check_result import NonScoredCheckResult
 
 
-class TestStructureCheck(unittest.TestCase):
+class TestStructureCheck:
     """Test cases for the StructureCheck class."""
 
-    def setUp(self) -> None:
+    def setup_method(self) -> None:
         """Set up the test environment."""
         self.structure_check = StructureCheck("structure", "sample_dir", "structure.json", is_venv_required=False)
-        return super().setUp()
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
     def test_01_valid_structure(self, mock_load_structure_file: MagicMock) -> None:
@@ -31,7 +32,7 @@ class TestStructureCheck(unittest.TestCase):
         result = self.structure_check.run()
 
         # Assert
-        self.assertEqual(result, expected)
+        assert result == expected
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
     def test_02_invalid_required_structure(self, mock_load_structure_file: MagicMock) -> None:
@@ -51,7 +52,7 @@ class TestStructureCheck(unittest.TestCase):
         result = self.structure_check.run()
 
         # Assert
-        self.assertEqual(result, expected)
+        assert result == expected
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
     def test_03_invalid_non_required_structure(self, mock_load_structure_file: MagicMock) -> None:
@@ -68,7 +69,7 @@ class TestStructureCheck(unittest.TestCase):
         result = self.structure_check.run()
 
         # Assert
-        self.assertEqual(result, expected)
+        assert result == expected
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
     def test_04_empty_structure_file(self, mock_load_structure_file: MagicMock) -> None:
@@ -81,10 +82,14 @@ class TestStructureCheck(unittest.TestCase):
         result = self.structure_check.run()
 
         # Assert
-        self.assertEqual(result, expected)
+        assert result == expected
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
-    def test_05_logs_structure_validity(self, mock_load_structure_file: MagicMock) -> None:
+    def test_05_logs_structure_validity(
+        self,
+        mock_load_structure_file: MagicMock,
+        log_output: Callable[[], list[str]],
+    ) -> None:
         """Verify that the run method logs the validity of each structure element."""
         # Arrange
         mock_element = MagicMock()
@@ -94,12 +99,10 @@ class TestStructureCheck(unittest.TestCase):
         mock_load_structure_file.return_value = [mock_element]
         expected_log_output = "Is test_element structure valid ?"
 
-        with self.assertLogs("grader", level="DEBUG") as log:
-            # Act
-            self.structure_check.run()
+        self.structure_check.run()
 
         # Assert
-        self.assertTrue(any(expected_log_output in message for message in log.output))
+        assert any(expected_log_output in message for message in log_output())
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
     def test_06_raises_check_error_on_invalid_structure_file(self, mock_load_structure_file: MagicMock) -> None:
@@ -108,7 +111,7 @@ class TestStructureCheck(unittest.TestCase):
         mock_load_structure_file.side_effect = CheckError("Invalid structure file")
 
         # Act & Assert
-        with self.assertRaises(CheckError):
+        with pytest.raises(CheckError):
             self.structure_check.run()
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
@@ -130,7 +133,7 @@ class TestStructureCheck(unittest.TestCase):
         result = self.structure_check.run()
 
         # Assert
-        self.assertEqual(result, expected)
+        assert result == expected
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
     def test_08_multiple_elements_with_invalid_required(self, mock_load_structure_file: MagicMock) -> None:
@@ -154,7 +157,7 @@ class TestStructureCheck(unittest.TestCase):
         result = self.structure_check.run()
 
         # Assert
-        self.assertEqual(result, expected)
+        assert result == expected
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
     def test_09_multiple_elements_with_invalid_non_required(self, mock_load_structure_file: MagicMock) -> None:
@@ -175,7 +178,7 @@ class TestStructureCheck(unittest.TestCase):
         result = self.structure_check.run()
 
         # Assert
-        self.assertEqual(result, expected)
+        assert result == expected
 
     @patch("grader.checks.structure_check.StructureCheck._StructureCheck__load_structure_file")
     def test_10_all_invalid_elements(self, mock_load_structure_file: MagicMock) -> None:
@@ -202,7 +205,7 @@ class TestStructureCheck(unittest.TestCase):
         result = self.structure_check.run()
 
         # Assert
-        self.assertEqual(result, expected)
+        assert result == expected
 
     @patch("grader.utils.structure_validator.StructureValidator.is_structure_valid")
     @patch("grader.checks.structure_check.Resource")
@@ -225,7 +228,7 @@ class TestStructureCheck(unittest.TestCase):
         result = self.structure_check.run()
 
         # Assert
-        self.assertEqual(result, expected)
+        assert result == expected
         mock_resource_cls.assert_called_once_with("structure.json")
 
     @patch("grader.checks.structure_check.Resource")
@@ -235,9 +238,9 @@ class TestStructureCheck(unittest.TestCase):
         mock_resource_cls.return_value.read.return_value = json.dumps({"first": {"second": -1}})
 
         # Act & Assert
-        with self.assertRaises(CheckError) as context:
+        with pytest.raises(CheckError) as context:
             self.structure_check.run()
-        self.assertIn("Invalid structure file", str(context.exception))
+        assert "Invalid structure file" in str(context.value)
 
     @patch("grader.checks.structure_check.Resource")
     def test_13_load_structure_file_empty(self, mock_resource_cls: MagicMock) -> None:
@@ -250,7 +253,7 @@ class TestStructureCheck(unittest.TestCase):
         result = self.structure_check.run()
 
         # Assert
-        self.assertEqual(result, expected)
+        assert result == expected
 
     @patch("grader.checks.structure_check.Resource")
     def test_14_load_structure_file_invalid_json(self, mock_resource_cls: MagicMock) -> None:
@@ -259,9 +262,9 @@ class TestStructureCheck(unittest.TestCase):
         mock_resource_cls.return_value.read.return_value = "not valid json"
 
         # Act & Assert
-        with self.assertRaises(CheckError) as context:
+        with pytest.raises(CheckError) as context:
             self.structure_check.run()
-        self.assertIn("Invalid structure file", str(context.exception))
+        assert "Invalid structure file" in str(context.value)
 
     @patch("grader.checks.structure_check.Resource")
     def test_15_load_structure_file_not_found(self, mock_resource_cls: MagicMock) -> None:
@@ -270,9 +273,9 @@ class TestStructureCheck(unittest.TestCase):
         mock_resource_cls.return_value.read.side_effect = ResourceError("Local file not found: structure.json")
 
         # Act & Assert
-        with self.assertRaises(CheckError) as context:
+        with pytest.raises(CheckError) as context:
             self.structure_check.run()
-        self.assertIn("Cannot read structure file", str(context.exception))
+        assert "Cannot read structure file" in str(context.value)
 
     @patch("grader.checks.structure_check.Resource")
     def test_16_load_structure_file_remote_download_fails(self, mock_resource_cls: MagicMock) -> None:
@@ -284,7 +287,7 @@ class TestStructureCheck(unittest.TestCase):
         )
 
         # Act & Assert
-        with self.assertRaises(CheckError) as context:
+        with pytest.raises(CheckError) as context:
             structure_check.run()
-        self.assertIn("Cannot read structure file", str(context.exception))
+        assert "Cannot read structure file" in str(context.value)
         mock_resource_cls.assert_called_once_with("https://example.com/structure.json")

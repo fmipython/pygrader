@@ -1,40 +1,40 @@
 """Unit tests for the CoverageCheck class in the coverage_check module."""
 
-import unittest
+from collections.abc import Callable
 from subprocess import CompletedProcess
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 from grader.checks.coverage_check import CoverageCheck
 from grader.exceptions import CheckError
 from grader.models.check_result import ScoredCheckResult
 
 
-class TestCoverageCheck(unittest.TestCase):
+class TestCoverageCheck:
     """Test cases for the CoverageCheck class."""
 
-    def setUp(self) -> None:
+    def setup_method(self) -> None:
         """Set up the CoverageCheck instance for testing."""
         self.coverage_check = CoverageCheck("Coverage", "sample_dir", 2, is_venv_required=False)
         # This way, we have 3 ranges: 0-33, 34-66, 67-100
-        return super().setUp()
 
     @patch("subprocess.run")
-    def test_01_coverage_run_fail(self, mocked_run: MagicMock) -> None:
+    def test_01_coverage_run_fail(self, mocked_run: MagicMock, log_output: Callable[[], list[str]]) -> None:
         """Test that a failed coverage run logs an error and raises an exception."""
         # Arrange
         mocked_run.return_value = CompletedProcess(args=["coverage", "run"], returncode=1)
 
         # Act
-        with self.assertLogs("grader", level="ERROR") as log:
-            with self.assertRaises(CheckError):
-                self.coverage_check.run()
-            is_message_logged = "ERROR:grader:Coverage run failed. stdout:" in log.output[0]
+        with pytest.raises(CheckError):
+            self.coverage_check.run()
+        is_message_logged = "ERROR:grader:Coverage run failed. stdout:" in " ".join(log_output())
 
         # Assert
-        self.assertTrue(is_message_logged)
+        assert is_message_logged
 
     @patch("subprocess.run")
-    def test_02_coverage_report_fail(self, mocked_run: MagicMock) -> None:
+    def test_02_coverage_report_fail(self, mocked_run: MagicMock, log_output: Callable[[], list[str]]) -> None:
         """Test that a failed coverage report logs an error and returns a score of 0.0."""
 
         # Arrange
@@ -47,13 +47,12 @@ class TestCoverageCheck(unittest.TestCase):
 
         mocked_run.side_effect = mocked_run_side_effect
         # Act
-        with self.assertLogs("grader", level="ERROR") as log:
-            with self.assertRaises(CheckError):
-                self.coverage_check.run()
-            is_message_logged = "ERROR:grader:Coverage report failed" in log.output
+        with pytest.raises(CheckError):
+            self.coverage_check.run()
+        is_message_logged = "ERROR:grader:Coverage report failed" in log_output()
 
         # Assert
-        self.assertTrue(is_message_logged)
+        assert is_message_logged
 
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_run")
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_report")
@@ -68,7 +67,7 @@ class TestCoverageCheck(unittest.TestCase):
         actual_score = self.coverage_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        assert expected_score == actual_score
 
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_run")
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_report")
@@ -83,7 +82,7 @@ class TestCoverageCheck(unittest.TestCase):
         actual_score = self.coverage_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        assert expected_score == actual_score
 
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_run")
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_report")
@@ -98,7 +97,7 @@ class TestCoverageCheck(unittest.TestCase):
         actual_score = self.coverage_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        assert expected_score == actual_score
 
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_run")
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_report")
@@ -113,7 +112,7 @@ class TestCoverageCheck(unittest.TestCase):
         actual_score = self.coverage_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        assert expected_score == actual_score
 
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_run")
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_report")
@@ -130,7 +129,7 @@ class TestCoverageCheck(unittest.TestCase):
         actual_score = self.coverage_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        assert expected_score == actual_score
 
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_run")
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_report")
@@ -145,7 +144,7 @@ class TestCoverageCheck(unittest.TestCase):
         actual_score = self.coverage_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        assert expected_score == actual_score
 
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_run")
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_report")
@@ -160,7 +159,7 @@ class TestCoverageCheck(unittest.TestCase):
         actual_score = self.coverage_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        assert expected_score == actual_score
 
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_run")
     @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_report")
@@ -175,7 +174,7 @@ class TestCoverageCheck(unittest.TestCase):
         actual_score = self.coverage_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        assert expected_score == actual_score
 
     @patch("subprocess.run")
     def test_11_coverage_report_read_properly(self, mocked_run: MagicMock) -> None:
@@ -194,4 +193,4 @@ class TestCoverageCheck(unittest.TestCase):
         result = self.coverage_check.run()
 
         # Assert
-        self.assertEqual(ScoredCheckResult("Coverage", 2, "Tests cover 100.00% of the code", "", 2), result)
+        assert ScoredCheckResult("Coverage", 2, "Tests cover 100.00% of the code", "", 2) == result

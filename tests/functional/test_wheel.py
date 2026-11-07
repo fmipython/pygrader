@@ -1,24 +1,25 @@
 """Module for functional tests related to the wheel package."""
 
-import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
+
+import pytest
 
 from grader.utils.process import run
 
 
-class TestWheel(unittest.TestCase):
+class TestWheel:
     """Class for testing wheel package functionality."""
 
     temp_dir: TemporaryDirectory
 
     @classmethod
-    def setUpClass(cls) -> None:
+    def setup_class(cls) -> None:
         """Create a temporary directory for wheel building tests."""
         cls.temp_dir = TemporaryDirectory()
 
     @classmethod
-    def tearDownClass(cls) -> None:
+    def teardown_class(cls) -> None:
         """Clean up the temporary directory after tests."""
         cls.temp_dir.cleanup()
 
@@ -27,9 +28,9 @@ class TestWheel(unittest.TestCase):
         try:
             wheel_path = build_wheel(self.temp_dir.name)
         except RuntimeError as e:
-            self.fail(f"Wheel build failed with error: {e}")
+            pytest.fail(f"Wheel build failed with error: {e}")
 
-        self.assertTrue(wheel_path.exists(), "Wheel file was not created")
+        assert wheel_path.exists(), "Wheel file was not created"
 
 
 def build_wheel(build_dir: str) -> Path:

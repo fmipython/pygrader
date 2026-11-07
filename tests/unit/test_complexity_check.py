@@ -26,7 +26,9 @@ def fixture_check() -> ComplexityCheck:
 
 @patch("complexipy.file_complexity")
 @patch("grader.utils.files.find_all_source_files")
-def test_01_all_functions_within_threshold(mock_find: MagicMock, mock_complexity: MagicMock, check: ComplexityCheck):
+def test_01_all_functions_within_threshold(
+    mock_find: MagicMock, mock_complexity: MagicMock, check: ComplexityCheck
+) -> None:
     """Verify that the check passes when no function exceeds the threshold."""
     mock_find.return_value = ["a.py"]
     mock_complexity.return_value = _file_complexity(("foo", 1, 10), ("bar", 5, 2))
@@ -38,7 +40,7 @@ def test_01_all_functions_within_threshold(mock_find: MagicMock, mock_complexity
 
 @patch("complexipy.file_complexity")
 @patch("grader.utils.files.find_all_source_files")
-def test_02_function_above_threshold(mock_find: MagicMock, mock_complexity: MagicMock, check: ComplexityCheck):
+def test_02_function_above_threshold(mock_find: MagicMock, mock_complexity: MagicMock, check: ComplexityCheck) -> None:
     """Verify that the check fails and names the offending functions."""
     mock_find.return_value = ["a.py", "b.py"]
     mock_complexity.side_effect = [_file_complexity(("foo", 1, 11)), _file_complexity(("bar", 7, 3))]
@@ -49,7 +51,7 @@ def test_02_function_above_threshold(mock_find: MagicMock, mock_complexity: Magi
 
 
 @patch("grader.utils.files.find_all_source_files")
-def test_03_no_source_files(mock_find: MagicMock, check: ComplexityCheck):
+def test_03_no_source_files(mock_find: MagicMock, check: ComplexityCheck) -> None:
     """Verify that a project without source files passes."""
     mock_find.return_value = []
 
@@ -57,7 +59,7 @@ def test_03_no_source_files(mock_find: MagicMock, check: ComplexityCheck):
 
 
 @patch("grader.utils.files.find_all_source_files")
-def test_04_finding_files_fails(mock_find: MagicMock, check: ComplexityCheck):
+def test_04_finding_files_fails(mock_find: MagicMock, check: ComplexityCheck) -> None:
     """Verify that an OSError while finding files is reported as a CheckError."""
     mock_find.side_effect = OSError("boom")
 
@@ -67,7 +69,7 @@ def test_04_finding_files_fails(mock_find: MagicMock, check: ComplexityCheck):
 
 @patch("complexipy.file_complexity")
 @patch("grader.utils.files.find_all_source_files")
-def test_05_complexipy_fails(mock_find: MagicMock, mock_complexity: MagicMock, check: ComplexityCheck):
+def test_05_complexipy_fails(mock_find: MagicMock, mock_complexity: MagicMock, check: ComplexityCheck) -> None:
     """Verify that a complexipy failure is reported as a CheckError."""
     mock_find.return_value = ["a.py"]
     mock_complexity.side_effect = ValueError("bad syntax")

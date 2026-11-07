@@ -8,6 +8,7 @@ OpenAI-compatible chat completions endpoint (OpenRouter by default).
 import json
 import logging
 import os
+from pathlib import Path
 
 import requests
 from dotenv import load_dotenv
@@ -111,7 +112,7 @@ class SpecCheck(ScoredCheck):
         """
         chunks = []
         for path in find_all_source_files(self._project_root):
-            relative_path = os.path.relpath(path, self._project_root)
+            relative_path = Path(path).relative_to(Path(self._project_root).resolve())
             try:
                 with open(path, "r", encoding="utf-8") as file_pointer:
                     chunks.append(f"# === {relative_path} ===\n{file_pointer.read()}")

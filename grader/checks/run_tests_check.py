@@ -1,9 +1,9 @@
 """Module containing the check for running tests against the submitted code."""
 
 import logging
-import os
 from collections import defaultdict
 from dataclasses import dataclass
+from pathlib import Path
 
 from grader.checks.abstract_check import ScoredCheck
 from grader.exceptions import CheckError, ResourceError
@@ -117,11 +117,9 @@ class RunTestsCheck(ScoredCheck):
         :rtype: str
         :raises CheckError: If pytest fails to execute or encounters an error.
         """
-        if os.path.isabs(self._project_root):
-            pytest_root_dir = PYTEST_ROOT_DIR_ARG.format(self._project_root)
-        else:
-            pytest_root_dir = PYTEST_ROOT_DIR_ARG.format(os.path.join(os.getcwd(), self._project_root))
-        command = [PYTEST_PATH] + PYTEST_ARGS + [pytest_root_dir] + self.__tests_path
+        # Joining with an absolute project root yields the root itself
+        pytest_root_dir = PYTEST_ROOT_DIR_ARG.format(Path.cwd() / self._project_root)
+        command = [str(PYTEST_PATH)] + PYTEST_ARGS + [pytest_root_dir] + self.__tests_path
 
         pythonpath_env = process.extend_env_variable("PYTHONPATH", self._project_root)
 

@@ -5,7 +5,6 @@ It checks if requirements.txt exists in the project root.
 """
 
 import logging
-import os
 from pathlib import Path
 
 from grader.checks.abstract_check import ScoredCheck
@@ -43,8 +42,8 @@ class RequirementsCheck(ScoredCheck):
         """
         super().__init__(name, max_points, project_root, is_venv_required, env_vars, assets)
 
-        self.__requirements_path = os.path.join(self._project_root, REQUIREMENTS_FILENAME)
-        self.__pyproject_path = os.path.join(self._project_root, PYPROJECT_FILENAME)
+        self.__requirements_path = Path(self._project_root) / REQUIREMENTS_FILENAME
+        self.__pyproject_path = Path(self._project_root) / PYPROJECT_FILENAME
         self.__is_checking_install = is_checking_install
 
     def run(self) -> ScoredCheckResult:
@@ -57,8 +56,8 @@ class RequirementsCheck(ScoredCheck):
         """
         self._pre_run()
 
-        requirements = Path(self.__requirements_path)
-        pyproject = Path(self.__pyproject_path)
+        requirements = self.__requirements_path
+        pyproject = self.__pyproject_path
 
         files_to_search = [requirements, pyproject]
 

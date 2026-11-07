@@ -43,7 +43,7 @@ class CoverageCheck(ScoredCheck):
         """
         super().__init__(name, max_points, project_root, is_venv_required, env_vars, assets)
 
-        self.__coverage_full_path = COVERAGE_PATH
+        self.__coverage_full_path = str(COVERAGE_PATH)
 
     def run(self) -> ScoredCheckResult:
         """

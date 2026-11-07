@@ -3,6 +3,7 @@
 import os
 import shutil
 from logging import Logger
+from pathlib import Path
 
 import grader.utils.constants as const
 from grader.checks.abstract_check import AbstractCheck, NonScoredCheck, ScoredCheck
@@ -78,7 +79,7 @@ class Grader:
             self.__logger.info("Running checks for student %s", run_id)
         self.__logger.debug("Project root: %s", project_root)
 
-        if not os.path.exists(project_root):
+        if not Path(project_root).exists():
             self.__logger.error("Project root directory does not exist")
             raise InvalidProjectRootError("Project root directory does not exist")
 
@@ -158,7 +159,5 @@ class Grader:
         """
         shutil.rmtree(const.TEMP_FILES_DIR, ignore_errors=True)
 
-        coverage_file_full_path = os.path.join(project_root, const.COVERAGE_FILE)
-        if os.path.exists(coverage_file_full_path):
-            os.remove(coverage_file_full_path)
-        shutil.rmtree(os.path.join(project_root, const.PYTEST_CACHE), ignore_errors=True)
+        (Path(project_root) / const.COVERAGE_FILE).unlink(missing_ok=True)
+        shutil.rmtree(Path(project_root) / const.PYTEST_CACHE, ignore_errors=True)

@@ -5,7 +5,6 @@ Calls all the checks, and stores their results.
 """
 
 import glob
-import os
 import shutil
 import zipfile
 from pathlib import Path
@@ -139,7 +138,7 @@ def run_grader() -> int:
     # TODO - Add output to a file
     print(reporter.to_string())
 
-    if os.path.exists(const.WORK_DIR):
+    if const.WORK_DIR.exists():
         shutil.rmtree(const.WORK_DIR)
 
     return 1 if has_failure else 0

@@ -3,8 +3,8 @@
 from __future__ import annotations  # Python 3.14 will fix this
 
 import logging
-import os
 import shutil
+from pathlib import Path
 from typing import Self
 
 import grader.utils.constants as const
@@ -41,7 +41,7 @@ class VirtualEnvironment:
         """
         self._project_path = project_path
         # TODO - To fully allow for a custom venv name, we need to rethink how we handle paths in the constants
-        self._venv_path = os.path.join(project_path, name)
+        self._venv_path = Path(project_path) / name
         self.__is_keeping_venv_after_run = is_keeping_venv_after_run
         self.__is_keeping_existing_venv = is_keeping_existing_venv
 
@@ -75,7 +75,7 @@ class VirtualEnvironment:
         # Create new venv
         logger.log(VERBOSE, "Creating new venv")
 
-        create_venv_result = run([const.PYTHON_BIN, "-m", "venv", self._venv_path])
+        create_venv_result = run([const.PYTHON_BIN, "-m", "venv", str(self._venv_path)])
         if create_venv_result.returncode != 0:
             logger.error("Failed to create virtual environment")
             raise VirtualEnvironmentError("Failed to create virtual environment")
@@ -83,15 +83,14 @@ class VirtualEnvironment:
         # Install project as package
         # note: we haven't shown them `setup.py` so we shouldn't look for it?
         # only support `pyproject.toml` configuration for now
-        if os.path.exists(os.path.join(self._project_path, const.PYPROJECT_FILENAME)):
+        if (Path(self._project_path) / const.PYPROJECT_FILENAME).exists():
             logger.log(VERBOSE, "Installing project as package")
             VirtualEnvironment.__install_project_as_package(self._venv_path, self._project_path)
         else:
             # if it is not a packaged project, check for requirements.txt and install them
-            requirements_path = os.path.join(self._project_path, const.REQUIREMENTS_FILENAME)
+            requirements_path = Path(self._project_path) / const.REQUIREMENTS_FILENAME
 
-            does_requirements_exist = os.path.exists(requirements_path)
-            if not does_requirements_exist:
+            if not requirements_path.exists():
                 logger.debug("No requirements.txt file found in the project directory")
             else:
                 logger.log(VERBOSE, "Installing requirements")
@@ -100,15 +99,15 @@ class VirtualEnvironment:
         # Install grader dependencies
         logger.log(VERBOSE, "Installing grader dependencies")
 
-        grader_requirements_path = const.GRADER_REQUIREMENTS
+        grader_requirements_path = Path(const.GRADER_REQUIREMENTS)
         VirtualEnvironment.__install_requirements(self._venv_path, grader_requirements_path)
 
     def __remove_existing_venv(self) -> None:
         """Remove any existing virtual environment in the project directory."""
-        possible_venv_paths = [os.path.join(self._project_path, venv_path) for venv_path in const.POSSIBLE_VENV_DIRS]
+        possible_venv_paths = [Path(self._project_path) / venv_path for venv_path in const.POSSIBLE_VENV_DIRS]
 
         for path in possible_venv_paths:
-            if os.path.exists(path):
+            if path.exists():
                 logger.log(VERBOSE, "Found existing venv at %s", path)
                 shutil.rmtree(path)
 
@@ -119,7 +118,7 @@ class VirtualEnvironment:
             shutil.rmtree(self._venv_path)
 
     @staticmethod
-    def __install_requirements(venv_path: str, requirements_path: str) -> None:
+    def __install_requirements(venv_path: Path, requirements_path: Path) -> None:
         """
         Install the requirements specified in the requirements file into the virtual environment.
 
@@ -131,16 +130,16 @@ class VirtualEnvironment:
         :return: None
         :rtype: None.
         """
-        pip_path = os.path.join(venv_path, const.PIP_PATH)
+        pip_path = venv_path / const.PIP_PATH
 
-        output = run([pip_path, "install", "-r", requirements_path])
+        output = run([str(pip_path), "install", "-r", str(requirements_path)])
 
         if output.returncode != 0:
             logger.error("Failed to install requirements from %s", requirements_path)
             raise VirtualEnvironmentError(f"Failed to install requirements from {requirements_path}")
 
     @staticmethod
-    def __install_project_as_package(venv_path: str, project_path: str) -> None:
+    def __install_project_as_package(venv_path: Path, project_path: str) -> None:
         """
         Install the project as a package into the virtual environment.
 
@@ -152,10 +151,10 @@ class VirtualEnvironment:
         :return: None
         :rtype: None.
         """
-        pip_path = os.path.join(venv_path, const.PIP_PATH)
+        pip_path = venv_path / const.PIP_PATH
 
         # Editable install fixes issues with directory structure renaming in pyproject.toml
-        output = run([pip_path, "install", "-e", project_path])
+        output = run([str(pip_path), "install", "-e", project_path])
 
         if output.returncode != 0:
             logger.error("Failed to install project from %s", project_path)

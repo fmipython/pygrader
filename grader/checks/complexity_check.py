@@ -9,7 +9,7 @@ import logging
 import complexipy
 
 from grader.checks.abstract_check import NonScoredCheck
-from grader.exceptions import CheckError
+from grader.exceptions import CheckError, InvalidConfigError
 from grader.models.check_result import NonScoredCheckResult
 from grader.utils import files
 
@@ -42,6 +42,9 @@ class ComplexityCheck(NonScoredCheck):
         :param env_vars: Optional environment variables for the check.
         :param assets: Optional list of resource sources (paths, URLs or Cove URIs) for the check.
         """
+        if isinstance(max_complexity, bool) or not isinstance(max_complexity, int) or max_complexity < 1:
+            raise InvalidConfigError(f"max_complexity must be a positive integer, got {max_complexity!r}")
+
         super().__init__(name, project_root, is_fatal, is_venv_required, env_vars, assets)
         self.__max_complexity = max_complexity
 
@@ -51,7 +54,9 @@ class ComplexityCheck(NonScoredCheck):
 
         The check passes when no function is more complex than the configured maximum.
 
-        :raises CheckError: If the source files cannot be found or analysed.
+        Files that cannot be parsed fail the check but do not stop the analysis of the other files.
+
+        :raises CheckError: If the source files cannot be found.
         :returns: The result of the check, listing the offending functions in the info field.
         :rtype: NonScoredCheckResult
         """
@@ -64,12 +69,14 @@ class ComplexityCheck(NonScoredCheck):
             raise CheckError("Error while finding python files") from error
 
         offenders: list[str] = []
+        unparsable: list[str] = []
         for source_file in source_files:
             try:
                 file_complexity = complexipy.file_complexity(source_file)
-            except (OSError, ValueError, RuntimeError) as error:
-                logger.error("Error while running complexipy on %s: %s", source_file, error)
-                raise CheckError(f"Error while running complexipy on {source_file}") from error
+            except ValueError as error:  # complexipy raises ValueError for unreadable or invalid files
+                logger.warning("Could not analyse %s: %s", source_file, error)
+                unparsable.append(source_file)
+                continue
 
             offenders.extend(
                 f"{source_file}:{function.line_start} {function.name} ({function.complexity})"
@@ -77,8 +84,12 @@ class ComplexityCheck(NonScoredCheck):
                 if function.complexity > self.__max_complexity
             )
 
-        if offenders:
-            info = f"Functions above complexity {self.__max_complexity}: " + ", ".join(offenders)
-            return NonScoredCheckResult(self.name, False, info, "")
+        if offenders or unparsable:
+            info = []
+            if offenders:
+                info.append(f"Functions above complexity {self.__max_complexity}: " + ", ".join(offenders))
+            if unparsable:
+                info.append("Could not analyse: " + ", ".join(unparsable))
+            return NonScoredCheckResult(self.name, False, ". ".join(info), "")
 
         return NonScoredCheckResult(self.name, True, f"All functions are within complexity {self.__max_complexity}", "")

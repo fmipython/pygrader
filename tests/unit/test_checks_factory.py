@@ -5,6 +5,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from grader.checks.checks_factory import create_checks
+from grader.checks.complexity_check import ComplexityCheck
 from grader.exceptions import InvalidCheckError, InvalidConfigError
 
 
@@ -60,6 +61,15 @@ class TestChecksFactory:
         # Act
         with pytest.raises(InvalidCheckError):
             create_checks(config, project_root)
+
+    def test_05b_complexity_check_is_created_with_its_options(self) -> None:
+        """Test that the complexity check is built from its config, without max_points."""
+        config = {"checks": [{"name": "complexity", "is_venv_required": False, "max_complexity": 7}]}
+
+        non_venv_checks, venv_checks = create_checks(config, "test_project")
+
+        assert not venv_checks
+        assert isinstance(non_venv_checks[0], ComplexityCheck)
 
     def test_06_venv_required(self) -> None:
         """Test that checks requiring a virtual environment are separated correctly."""

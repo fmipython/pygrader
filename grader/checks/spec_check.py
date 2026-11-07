@@ -112,7 +112,12 @@ class SpecCheck(ScoredCheck):
         """
         chunks = []
         for path in find_all_source_files(self._project_root):
-            relative_path = Path(path).resolve().relative_to(Path(self._project_root).resolve())
+            resolved_path = Path(path).resolve()
+            project_root = Path(self._project_root).resolve()
+            # Symlinked files can resolve to a location outside the project root
+            relative_path = (
+                resolved_path.relative_to(project_root) if resolved_path.is_relative_to(project_root) else resolved_path
+            )
             try:
                 with open(path, "r", encoding="utf-8") as file_pointer:
                     chunks.append(f"# === {relative_path} ===\n{file_pointer.read()}")

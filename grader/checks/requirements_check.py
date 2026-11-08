@@ -56,10 +56,7 @@ class RequirementsCheck(ScoredCheck):
         """
         self._pre_run()
 
-        requirements = self.__requirements_path
-        pyproject = self.__pyproject_path
-
-        files_to_search = [requirements, pyproject]
+        files_to_search = [self.__requirements_path, self.__pyproject_path]
 
         is_one_of_files_present = any(file_path.exists() for file_path in files_to_search)
 

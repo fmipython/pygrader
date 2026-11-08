@@ -437,6 +437,7 @@ class TestMultipleProjectsSupport(BaseFunctionalTestWithSampleProject):
 
     def setup_method(self) -> None:
         """Set up the sample project checkout plus a scratch directory for batch fixtures."""
+        super().setup_method()
         self.batch_dir = Path(self.clone_path).parent / "batch_projects"
         if self.batch_dir.exists():
             shutil.rmtree(self.batch_dir)
@@ -446,6 +447,7 @@ class TestMultipleProjectsSupport(BaseFunctionalTestWithSampleProject):
         """Clean up the batch scratch directory in addition to the sample project checkout."""
         if self.batch_dir.exists():
             shutil.rmtree(self.batch_dir)
+        super().teardown_method()
 
     def test_01_same_filename_archives_are_graded_independently(self) -> None:
         """

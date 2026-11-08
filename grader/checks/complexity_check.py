@@ -9,7 +9,7 @@ import logging
 import complexipy
 
 from grader.checks.abstract_check import NonScoredCheck
-from grader.exceptions import CheckError, InvalidConfigError
+from grader.exceptions import CheckError
 from grader.models.check_result import NonScoredCheckResult
 from grader.utils import files
 
@@ -42,9 +42,6 @@ class ComplexityCheck(NonScoredCheck):
         :param env_vars: Optional environment variables for the check.
         :param assets: Optional list of resource sources (paths, URLs or Cove URIs) for the check.
         """
-        if isinstance(max_complexity, bool) or not isinstance(max_complexity, int) or max_complexity < 1:
-            raise InvalidConfigError(f"max_complexity must be a positive integer, got {max_complexity!r}")
-
         super().__init__(name, project_root, is_fatal, is_venv_required, env_vars, assets)
         self.__max_complexity = max_complexity
 

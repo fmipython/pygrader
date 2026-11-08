@@ -62,7 +62,7 @@ class TestChecksFactory:
         with pytest.raises(InvalidCheckError):
             create_checks(config, project_root)
 
-    def test_05b_complexity_check_is_created_with_its_options(self) -> None:
+    def test_06_complexity_check_is_created_with_its_options(self) -> None:
         """Test that the complexity check is built from its config, without max_points."""
         config = {"checks": [{"name": "complexity", "is_venv_required": False, "max_complexity": 7}]}
 
@@ -71,7 +71,7 @@ class TestChecksFactory:
         assert not venv_checks
         assert isinstance(non_venv_checks[0], ComplexityCheck)
 
-    def test_06_venv_required(self) -> None:
+    def test_07_venv_required(self) -> None:
         """Test that checks requiring a virtual environment are separated correctly."""
         # Arrange
         config = {"checks": [{"name": "coverage", "max_points": 10, "is_venv_required": True}]}
@@ -84,7 +84,7 @@ class TestChecksFactory:
         assert len(non_venv_checks) == 0
         assert len(venv_checks) == 1
 
-    def test_07_venv_not_required(self) -> None:
+    def test_08_venv_not_required(self) -> None:
         """Test that checks not requiring a virtual environment are separated correctly."""
         # Arrange
         config = {"checks": [{"name": "coverage", "max_points": 10, "is_venv_required": False}]}
@@ -97,7 +97,7 @@ class TestChecksFactory:
         assert len(non_venv_checks) == 1
         assert len(venv_checks) == 0
 
-    def test_08_is_venv_required_not_present(self) -> None:
+    def test_09_is_venv_required_not_present(self) -> None:
         """Test that when is_venv_required is not present, an InvalidConfigError is raised."""
         # Arrange
         config = {"checks": [{"name": "coverage", "max_points": 10}]}
@@ -107,7 +107,7 @@ class TestChecksFactory:
         with pytest.raises(InvalidConfigError):
             _ = create_checks(config, project_root)
 
-    def test_09_environment_variables_global_only(self) -> None:
+    def test_10_environment_variables_global_only(self) -> None:
         """Test that global environment variables are passed to checks."""
         # Arrange
         config = {
@@ -129,7 +129,7 @@ class TestChecksFactory:
             assert "GLOBAL_VAR" in check.env_vars
             assert check.env_vars["GLOBAL_VAR"] == "global_value"
 
-    def test_10_environment_variables_check_specific(self) -> None:
+    def test_11_environment_variables_check_specific(self) -> None:
         """Test that check-specific environment variables are passed to checks."""
         # Arrange
         config = {
@@ -157,7 +157,7 @@ class TestChecksFactory:
             assert "CHECK_VAR" in check.env_vars
             assert check.env_vars["CHECK_VAR"] == "check_value"
 
-    def test_11_environment_variables_merge_priority(self) -> None:
+    def test_12_environment_variables_merge_priority(self) -> None:
         """Test that check-specific environment variables override global ones."""
         # Arrange
         config = {
@@ -191,7 +191,7 @@ class TestChecksFactory:
             assert check.env_vars["CHECK_VAR"] == "check_value"
 
     @patch("os.environ")
-    def test_12_environment_variables_none_when_not_defined(self, existing_env: MagicMock) -> None:
+    def test_13_environment_variables_none_when_not_defined(self, existing_env: MagicMock) -> None:
         """Test that env_vars is None when no environment variables are defined."""
         # Arrange
         existing_env.return_value = {}
@@ -206,7 +206,7 @@ class TestChecksFactory:
         check = non_venv_checks[0]
         assert check.env_vars == {}
 
-    def test_13_selected_checks_filters_subset(self) -> None:
+    def test_14_selected_checks_filters_subset(self) -> None:
         """Test that selected_checks limits the built checks to the matching subset."""
         # Arrange
         config = {
@@ -225,7 +225,7 @@ class TestChecksFactory:
         assert [check.name for check in non_venv_checks] == ["requirements"]
         assert [check.name for check in venv_checks] == ["pylint"]
 
-    def test_14_selected_checks_none_runs_everything(self) -> None:
+    def test_15_selected_checks_none_runs_everything(self) -> None:
         """Test that selected_checks=None keeps the current full-run behavior."""
         # Arrange
         config = {
@@ -243,7 +243,7 @@ class TestChecksFactory:
         assert len(non_venv_checks) == 1
         assert len(venv_checks) == 1
 
-    def test_15_selected_checks_unknown_name_raises(self) -> None:
+    def test_16_selected_checks_unknown_name_raises(self) -> None:
         """Test that requesting an unknown check name raises InvalidCheckError."""
         # Arrange
         config = {"checks": [{"name": "coverage", "max_points": 10, "is_venv_required": False}]}
@@ -254,7 +254,7 @@ class TestChecksFactory:
             create_checks(config, project_root, selected_checks=["pylintt"])
 
     @patch("grader.checks.abstract_check.Resource")
-    def test_16_assets_are_loaded_as_resources(self, mocked_resource: MagicMock) -> None:
+    def test_17_assets_are_loaded_as_resources(self, mocked_resource: MagicMock) -> None:
         """Test that a check's "assets" config entries are converted to Resource objects."""
         # Arrange
         config = {
@@ -277,7 +277,7 @@ class TestChecksFactory:
         check = non_venv_checks[0]
         assert check.assets == [mocked_resource.return_value, mocked_resource.return_value]
 
-    def test_17_assets_default_to_empty_list(self) -> None:
+    def test_18_assets_default_to_empty_list(self) -> None:
         """Test that a check built without an "assets" key exposes an empty assets list."""
         # Arrange
         config = {"checks": [{"name": "coverage", "max_points": 10, "is_venv_required": False}]}

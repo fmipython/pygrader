@@ -1,10 +1,12 @@
 """Unit tests for the TypeHintsCheck class."""
 
-import os
 import shutil
-import unittest
+from collections.abc import Callable
+from pathlib import Path
 from subprocess import CompletedProcess
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 import grader.utils.constants as const
 from grader.checks.type_hints_check import TypeHintsCheck
@@ -12,14 +14,13 @@ from grader.exceptions import CheckError
 from grader.models.check_result import ScoredCheckResult
 
 
-class TestTypeHintsCheck(unittest.TestCase):
+class TestTypeHintsCheck:
     """Test cases for the TypeHintsCheck class."""
 
-    def setUp(self) -> None:
+    def setup_method(self) -> None:
         """Set up the test environment."""
         self.type_hints_check = TypeHintsCheck("type_hints", "sample_dir", 2, is_venv_required=False)
         # This way, we have 3 ranges: 0-33, 34-66, 67-100
-        return super().setUp()
 
     @patch("grader.utils.process.run")
     @patch("grader.utils.files.find_all_source_files")
@@ -37,8 +38,8 @@ class TestTypeHintsCheck(unittest.TestCase):
         mocked_run.return_value = CompletedProcess(args=["mypy"], returncode=0)
 
         # Copy mypy_sample_linecount.txt to the reports directory
-        os.makedirs(const.REPORTS_TEMP_DIR, exist_ok=True)
-        shutil.copy(os.path.join("tests", "mypy_sample_linecount.txt"), const.MYPY_LINE_COUNT_REPORT)
+        Path(const.REPORTS_TEMP_DIR).mkdir(parents=True, exist_ok=True)
+        shutil.copy(str(Path("tests", "mypy_sample_linecount.txt")), const.MYPY_LINE_COUNT_REPORT)
 
         # Act
         self.type_hints_check.run()
@@ -48,11 +49,11 @@ class TestTypeHintsCheck(unittest.TestCase):
         mocked_find_python_files.assert_called_once()
         mocked_run.assert_called_once()
         # called_with[0] is *args. First arg is the list of "args" of lint.Run
-        self.assertIn("file1.py", called_with[0][0])
-        self.assertIn("file2.py", called_with[0][0])
+        assert "file1.py" in called_with[0][0]
+        assert "file2.py" in called_with[0][0]
 
     @patch("grader.utils.process.run")
-    def test_03_mypy_report_missing(self, mocked_run: MagicMock) -> None:
+    def test_03_mypy_report_missing(self, mocked_run: MagicMock, log_output: Callable[[], list[str]]) -> None:
         """
         Test if an error is logged when the mypy linecount report is missing.
 
@@ -62,17 +63,16 @@ class TestTypeHintsCheck(unittest.TestCase):
         # Arrange
         mocked_run.return_value = CompletedProcess(args=["mypy"], returncode=0)
 
-        if os.path.exists(const.MYPY_LINE_COUNT_REPORT):
-            os.remove(const.MYPY_LINE_COUNT_REPORT)
+        if Path(const.MYPY_LINE_COUNT_REPORT).exists():
+            Path(const.MYPY_LINE_COUNT_REPORT).unlink()
 
         # Act
-        with self.assertLogs(level="ERROR") as cm:
-            with self.assertRaises(CheckError):
-                self.type_hints_check.run()
-            is_error_logged = any("Mypy linecount report not found" in log for log in cm.output)
+        with pytest.raises(CheckError):
+            self.type_hints_check.run()
+        is_error_logged = any("Mypy linecount report not found" in log for log in log_output())
 
         # Assert
-        self.assertTrue(is_error_logged)
+        assert is_error_logged
 
     @patch("grader.utils.process.run")
     def test_04_translate_score_zero(self, mocked_run: MagicMock) -> None:
@@ -93,7 +93,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         actual_score = self.type_hints_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        assert expected_score == actual_score
 
     @patch("grader.utils.process.run")
     def test_05_translate_score_inside_first_range(self, mocked_run: MagicMock) -> None:
@@ -114,7 +114,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         actual_score = self.type_hints_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        assert expected_score == actual_score
 
     @patch("grader.utils.process.run")
     def test_06_translate_score_right_bound_first_range(self, mocked_run: MagicMock) -> None:
@@ -135,7 +135,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         actual_score = self.type_hints_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        assert expected_score == actual_score
 
     @patch("grader.utils.process.run")
     def test_07_translate_score_left_bound_second_range(self, mocked_run: MagicMock) -> None:
@@ -156,7 +156,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         actual_score = self.type_hints_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        assert expected_score == actual_score
 
     @patch("grader.utils.process.run")
     def test_08_translate_score_inside_bound_second_range(self, mocked_run: MagicMock) -> None:
@@ -177,7 +177,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         actual_score = self.type_hints_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        assert expected_score == actual_score
 
     @patch("grader.utils.process.run")
     def test_09_translate_score_right_bound_second_range(self, mocked_run: MagicMock) -> None:
@@ -198,7 +198,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         actual_score = self.type_hints_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        assert expected_score == actual_score
 
     @patch("grader.utils.process.run")
     def test_10_translate_score_inside_bound_third_range(self, mocked_run: MagicMock) -> None:
@@ -219,7 +219,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         actual_score = self.type_hints_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        assert expected_score == actual_score
 
     @patch("grader.utils.process.run")
     def test_11_translate_score_max(self, mocked_run: MagicMock) -> None:
@@ -240,7 +240,7 @@ class TestTypeHintsCheck(unittest.TestCase):
         actual_score = self.type_hints_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        assert expected_score == actual_score
 
     @patch("grader.utils.process.run")
     def test_12_translate_score_all_zeros(self, mocked_run: MagicMock) -> None:
@@ -261,4 +261,4 @@ class TestTypeHintsCheck(unittest.TestCase):
         actual_score = self.type_hints_check.run()
 
         # Assert
-        self.assertEqual(expected_score, actual_score)
+        assert expected_score == actual_score

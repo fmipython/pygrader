@@ -1,22 +1,22 @@
 """Unit tests for the PylintCheck class."""
 
-import unittest
 from subprocess import CompletedProcess
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 import grader.utils.constants as const
 from grader.checks.pylint_check import PylintCheck
 from grader.exceptions import CheckError
 
 
-class TestPylintCheck(unittest.TestCase):
+class TestPylintCheck:
     """Test cases for the PylintCheck class."""
 
-    def setUp(self) -> None:
+    def setup_method(self) -> None:
         """Set up the test environment."""
         self.pylint_check = PylintCheck("pylint", "sample_dir", 2, is_venv_required=False)
         # This way, we have 3 ranges: 0-33, 34-66, 67-100
-        return super().setUp()
 
     @patch("grader.utils.process.run")
     @patch("grader.utils.files.find_all_python_files")
@@ -41,22 +41,22 @@ class TestPylintCheck(unittest.TestCase):
         mocked_pylint.assert_called_once()
         mocked_find_python_files.assert_called_once()
         # called_with[0] is *args. First arg is the list of "args" of lint.Run
-        self.assertIn("file1.py", called_with[0][0])
-        self.assertIn("file2.py", called_with[0][0])
+        assert "file1.py" in called_with[0][0]
+        assert "file2.py" in called_with[0][0]
 
     @patch("grader.utils.process.run")
-    @patch("os.path.exists")
-    def test_02_pylintrc_file_exists(self, mocked_os_path_exists: MagicMock, mocked_pylint: MagicMock) -> None:
+    @patch("pathlib.Path.exists")
+    def test_02_pylintrc_file_exists(self, mocked_path_exists: MagicMock, mocked_pylint: MagicMock) -> None:
         """
         Test if pylint is called with the --rcfile argument when the pylintrc file exists.
 
-        :param mocked_os_path_exists: Mocked os.path.exists function.
-        :type mocked_os_path_exists: MagicMock
+        :param mocked_path_exists: Mocked os.path.exists function.
+        :type mocked_path_exists: MagicMock
         :param mocked_pylint: Mocked grader.utils.process.run function.
         :type mocked_pylint: MagicMock
         """
         # Arrange
-        mocked_os_path_exists.return_value = True
+        mocked_path_exists.return_value = True
         mocked_pylint.return_value = CompletedProcess("pylint", 0, self.__create_sample_pylint_output(10))
 
         # Act
@@ -67,22 +67,22 @@ class TestPylintCheck(unittest.TestCase):
         mocked_pylint.assert_called_once()
 
         # called_with[0] is *args. First arg is the list of "args" of lint.Run
-        self.assertIn("--rcfile", called_with[0][0])
-        self.assertIn(const.PYLINTRC, called_with[0][0])
+        assert "--rcfile" in called_with[0][0]
+        assert const.PYLINTRC in called_with[0][0]
 
     @patch("grader.utils.process.run")
-    @patch("os.path.exists")
-    def test_03_pylintrc_file_does_not_exist(self, mocked_os_path_exists: MagicMock, mocked_pylint: MagicMock) -> None:
+    @patch("pathlib.Path.exists")
+    def test_03_pylintrc_file_does_not_exist(self, mocked_path_exists: MagicMock, mocked_pylint: MagicMock) -> None:
         """
         Test if pylint is called without the --rcfile argument when the pylintrc file does not exist.
 
-        :param mocked_os_path_exists: Mocked os.path.exists function.
-        :type mocked_os_path_exists: MagicMock
+        :param mocked_path_exists: Mocked os.path.exists function.
+        :type mocked_path_exists: MagicMock
         :param mocked_pylint: Mocked grader.utils.process.run function.
         :type mocked_pylint: MagicMock
         """
         # Arrange
-        mocked_os_path_exists.return_value = False
+        mocked_path_exists.return_value = False
         mocked_pylint.return_value = CompletedProcess("pylint", 0, self.__create_sample_pylint_output(10))
 
         # Act
@@ -93,8 +93,8 @@ class TestPylintCheck(unittest.TestCase):
         mocked_pylint.assert_called_once()
 
         # called_with[0] is *args. First arg is the list of "args" of lint.Run
-        self.assertNotIn("--rcfile", called_with[0][0])
-        self.assertNotIn(const.PYLINTRC, called_with[0][0])
+        assert "--rcfile" not in called_with[0][0]
+        assert const.PYLINTRC not in called_with[0][0]
 
     @patch("grader.utils.process.run")
     def test_04_translate_score_zero(self, mocked_pylint: MagicMock) -> None:
@@ -112,9 +112,9 @@ class TestPylintCheck(unittest.TestCase):
         actual_score = self.pylint_check.run()
 
         # Assert
-        self.assertEqual(1, actual_score.result)
-        self.assertEqual(self.pylint_check.name, actual_score.name)
-        self.assertEqual(self.pylint_check.max_points, actual_score.max_score)
+        assert 1 == actual_score.result
+        assert self.pylint_check.name == actual_score.name
+        assert self.pylint_check.max_points == actual_score.max_score
 
     @patch("grader.utils.process.run")
     def test_05_translate_score_inside_first_range(self, mocked_pylint: MagicMock) -> None:
@@ -132,9 +132,9 @@ class TestPylintCheck(unittest.TestCase):
         actual_score = self.pylint_check.run()
 
         # Assert
-        self.assertEqual(0, actual_score.result)
-        self.assertEqual(self.pylint_check.name, actual_score.name)
-        self.assertEqual(self.pylint_check.max_points, actual_score.max_score)
+        assert 0 == actual_score.result
+        assert self.pylint_check.name == actual_score.name
+        assert self.pylint_check.max_points == actual_score.max_score
 
     @patch("grader.utils.process.run")
     def test_06_translate_score_right_bound_first_range(self, mocked_pylint: MagicMock) -> None:
@@ -152,9 +152,9 @@ class TestPylintCheck(unittest.TestCase):
         actual_score = self.pylint_check.run()
 
         # Assert
-        self.assertEqual(1, actual_score.result)
-        self.assertEqual(self.pylint_check.name, actual_score.name)
-        self.assertEqual(self.pylint_check.max_points, actual_score.max_score)
+        assert 1 == actual_score.result
+        assert self.pylint_check.name == actual_score.name
+        assert self.pylint_check.max_points == actual_score.max_score
 
     @patch("grader.utils.process.run")
     def test_07_translate_score_left_bound_second_range(self, mocked_pylint: MagicMock) -> None:
@@ -172,9 +172,9 @@ class TestPylintCheck(unittest.TestCase):
         actual_score = self.pylint_check.run()
 
         # Assert
-        self.assertEqual(1, actual_score.result)
-        self.assertEqual(self.pylint_check.name, actual_score.name)
-        self.assertEqual(self.pylint_check.max_points, actual_score.max_score)
+        assert 1 == actual_score.result
+        assert self.pylint_check.name == actual_score.name
+        assert self.pylint_check.max_points == actual_score.max_score
 
     @patch("grader.utils.process.run")
     def test_08_translate_score_inside_bound_second_range(self, mocked_pylint: MagicMock) -> None:
@@ -192,9 +192,9 @@ class TestPylintCheck(unittest.TestCase):
         actual_score = self.pylint_check.run()
 
         # Assert
-        self.assertEqual(1, actual_score.result)
-        self.assertEqual(self.pylint_check.name, actual_score.name)
-        self.assertEqual(self.pylint_check.max_points, actual_score.max_score)
+        assert 1 == actual_score.result
+        assert self.pylint_check.name == actual_score.name
+        assert self.pylint_check.max_points == actual_score.max_score
 
     @patch("grader.utils.process.run")
     def test_09_translate_score_right_bound_second_range(self, mocked_pylint: MagicMock) -> None:
@@ -212,9 +212,9 @@ class TestPylintCheck(unittest.TestCase):
         actual_score = self.pylint_check.run()
 
         # Assert
-        self.assertEqual(2, actual_score.result)
-        self.assertEqual(self.pylint_check.name, actual_score.name)
-        self.assertEqual(self.pylint_check.max_points, actual_score.max_score)
+        assert 2 == actual_score.result
+        assert self.pylint_check.name == actual_score.name
+        assert self.pylint_check.max_points == actual_score.max_score
 
     @patch("grader.utils.process.run")
     def test_10_translate_score_inside_bound_third_range(self, mocked_pylint: MagicMock) -> None:
@@ -232,9 +232,9 @@ class TestPylintCheck(unittest.TestCase):
         actual_score = self.pylint_check.run()
 
         # Assert
-        self.assertEqual(2, actual_score.result)
-        self.assertEqual(self.pylint_check.name, actual_score.name)
-        self.assertEqual(self.pylint_check.max_points, actual_score.max_score)
+        assert 2 == actual_score.result
+        assert self.pylint_check.name == actual_score.name
+        assert self.pylint_check.max_points == actual_score.max_score
 
     @patch("grader.utils.process.run")
     def test_11_translate_score_max(self, mocked_pylint: MagicMock) -> None:
@@ -252,9 +252,9 @@ class TestPylintCheck(unittest.TestCase):
         actual_score = self.pylint_check.run()
 
         # Assert
-        self.assertEqual(2, actual_score.result)
-        self.assertEqual(self.pylint_check.name, actual_score.name)
-        self.assertEqual(self.pylint_check.max_points, actual_score.max_score)
+        assert 2 == actual_score.result
+        assert self.pylint_check.name == actual_score.name
+        assert self.pylint_check.max_points == actual_score.max_score
 
     @patch("grader.utils.files.find_all_python_files")
     def test_12_find_all_python_files_raises_os_error(self, mocked_find: MagicMock) -> None:
@@ -263,7 +263,7 @@ class TestPylintCheck(unittest.TestCase):
         mocked_find.side_effect = OSError("Test error")
 
         # Act
-        with self.assertRaises(CheckError):
+        with pytest.raises(CheckError):
             self.pylint_check.run()
 
     @patch("grader.utils.process.run")
@@ -273,7 +273,7 @@ class TestPylintCheck(unittest.TestCase):
         mocked_run.side_effect = OSError("Test error")
 
         # Act
-        with self.assertRaises(CheckError):
+        with pytest.raises(CheckError):
             self.pylint_check.run()
 
     @patch("grader.utils.process.run")
@@ -283,7 +283,7 @@ class TestPylintCheck(unittest.TestCase):
         mocked_run.return_value = CompletedProcess("pylint", 1)
 
         # Act
-        with self.assertRaises(CheckError):
+        with pytest.raises(CheckError):
             self.pylint_check.run()
 
     @staticmethod
@@ -308,13 +308,13 @@ class TestPylintCheck(unittest.TestCase):
         return "\n".join(content).format(score=score)
 
     @patch("grader.utils.process.run")
-    @patch("os.path.exists")
-    def test_pylint_with_custom_pylintrc(self, mocked_os_path_exists: MagicMock, mocked_pylint: MagicMock) -> None:
+    @patch("pathlib.Path.exists")
+    def test_pylint_with_custom_pylintrc(self, mocked_path_exists: MagicMock, mocked_pylint: MagicMock) -> None:
         """Test if pylint is called with the --rcfile argument when a custom pylintrc file is specified and exists."""
         # Arrange
         custom_pylintrc = "custom_rc_file"
         pylint_check = PylintCheck("pylint", "sample_dir", 2, is_venv_required=False, pylintrc_path=custom_pylintrc)
-        mocked_os_path_exists.return_value = True
+        mocked_path_exists.return_value = True
         mocked_pylint.return_value = CompletedProcess("pylint", 0, self.__create_sample_pylint_output(10))
 
         # Act
@@ -323,19 +323,19 @@ class TestPylintCheck(unittest.TestCase):
 
         # Assert
         mocked_pylint.assert_called_once()
-        self.assertIn("--rcfile", called_with[0][0])
-        self.assertIn(custom_pylintrc, called_with[0][0])
+        assert "--rcfile" in called_with[0][0]
+        assert custom_pylintrc in called_with[0][0]
 
     @patch("grader.utils.process.run")
-    @patch("os.path.exists")
+    @patch("pathlib.Path.exists")
     def test_pylint_with_nonexistent_custom_pylintrc(
-        self, mocked_os_path_exists: MagicMock, mocked_pylint: MagicMock
+        self, mocked_path_exists: MagicMock, mocked_pylint: MagicMock
     ) -> None:
         """Test if pylint is called without the --rcfile argument when a custom pylintrc is specified but does not exist."""
         # Arrange
         custom_pylintrc = "non_existent_rc_file"
         pylint_check = PylintCheck("pylint", "sample_dir", 2, is_venv_required=False, pylintrc_path=custom_pylintrc)
-        mocked_os_path_exists.return_value = False
+        mocked_path_exists.return_value = False
         mocked_pylint.return_value = CompletedProcess("pylint", 0, self.__create_sample_pylint_output(10))
 
         # Act
@@ -344,5 +344,5 @@ class TestPylintCheck(unittest.TestCase):
 
         # Assert
         mocked_pylint.assert_called_once()
-        self.assertNotIn("--rcfile", called_with[0][0])
-        self.assertNotIn(custom_pylintrc, called_with[0][0])
+        assert "--rcfile" not in called_with[0][0]
+        assert custom_pylintrc not in called_with[0][0]

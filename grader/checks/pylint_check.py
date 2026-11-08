@@ -5,9 +5,9 @@ It uses the pylint python library directly to run the check.
 
 import itertools
 import logging
-import os
 import re
 from io import StringIO
+from pathlib import Path
 
 from pylint.reporters.text import TextReporter
 
@@ -72,10 +72,10 @@ class PylintCheck(ScoredCheck):
         pylint_args.append("--fail-under=0")
         pylint_args.append("--extension-pkg-whitelist=pygame")
 
-        if os.path.exists(self.__pylintrc_path):
+        if Path(self.__pylintrc_path).exists():
             pylint_args.extend(["--rcfile", self.__pylintrc_path])
 
-        command = [const.PYLINT_PATH] + pylint_args  # Current working directory is set in the process.run method
+        command = [str(const.PYLINT_PATH)] + pylint_args  # Current working directory is set in the process.run method
         try:
             results = process.run(command, current_directory=self._project_root, env_vars=self.env_vars)
         except (OSError, ValueError) as error:

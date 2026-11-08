@@ -1,6 +1,5 @@
 """Module containing the file-related functions."""
 
-import os
 import zipfile
 from pathlib import Path
 
@@ -56,9 +55,9 @@ def get_tests_directory_name(project_root_dir: str) -> str | None:
     :returns: The path to the tests directory if found, otherwise None
     """
     for possible_directory in const.POSSIBLE_TEST_DIRS:
-        possible_tests_path = os.path.join(project_root_dir, possible_directory)
-        if os.path.exists(possible_tests_path):
-            return possible_tests_path
+        possible_tests_path = Path(project_root_dir) / possible_directory
+        if possible_tests_path.exists():
+            return str(possible_tests_path)
 
     return None
 
@@ -72,11 +71,7 @@ def find_all_files_under_directory(directory: str, extension: str) -> list[str]:
     :return: A list of all files under the directory with the specified extension
     :rtype: list[str]
     """
-    files = [
-        os.path.join(root, file) for root, _, files in os.walk(directory) for file in files if file.endswith(extension)
-    ]
-
-    return files
+    return [str(file) for file in Path(directory).rglob(f"*{extension}") if file.is_file()]
 
 
 def is_path_zip(path: str) -> bool:
@@ -102,7 +97,7 @@ def unzip_archive(archive_path: str, target_directory: str | None = None) -> str
     # Batch processing gives every submission's archive the same filename (e.g. "project.zip"),
     # so the parent directory name (unique per submission) is included to keep extractions apart.
     submission_dir = archive_path_obj.parent.name
-    working_directory = target_directory or os.path.join(const.WORK_DIR, submission_dir, archive_stem)
+    working_directory = target_directory or str(const.WORK_DIR / submission_dir / archive_stem)
 
     with zipfile.ZipFile(archive_path, "r") as zip_ref:
         zip_ref.extractall(working_directory)

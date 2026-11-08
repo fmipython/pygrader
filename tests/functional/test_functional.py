@@ -2,30 +2,31 @@
 
 import os
 import shutil
-import unittest
 import zipfile
 from pathlib import Path
+
+import pytest
 
 import grader.utils.constants as const
 from grader.utils.process import run
 
 
-class BaseFunctionalTestWithGrader(unittest.TestCase):
+class BaseFunctionalTestWithGrader:
     """Base class for functional tests with the grader."""
 
     repo_url = "https://github.com/fmipython/pygrader"
     clone_path = "/tmp/pygrader-cloned"
 
-    def setUp(self) -> None:
+    def setup_method(self) -> None:
         """Set up test fixtures by cloning the grader repository if needed."""
-        if os.path.exists(self.clone_path):
+        if Path(self.clone_path).exists():
             return
 
         clone_result = run(["git", "clone", self.repo_url, self.clone_path])
         if clone_result.returncode != 0:
             raise RuntimeError(f"Failed to clone the repository: {clone_result.stderr}")
 
-        current_branch_result = run(["git", "rev-parse", "--abbrev-ref", "HEAD"], current_directory=os.getcwd())
+        current_branch_result = run(["git", "rev-parse", "--abbrev-ref", "HEAD"], current_directory=str(Path.cwd()))
         if current_branch_result.returncode != 0:
             raise RuntimeError(f"Failed to get current branch: {current_branch_result.stderr}")
 
@@ -36,19 +37,19 @@ class BaseFunctionalTestWithGrader(unittest.TestCase):
             raise RuntimeError(f"Failed to checkout branch {current_branch}: {checkout_result.stderr}")
 
         # Remove the functional tests from the repo, as they cause issues and time loss.
-        functional_tests_path = os.path.join(self.clone_path, "tests", "functional", "test_functional.py")
-        if os.path.exists(functional_tests_path):
-            os.remove(functional_tests_path)
+        functional_tests_path = str(Path(self.clone_path, "tests", "functional", "test_functional.py"))
+        if Path(functional_tests_path).exists():
+            Path(functional_tests_path).unlink()
 
-    def tearDown(self) -> None:
+    def teardown_method(self) -> None:
         """Clean up test fixtures by removing the cloned repository."""
-        if not os.path.exists(self.clone_path):
+        if not Path(self.clone_path).exists():
             return
 
         shutil.rmtree(self.clone_path)
 
 
-@unittest.skipIf(os.name == "nt", "Test skipped on Windows")
+@pytest.mark.skipif(os.name == "nt", reason="Test skipped on Windows")
 class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
     """Functional tests for the grader in a good weather scenario."""
 
@@ -60,8 +61,8 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
         """
         # Arrange
         log_file = "grader.log"
-        if os.path.exists(log_file):
-            os.remove(log_file)
+        if Path(log_file).exists():
+            Path(log_file).unlink()
         command = build_command(project_path=self.clone_path)
 
         # Act
@@ -71,17 +72,17 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
         run_stdout = run_result.stdout
 
         # Assert
-        self.assertEqual(run_returncode, 0, run_stdout)
-        self.assertTrue(is_score_correct(expected_score=10, target_check="requirements", grader_output=run_stdout))
-        self.assertTrue(is_score_correct(expected_score=10, target_check="pylint", grader_output=run_stdout))
-        self.assertTrue(is_score_correct(expected_score=10, target_check="type-hints", grader_output=run_stdout))
-        self.assertTrue(os.path.exists(log_file), "Log file was not created")
-        os.remove(log_file)
-        self.assertNotIn(
-            "Running checks for student", run_stdout, "Unexpected student id output found when none was provided"
+        assert run_returncode == 0, run_stdout
+        assert is_score_correct(expected_score=10, target_check="requirements", grader_output=run_stdout)
+        assert is_score_correct(expected_score=10, target_check="pylint", grader_output=run_stdout)
+        assert is_score_correct(expected_score=10, target_check="type-hints", grader_output=run_stdout)
+        assert Path(log_file).exists(), "Log file was not created"
+        Path(log_file).unlink()
+        assert "Running checks for student" not in run_stdout, (
+            "Unexpected student id output found when none was provided"
         )
 
-    @unittest.skip("Coverage check test is too unstable")
+    @pytest.mark.skip(reason="Coverage check test is too unstable")
     def test_04_coverage_check(self) -> None:
         """Verify that the grader runs the coverage check and returns the expected score."""
         # Arrange
@@ -94,8 +95,8 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
         run_stdout = run_result.stdout
 
         # Assert
-        self.assertEqual(run_returncode, 0, run_stdout)
-        self.assertTrue(is_score_correct(expected_score=8, target_check="coverage", grader_output=run_stdout))
+        assert run_returncode == 0, run_stdout
+        assert is_score_correct(expected_score=8, target_check="coverage", grader_output=run_stdout)
 
     def test_06_student_id_single_run(self) -> None:
         """Verify the student-id log file name and the student-id output line from a single grader run."""
@@ -103,22 +104,22 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
         student_id = "student123"
         log_file = f"{student_id}.log"
         expected_output = f"Running checks for student {student_id}"
-        if os.path.exists(log_file):
-            os.remove(log_file)
+        if Path(log_file).exists():
+            Path(log_file).unlink()
         command = build_command(project_path=self.clone_path, student_id=student_id)
 
         # Act
         run_result = run(command)
 
         # Assert
-        self.assertEqual(run_result.returncode, 0, run_result.stdout)
-        self.assertTrue(os.path.exists(log_file), f"Log file with student ID '{student_id}' was not created")
-        os.remove(log_file)
-        self.assertIn(
-            expected_output, run_result.stdout, f"Expected output '{expected_output}' not found in the tool's output"
+        assert run_result.returncode == 0, run_result.stdout
+        assert Path(log_file).exists(), f"Log file with student ID '{student_id}' was not created"
+        Path(log_file).unlink()
+        assert expected_output in run_result.stdout, (
+            f"Expected output '{expected_output}' not found in the tool's output"
         )
 
-    @unittest.skip("Unstable test")
+    @pytest.mark.skip(reason="Unstable test")
     def test_09_all_checks_score_one(self) -> None:
         """Verify that all checks return a score of 1 when using the full_single_point.json configuration."""
         # Arrange
@@ -132,11 +133,10 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
         run_stdout = run_result.stdout
 
         # Assert
-        self.assertEqual(run_returncode, 0, run_stdout)
+        assert run_returncode == 0, run_stdout
         for check in ["requirements", "pylint", "type-hints", "coverage"]:
-            self.assertTrue(
-                is_score_correct(expected_score=1, target_check=check, grader_output=run_stdout),
-                f"Check '{check}' did not have the expected score of 1",
+            assert is_score_correct(expected_score=1, target_check=check, grader_output=run_stdout), (
+                f"Check '{check}' did not have the expected score of 1"
             )
 
     def test_10_only_pylint_check(self) -> None:
@@ -152,13 +152,12 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
         run_stdout = run_result.stdout
 
         # Assert
-        self.assertEqual(run_returncode, 0, run_stdout)
-        self.assertTrue(
-            is_score_correct(expected_score=1, target_check="pylint", grader_output=run_stdout),
-            "Pylint check did not have the expected score of 1",
+        assert run_returncode == 0, run_stdout
+        assert is_score_correct(expected_score=1, target_check="pylint", grader_output=run_stdout), (
+            "Pylint check did not have the expected score of 1"
         )
         for check in ["requirements", "type-hints", "coverage"]:
-            self.assertNotIn(f"Check: {check}", run_stdout, f"Unexpected check '{check}' was executed")
+            assert f"Check: {check}" not in run_stdout, f"Unexpected check '{check}' was executed"
 
     def test_13_checks_flag_selects_subset(self) -> None:
         """Verify that --checks limits execution to the requested checks from the full config."""
@@ -172,16 +171,15 @@ class TestFunctionalGoodWeatherWithGrader(BaseFunctionalTestWithGrader):
         run_stdout = run_result.stdout
 
         # Assert
-        self.assertEqual(run_returncode, 0, run_stdout)
-        self.assertTrue(
-            is_score_correct(expected_score=10, target_check="requirements", grader_output=run_stdout),
-            "Requirements check did not have the expected score of 10",
+        assert run_returncode == 0, run_stdout
+        assert is_score_correct(expected_score=10, target_check="requirements", grader_output=run_stdout), (
+            "Requirements check did not have the expected score of 10"
         )
         for check in ["pylint", "type-hints", "coverage"]:
-            self.assertNotIn(f"Check: {check}", run_stdout, f"Unexpected check '{check}' was executed")
+            assert f"Check: {check}" not in run_stdout, f"Unexpected check '{check}' was executed"
 
 
-@unittest.skipIf(os.name == "nt", "Test skipped on Windows")
+@pytest.mark.skipif(os.name == "nt", reason="Test skipped on Windows")
 class TestFunctionalBadWeatherWithGrader(BaseFunctionalTestWithGrader):
     """Functional tests for the grader in a bad weather scenario."""
 
@@ -190,11 +188,11 @@ class TestFunctionalBadWeatherWithGrader(BaseFunctionalTestWithGrader):
         # Arrange
         command = build_command(project_path=self.clone_path)
 
-        if os.path.exists(os.path.join(self.clone_path, "requirements.txt")):
-            os.remove(os.path.join(self.clone_path, "requirements.txt"))
+        if Path(str(Path(self.clone_path, "requirements.txt"))).exists():
+            Path(str(Path(self.clone_path, "requirements.txt"))).unlink()
 
-        if os.path.exists(os.path.join(self.clone_path, "pyproject.toml")):
-            os.remove(os.path.join(self.clone_path, "pyproject.toml"))
+        if Path(str(Path(self.clone_path, "pyproject.toml"))).exists():
+            Path(str(Path(self.clone_path, "pyproject.toml"))).unlink()
 
         # Act
         run_result = run(command)
@@ -203,8 +201,8 @@ class TestFunctionalBadWeatherWithGrader(BaseFunctionalTestWithGrader):
         run_stdout = run_result.stdout
 
         # Assert
-        self.assertEqual(run_returncode, 0, run_stdout)
-        self.assertTrue(is_score_correct(expected_score=0, target_check="requirements", grader_output=run_stdout))
+        assert run_returncode == 0, run_stdout
+        assert is_score_correct(expected_score=0, target_check="requirements", grader_output=run_stdout)
 
     def test_12_no_config_provided(self) -> None:
         """Verify that the grader handles the absence of a configuration file gracefully."""
@@ -216,8 +214,8 @@ class TestFunctionalBadWeatherWithGrader(BaseFunctionalTestWithGrader):
         run_result = run(command)
 
         # Assert
-        self.assertNotEqual(run_result.returncode, 0, "Expected non-zero return code when no config is provided")
-        self.assertIn("Error with the configuration file", run_result.stdout)
+        assert run_result.returncode != 0, "Expected non-zero return code when no config is provided"
+        assert "Error with the configuration file" in run_result.stdout
 
     def test_14_no_project_path_provided(self) -> None:
         """Verify that the grader handles the absence of a project path gracefully."""
@@ -228,14 +226,14 @@ class TestFunctionalBadWeatherWithGrader(BaseFunctionalTestWithGrader):
         run_result = run(command)
 
         # Assert
-        self.assertNotEqual(run_result.returncode, 0, "Expected non-zero return code when no project path is provided")
-        self.assertIn("error: the following arguments are required: project_root", run_result.stderr)
+        assert run_result.returncode != 0, "Expected non-zero return code when no project path is provided"
+        assert "error: the following arguments are required: project_root" in run_result.stderr
 
     def test_15_invalid_project_path(self) -> None:
         """Verify that the grader handles an invalid project path gracefully."""
         # Arrange
         invalid_path = "/tmp/invalid_project_path"
-        if os.path.exists(invalid_path):
+        if Path(invalid_path).exists():
             shutil.rmtree(invalid_path)
 
         command = build_command(project_path=invalid_path)
@@ -244,10 +242,10 @@ class TestFunctionalBadWeatherWithGrader(BaseFunctionalTestWithGrader):
         run_result = run(command)
 
         # Assert
-        self.assertIn("Project root directory does not exist", run_result.stdout)
+        assert "Project root directory does not exist" in run_result.stdout
 
 
-class BaseFunctionalTestWithSampleProject(unittest.TestCase):
+class BaseFunctionalTestWithSampleProject:
     """
     Base class for functional tests with a sample project.
 
@@ -258,9 +256,9 @@ class BaseFunctionalTestWithSampleProject(unittest.TestCase):
     repo_url = "https://github.com/fmipython/pygrader-sample-project"
     clone_path = "/tmp/sample_project"
 
-    def setUp(self) -> None:
+    def setup_method(self) -> None:
         """Set up test fixtures by cloning the sample project repository if needed."""
-        if os.path.exists(self.clone_path):
+        if Path(self.clone_path).exists():
             return
 
         clone_result = run(["git", "clone", self.repo_url, self.clone_path])
@@ -268,13 +266,13 @@ class BaseFunctionalTestWithSampleProject(unittest.TestCase):
             raise RuntimeError(f"Failed to clone the repository: {clone_result.stderr}")
 
         # Remove the functional tests from the repo, as they cause issues and time loss.
-        functional_tests_path = os.path.join(self.clone_path, "tests", "test_functional.py")
-        if os.path.exists(functional_tests_path):
-            os.remove(functional_tests_path)
+        functional_tests_path = str(Path(self.clone_path, "tests", "test_functional.py"))
+        if Path(functional_tests_path).exists():
+            Path(functional_tests_path).unlink()
 
-    def tearDown(self) -> None:
+    def teardown_method(self) -> None:
         """Clean up test fixtures by removing the cloned repository."""
-        if not os.path.exists(self.clone_path):
+        if not Path(self.clone_path).exists():
             return
 
         shutil.rmtree(self.clone_path)
@@ -292,10 +290,9 @@ class TestVariousConfigsOnSampleProject(BaseFunctionalTestWithSampleProject):
         run_result = run(command)
 
         # Assert
-        self.assertEqual(run_result.returncode, 0, run_result.stdout)
-        self.assertTrue(
-            is_score_correct(expected_score=1, target_check="pylint", grader_output=run_result.stdout),
-            "Pylint check did not have the expected score of 1",
+        assert run_result.returncode == 0, run_result.stdout
+        assert is_score_correct(expected_score=1, target_check="pylint", grader_output=run_result.stdout), (
+            "Pylint check did not have the expected score of 1"
         )
 
     def test_02_full(self) -> None:
@@ -307,13 +304,11 @@ class TestVariousConfigsOnSampleProject(BaseFunctionalTestWithSampleProject):
         run_result = run(command)
 
         # Assert
-        self.assertEqual(run_result.returncode, 0, run_result.stdout)
-        self.assertTrue(
-            is_score_correct(expected_score=10, target_check="requirements", grader_output=run_result.stdout)
-        )
-        self.assertTrue(is_score_correct(expected_score=7, target_check="pylint", grader_output=run_result.stdout))
-        self.assertTrue(is_score_correct(expected_score=8, target_check="type-hints", grader_output=run_result.stdout))
-        self.assertTrue(is_score_correct(expected_score=10, target_check="coverage", grader_output=run_result.stdout))
+        assert run_result.returncode == 0, run_result.stdout
+        assert is_score_correct(expected_score=10, target_check="requirements", grader_output=run_result.stdout)
+        assert is_score_correct(expected_score=7, target_check="pylint", grader_output=run_result.stdout)
+        assert is_score_correct(expected_score=8, target_check="type-hints", grader_output=run_result.stdout)
+        assert is_score_correct(expected_score=10, target_check="coverage", grader_output=run_result.stdout)
 
     def test_03_full_single_point(self) -> None:
         """Verify that all checks return a score of 1 when using the full_single_point.json configuration."""
@@ -324,13 +319,11 @@ class TestVariousConfigsOnSampleProject(BaseFunctionalTestWithSampleProject):
         run_result = run(command)
 
         # Assert
-        self.assertEqual(run_result.returncode, 0, run_result.stdout)
-        self.assertTrue(
-            is_score_correct(expected_score=1, target_check="requirements", grader_output=run_result.stdout)
-        )
-        self.assertTrue(is_score_correct(expected_score=1, target_check="pylint", grader_output=run_result.stdout))
-        self.assertTrue(is_score_correct(expected_score=1, target_check="type-hints", grader_output=run_result.stdout))
-        self.assertTrue(is_score_correct(expected_score=1, target_check="coverage", grader_output=run_result.stdout))
+        assert run_result.returncode == 0, run_result.stdout
+        assert is_score_correct(expected_score=1, target_check="requirements", grader_output=run_result.stdout)
+        assert is_score_correct(expected_score=1, target_check="pylint", grader_output=run_result.stdout)
+        assert is_score_correct(expected_score=1, target_check="type-hints", grader_output=run_result.stdout)
+        assert is_score_correct(expected_score=1, target_check="coverage", grader_output=run_result.stdout)
 
     def test_04_structure(self) -> None:
         """
@@ -345,12 +338,12 @@ class TestVariousConfigsOnSampleProject(BaseFunctionalTestWithSampleProject):
         run_result = run(command)
 
         # Assert
-        self.assertEqual(run_result.returncode, 0, run_result.stdout)
-        self.assertTrue(
-            is_non_scored_check_correct(expected_result=True, target_check="structure", grader_output=run_result.stdout)
+        assert run_result.returncode == 0, run_result.stdout
+        assert is_non_scored_check_correct(
+            expected_result=True, target_check="structure", grader_output=run_result.stdout
         )
 
-    @unittest.skip("The tests for sample_project are not in the repo")
+    @pytest.mark.skip(reason="The tests for sample_project are not in the repo")
     def test_05_tests(self) -> None:
         """Verify that the tests are executed and return the expected score when using the tests.json configuration."""
         # Arrange
@@ -360,8 +353,8 @@ class TestVariousConfigsOnSampleProject(BaseFunctionalTestWithSampleProject):
         run_result = run(command)
 
         # Assert
-        self.assertEqual(run_result.returncode, 0, run_result.stdout)
-        self.assertTrue(is_score_correct(expected_score=13, target_check="tests", grader_output=run_result.stdout))
+        assert run_result.returncode == 0, run_result.stdout
+        assert is_score_correct(expected_score=13, target_check="tests", grader_output=run_result.stdout)
 
     def test_06_2024(self) -> None:
         """Verify that the checks are executed and return the expected scores when using the 2024.json configuration."""
@@ -372,14 +365,12 @@ class TestVariousConfigsOnSampleProject(BaseFunctionalTestWithSampleProject):
         run_result = run(command)
 
         # Assert
-        self.assertEqual(run_result.returncode, 0, run_result.stdout)
+        assert run_result.returncode == 0, run_result.stdout
 
-        self.assertTrue(is_score_correct(expected_score=2, target_check="pylint", grader_output=run_result.stdout))
-        self.assertTrue(is_score_correct(expected_score=3, target_check="type-hints", grader_output=run_result.stdout))
-        self.assertTrue(is_score_correct(expected_score=5, target_check="coverage", grader_output=run_result.stdout))
-        self.assertTrue(
-            is_score_correct(expected_score=1, target_check="requirements", grader_output=run_result.stdout)
-        )
+        assert is_score_correct(expected_score=2, target_check="pylint", grader_output=run_result.stdout)
+        assert is_score_correct(expected_score=3, target_check="type-hints", grader_output=run_result.stdout)
+        assert is_score_correct(expected_score=5, target_check="coverage", grader_output=run_result.stdout)
+        assert is_score_correct(expected_score=1, target_check="requirements", grader_output=run_result.stdout)
 
 
 class TestRemoteTests(BaseFunctionalTestWithSampleProject):
@@ -392,10 +383,10 @@ class TestRemoteTests(BaseFunctionalTestWithSampleProject):
         Uses the tests.json configuration.
         """
         # Arrange
-        path_to_tests = os.path.join(self.clone_path, "tests", "test_sample_code.py")
+        path_to_tests = str(Path(self.clone_path, "tests", "test_sample_code.py"))
 
-        if os.path.exists(path_to_tests):
-            os.remove(path_to_tests)
+        if Path(path_to_tests).exists():
+            Path(path_to_tests).unlink()
 
         command = build_command(project_path=self.clone_path, config_file="tests.json")
 
@@ -405,8 +396,8 @@ class TestRemoteTests(BaseFunctionalTestWithSampleProject):
         # input("press any key to continue...")
 
         # Assert
-        self.assertEqual(run_result.returncode, 0, run_result.stdout)
-        self.assertTrue(is_score_correct(expected_score=13.5, target_check="tests", grader_output=run_result.stdout))
+        assert run_result.returncode == 0, run_result.stdout
+        assert is_score_correct(expected_score=13.5, target_check="tests", grader_output=run_result.stdout)
 
 
 class TestZipFileOnSampleProject(BaseFunctionalTestWithSampleProject):
@@ -429,10 +420,9 @@ class TestZipFileOnSampleProject(BaseFunctionalTestWithSampleProject):
         run_result = run(command)
 
         # Assert
-        self.assertEqual(run_result.returncode, 0, run_result.stdout)
-        self.assertTrue(
-            is_score_correct(expected_score=1, target_check="pylint", grader_output=run_result.stdout),
-            "Pylint check did not have the expected score of 1",
+        assert run_result.returncode == 0, run_result.stdout
+        assert is_score_correct(expected_score=1, target_check="pylint", grader_output=run_result.stdout), (
+            "Pylint check did not have the expected score of 1"
         )
 
 
@@ -445,19 +435,19 @@ class TestMultipleProjectsSupport(BaseFunctionalTestWithSampleProject):
     that's the shape ``desktop.utils.extract_student_id_from_path`` expects.
     """
 
-    def setUp(self) -> None:
+    def setup_method(self) -> None:
         """Set up the sample project checkout plus a scratch directory for batch fixtures."""
-        super().setUp()
+        super().setup_method()
         self.batch_dir = Path(self.clone_path).parent / "batch_projects"
         if self.batch_dir.exists():
             shutil.rmtree(self.batch_dir)
         self.batch_dir.mkdir(parents=True)
 
-    def tearDown(self) -> None:
+    def teardown_method(self) -> None:
         """Clean up the batch scratch directory in addition to the sample project checkout."""
         if self.batch_dir.exists():
             shutil.rmtree(self.batch_dir)
-        super().tearDown()
+        super().teardown_method()
 
     def test_01_same_filename_archives_are_graded_independently(self) -> None:
         """
@@ -499,19 +489,13 @@ class TestMultipleProjectsSupport(BaseFunctionalTestWithSampleProject):
         run_result = run(command)
 
         # Assert
-        self.assertEqual(run_result.returncode, 0, run_result.stdout)
-        self.assertTrue(
-            is_score_correct_for_run(
-                expected_score=1, target_check="pylint", run_id="CLEANID", grader_output=run_result.stdout
-            ),
-            "Clean submission did not keep its own pylint score",
-        )
-        self.assertTrue(
-            is_score_correct_for_run(
-                expected_score=0, target_check="pylint", run_id="BROKENID", grader_output=run_result.stdout
-            ),
-            "Broken submission did not get its own (lower) pylint score - archives may be overwriting each other",
-        )
+        assert run_result.returncode == 0, run_result.stdout
+        assert is_score_correct_for_run(
+            expected_score=1, target_check="pylint", run_id="CLEANID", grader_output=run_result.stdout
+        ), "Clean submission did not keep its own pylint score"
+        assert is_score_correct_for_run(
+            expected_score=0, target_check="pylint", run_id="BROKENID", grader_output=run_result.stdout
+        ), "Broken submission did not get its own (lower) pylint score - archives may be overwriting each other"
 
     def test_02_venv_failure_for_one_project_does_not_stop_the_batch(self) -> None:
         """Verify that a submission whose dependencies fail to install doesn't block the rest of the batch."""
@@ -531,17 +515,12 @@ class TestMultipleProjectsSupport(BaseFunctionalTestWithSampleProject):
         run_result = run(command)
 
         # Assert
-        self.assertEqual(run_result.returncode, 1, run_result.stdout)
-        self.assertTrue(
-            is_score_correct_for_run(
-                expected_score=1, target_check="pylint", run_id="GOODID", grader_output=run_result.stdout
-            ),
-            "Good submission was not graded despite the other submission's venv failure",
-        )
-        self.assertNotIn(
-            "Run ID: BADID",
-            run_result.stdout,
-            "Submission with an unresolvable dependency should not have produced any results",
+        assert run_result.returncode == 1, run_result.stdout
+        assert is_score_correct_for_run(
+            expected_score=1, target_check="pylint", run_id="GOODID", grader_output=run_result.stdout
+        ), "Good submission was not graded despite the other submission's venv failure"
+        assert "Run ID: BADID" not in run_result.stdout, (
+            "Submission with an unresolvable dependency should not have produced any results"
         )
 
 
@@ -562,8 +541,8 @@ def build_command(
     """
     grader_entrypoint = "pygrader.py"
 
-    full_config_path = os.path.join(const.CONFIG_DIR, config_file)
-    base_command = ["uv", "run", os.path.join(const.ROOT_DIR, grader_entrypoint)]
+    full_config_path = str(Path(const.CONFIG_DIR, config_file))
+    base_command = ["uv", "run", str(Path(const.ROOT_DIR, grader_entrypoint))]
 
     command = base_command + ["--config", full_config_path]
     if project_path is not None:

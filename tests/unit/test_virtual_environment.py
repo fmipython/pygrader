@@ -3,9 +3,11 @@
 import os
 import shutil
 import subprocess
-import unittest
+from pathlib import Path
 from subprocess import CompletedProcess
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 import grader.utils.constants as const
 from grader.exceptions import VirtualEnvironmentError
@@ -14,67 +16,52 @@ from grader.utils.virtual_environment import VirtualEnvironment
 
 
 # TODO - These tests take some time to run, also aren't exactly unit tests. Consider refactoring
-class TestsVirtualEnvironment(unittest.TestCase):
+class TestsVirtualEnvironment:
     """Test cases for the VirtualEnvironment class."""
 
-    def __init__(self, methodName: str = "runTest") -> None:
-        """
-        Initialize the test case.
-
-        :param methodName: The name of the test method to run.
-        :type methodName: str
-        """
+    def setup_method(self) -> None:
+        """Set up the test environment."""
         self.__sample_root_dir_path = "sample_root_dir"
         self.__sample_package_name = "pylint"
         self.__sample_package_version = "4.0.8"
-        super().__init__(methodName)
+        Path(self.__sample_root_dir_path).mkdir(parents=True, exist_ok=True)
 
-    def setUp(self) -> None:
-        """Set up the test environment."""
-        os.makedirs(self.__sample_root_dir_path, exist_ok=True)
-
-        return super().setUp()
-
-    def tearDown(self) -> None:
+    def teardown_method(self) -> None:
         """Tear down the test environment."""
-        if os.path.exists(self.__sample_root_dir_path):
+        if Path(self.__sample_root_dir_path).exists():
             shutil.rmtree(self.__sample_root_dir_path)
-
-        return super().tearDown()
 
     def test_01_existing_venv(self) -> None:
         """Verify that the VirtualEnvironment class cleans pre-existing virtual environments."""
         # Arrange
-        possible_paths = [
-            os.path.join(self.__sample_root_dir_path, venv_path) for venv_path in const.POSSIBLE_VENV_DIRS
-        ]
+        possible_paths = [str(Path(self.__sample_root_dir_path, venv_path)) for venv_path in const.POSSIBLE_VENV_DIRS]
 
         for path in possible_paths:
-            os.makedirs(path, exist_ok=True)
+            Path(path).mkdir(parents=True, exist_ok=True)
 
         # Act
         with VirtualEnvironment(self.__sample_root_dir_path):
-            do_directories_exist = (os.path.exists(venv_path) for venv_path in possible_paths)
+            do_directories_exist = (Path(venv_path).exists() for venv_path in possible_paths)
 
         # Assert
-        self.assertTrue(not any(do_directories_exist))
+        assert not any(do_directories_exist)
 
     def test_03_successful_venv_creation(self) -> None:
         """Verify that the VirtualEnvironment class can successfully create a virtual environment."""
         # Arrange
-        unix_path_to_python = os.path.join(self.__sample_root_dir_path, const.VENV_NAME, "bin", const.PYTHON_BIN_UNIX)
-        windows_path_to_python = os.path.join(
-            self.__sample_root_dir_path, const.VENV_NAME, "Scripts", const.PYTHON_BIN_WINDOWS
+        unix_path_to_python = str(Path(self.__sample_root_dir_path, const.VENV_NAME, "bin", const.PYTHON_BIN_UNIX))
+        windows_path_to_python = str(
+            Path(self.__sample_root_dir_path, const.VENV_NAME, "Scripts", const.PYTHON_BIN_WINDOWS)
         )
 
         path_to_python = windows_path_to_python if os.name == "nt" else unix_path_to_python
 
         # Act
         with VirtualEnvironment(self.__sample_root_dir_path):
-            does_python_exist = os.path.exists(path_to_python)
+            does_python_exist = Path(path_to_python).exists()
 
         # Assert
-        self.assertTrue(does_python_exist)
+        assert does_python_exist
 
     @patch("subprocess.run")
     def test_04_failed_venv_creation(self, patched_run: MagicMock) -> None:
@@ -87,16 +74,16 @@ class TestsVirtualEnvironment(unittest.TestCase):
         patched_run.return_value = subprocess.CompletedProcess([], 1)
 
         # Act & Assert
-        with self.assertRaises(VirtualEnvironmentError), VirtualEnvironment(self.__sample_root_dir_path):
+        with pytest.raises(VirtualEnvironmentError), VirtualEnvironment(self.__sample_root_dir_path):
             pass
 
     def test_05_install_requirements(self) -> None:
         """Verify that the VirtualEnvironment class installs the requirements."""
         # Arrange
-        requirements_path = os.path.join(self.__sample_root_dir_path, "requirements.txt")
+        requirements_path = str(Path(self.__sample_root_dir_path, "requirements.txt"))
         self.__create_sample_requirements(requirements_path)
 
-        pip_full_path = os.path.join(self.__sample_root_dir_path, const.VENV_NAME, const.PIP_PATH)
+        pip_full_path = str(Path(self.__sample_root_dir_path, const.VENV_NAME, const.PIP_PATH))
 
         # Act
         with VirtualEnvironment(self.__sample_root_dir_path):
@@ -109,8 +96,8 @@ class TestsVirtualEnvironment(unittest.TestCase):
             is_version_correct = self.__sample_package_version in pip_run_result.stdout
 
         # Assert
-        self.assertTrue(is_expected_package_installed)
-        self.assertTrue(is_version_correct)
+        assert is_expected_package_installed
+        assert is_version_correct
 
     @patch("subprocess.run")
     def test_06_fail_install_requirements(self, patched_run: MagicMock) -> None:
@@ -130,13 +117,13 @@ class TestsVirtualEnvironment(unittest.TestCase):
         patched_run.side_effect = custom_run_behavior
 
         # Act & Assert
-        with self.assertRaises(VirtualEnvironmentError), VirtualEnvironment(self.__sample_root_dir_path):
+        with pytest.raises(VirtualEnvironmentError), VirtualEnvironment(self.__sample_root_dir_path):
             pass
 
     def test_07_install_grader_requirements(self) -> None:
         """Verify that the VirtualEnvironment class installs the grader requirements."""
         # Arrange
-        pip_full_path = os.path.join(self.__sample_root_dir_path, const.VENV_NAME, const.PIP_PATH)
+        pip_full_path = str(Path(self.__sample_root_dir_path, const.VENV_NAME, const.PIP_PATH))
 
         # Act
         with VirtualEnvironment(self.__sample_root_dir_path):
@@ -146,8 +133,8 @@ class TestsVirtualEnvironment(unittest.TestCase):
             is_version_correct = "7.16.0" in pip_run_result.stdout
 
         # Assert
-        self.assertTrue(is_expected_package_installed)
-        self.assertTrue(is_version_correct)
+        assert is_expected_package_installed
+        assert is_version_correct
 
     @patch("subprocess.run")
     def test_08_fail_install_grader_requirements(self, patched_run: MagicMock) -> None:
@@ -167,23 +154,23 @@ class TestsVirtualEnvironment(unittest.TestCase):
         patched_run.side_effect = custom_run_behavior
 
         # Act & Assert
-        with self.assertRaises(VirtualEnvironmentError), VirtualEnvironment(self.__sample_root_dir_path):
+        with pytest.raises(VirtualEnvironmentError), VirtualEnvironment(self.__sample_root_dir_path):
             pass
 
     def test_09_teardown(self) -> None:
         """Verify that the VirtualEnvironment class removes the virtual environment when the context manager is exited."""
         # Arrange
-        venv_path = os.path.join(self.__sample_root_dir_path, const.VENV_NAME)
+        venv_path = str(Path(self.__sample_root_dir_path, const.VENV_NAME))
 
         # Act
         with VirtualEnvironment(self.__sample_root_dir_path):
-            does_venv_exist_before = os.path.exists(venv_path)
+            does_venv_exist_before = Path(venv_path).exists()
 
-        does_venv_exist_after = os.path.exists(venv_path)
+        does_venv_exist_after = Path(venv_path).exists()
 
         # Assert
-        self.assertTrue(does_venv_exist_before)
-        self.assertFalse(does_venv_exist_after)
+        assert does_venv_exist_before
+        assert not does_venv_exist_after
 
     def __create_sample_requirements(self, requirements_path: str) -> None:
         """

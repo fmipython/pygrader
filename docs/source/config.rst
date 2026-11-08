@@ -100,11 +100,12 @@ check's own section is rejected and makes the run fail.
     - ``tests`` - Runs unit tests
     - ``structure`` - Validates project file structure
     - ``spec`` - Grades the project against a markdown specification using an LLM
+    - ``complexity`` - Fails if any function exceeds a cognitive complexity threshold (via complexipy)
 
-``max_points`` (required for all checks except ``structure``)
+``max_points`` (required for all checks except ``structure`` and ``complexity``)
     The maximum score that can be awarded for this check.
     Can be an integer or float value.
-    The ``structure`` check is pass/fail and does not accept this field.
+    The ``structure`` and ``complexity`` checks are pass/fail and do not accept this field.
 
 ``is_venv_required`` (required)
     Boolean indicating if the check should be run within a virtual environment.
@@ -248,6 +249,28 @@ Example with a Cove URI:
         "name": "structure",
         "is_venv_required": false,
         "structure_file": "cove://fmi-python/project-structure"
+    }
+
+Complexity Check
+""""""""""""""""
+
+Runs complexipy on the project's source files (tests are excluded). The check passes when no
+function is more complex than the threshold, and lists the offending functions otherwise.
+
+``max_complexity`` (optional)
+    The highest cognitive complexity a single function may have. Default: ``15``.
+
+``is_fatal`` (optional)
+    Boolean marking the check as fatal. Default: ``false``. Not acted upon yet.
+
+Example:
+
+.. code-block:: json
+
+    {
+        "name": "complexity",
+        "is_venv_required": false,
+        "max_complexity": 15
     }
 
 Type Hints and Coverage Checks

@@ -1,13 +1,14 @@
 """Unit tests for the config module."""
 
-import unittest
 from unittest.mock import MagicMock, mock_open, patch
+
+import pytest
 
 from grader.exceptions import InvalidConfigError, ResourceError
 from grader.utils.config import load_config, read_from_file
 
 
-class TestLoadConfig(unittest.TestCase):
+class TestLoadConfig:
     """Unit tests for load_config."""
 
     @patch("grader.utils.config.read_from_file")
@@ -25,7 +26,7 @@ class TestLoadConfig(unittest.TestCase):
         config = load_config(sample_config_path)
 
         # Assert
-        self.assertEqual(config, {"key": "value"})
+        assert config == {"key": "value"}
         mock_resource_cls.assert_called_once_with(sample_config_path)
         mock_read_from_file.assert_called_once_with("/tmp/config.json")
 
@@ -36,11 +37,11 @@ class TestLoadConfig(unittest.TestCase):
         mock_resource_cls.return_value.to_file.side_effect = ResourceError("Download failed")
 
         # Act & Assert
-        with self.assertRaises(ResourceError):
+        with pytest.raises(ResourceError):
             load_config("http://example.com/config.json")
 
 
-class TestReadFromFile(unittest.TestCase):
+class TestReadFromFile:
     """Unit tests for read_from_file."""
 
     @patch("builtins.open", new_callable=mock_open, read_data='{"key": "value"}')
@@ -53,7 +54,7 @@ class TestReadFromFile(unittest.TestCase):
         config = read_from_file(sample_config_path)
 
         # Assert
-        self.assertEqual(config, {"key": "value"})
+        assert config == {"key": "value"}
         mock_file.assert_called_once_with(sample_config_path, encoding="utf-8")
 
     @patch("builtins.open", new_callable=mock_open)
@@ -63,7 +64,7 @@ class TestReadFromFile(unittest.TestCase):
         mock_file.side_effect = FileNotFoundError
 
         # Act & Assert
-        with self.assertRaises(InvalidConfigError):
+        with pytest.raises(InvalidConfigError):
             read_from_file("non_existent_config.json")
 
     @patch("builtins.open", new_callable=mock_open, read_data='{"key": "value"')
@@ -72,5 +73,5 @@ class TestReadFromFile(unittest.TestCase):
         # The read_data is intentionally malformed JSON
 
         # Act & Assert
-        with self.assertRaises(InvalidConfigError):
+        with pytest.raises(InvalidConfigError):
             read_from_file("invalid_config.json")

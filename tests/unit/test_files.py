@@ -1,10 +1,11 @@
 """Unit tests for the file utility functions."""
 
-import os
 import shutil
-import unittest
 import zipfile
+from pathlib import Path
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 from grader.utils.files import (
     find_all_files_under_directory,
@@ -16,18 +17,12 @@ from grader.utils.files import (
 )
 
 
-class TestFindAllPythonFiles(unittest.TestCase):
+class TestFindAllPythonFiles:
     """Test cases for the find_all_python_files function."""
 
-    def __init__(self, methodName: str = "runTest") -> None:
-        """
-        Initialize the test case.
-
-        :param methodName: The name of the test method to run.
-        :type methodName: str
-        """
+    def setup_method(self) -> None:
+        """Set up the test environment."""
         self.__sample_dir = "sample_dir"
-        super().__init__(methodName)
 
     @patch("grader.utils.structure_validator.StructureValidator.get_matching_files")
     def test_01_find_all_python_files(self, mocked_function: MagicMock) -> None:
@@ -45,7 +40,7 @@ class TestFindAllPythonFiles(unittest.TestCase):
         actual_files = find_all_python_files(self.__sample_dir)
 
         # Assert
-        self.assertEqual(expected_files, actual_files)
+        assert expected_files == actual_files
         mocked_function.assert_called_once_with(self.__sample_dir)
 
     def __build_sample_files(self) -> tuple[list[str], list[str]]:
@@ -56,48 +51,42 @@ class TestFindAllPythonFiles(unittest.TestCase):
         :rtype: tuple[list[str], list[str]]
         """
         root_dir = self.__sample_dir
-        folder_1 = os.path.join(root_dir, "folder1")
-        folder_2 = os.path.join(root_dir, "folder2")
-        subfolder_2 = os.path.join(folder_2, "subfolder2")
-        subfolder_3 = os.path.join(folder_2, "subfolder3")
-        venv_dir_1 = os.path.join(root_dir, "venv")
-        venv_dir_2 = os.path.join(root_dir, ".venv")
+        folder_1 = str(Path(root_dir, "folder1"))
+        folder_2 = str(Path(root_dir, "folder2"))
+        subfolder_2 = str(Path(folder_2, "subfolder2"))
+        subfolder_3 = str(Path(folder_2, "subfolder3"))
+        venv_dir_1 = str(Path(root_dir, "venv"))
+        venv_dir_2 = str(Path(root_dir, ".venv"))
 
         all_files = [
-            os.path.join(folder_1, "file2.py"),
-            os.path.join(folder_1, "file3.py"),
-            os.path.join(folder_2, "file5.py"),
-            os.path.join(subfolder_2, "file9.py"),
-            os.path.join(subfolder_3, "file10.py"),
-            os.path.join(venv_dir_1, "file11.py"),
-            os.path.join(venv_dir_1, "file12.py"),
-            os.path.join(venv_dir_2, "file13.py"),
-            os.path.join(venv_dir_2, "file14.py"),
+            str(Path(folder_1, "file2.py")),
+            str(Path(folder_1, "file3.py")),
+            str(Path(folder_2, "file5.py")),
+            str(Path(subfolder_2, "file9.py")),
+            str(Path(subfolder_3, "file10.py")),
+            str(Path(venv_dir_1, "file11.py")),
+            str(Path(venv_dir_1, "file12.py")),
+            str(Path(venv_dir_2, "file13.py")),
+            str(Path(venv_dir_2, "file14.py")),
         ]
 
         expected_files = [
-            os.path.join(folder_1, "file2.py"),
-            os.path.join(folder_1, "file3.py"),
-            os.path.join(folder_2, "file5.py"),
-            os.path.join(subfolder_2, "file9.py"),
-            os.path.join(subfolder_3, "file10.py"),
+            str(Path(folder_1, "file2.py")),
+            str(Path(folder_1, "file3.py")),
+            str(Path(folder_2, "file5.py")),
+            str(Path(subfolder_2, "file9.py")),
+            str(Path(subfolder_3, "file10.py")),
         ]
 
         return all_files, expected_files
 
 
-class TestFindAllSourceFiles(unittest.TestCase):
+class TestFindAllSourceFiles:
     """Test cases for the find_all_source_files function."""
 
-    def __init__(self, methodName: str = "runTest") -> None:
-        """
-        Initialize the test case.
-
-        :param methodName: The name of the test method to run.
-        :type methodName: str
-        """
+    def setup_method(self) -> None:
+        """Set up the test environment."""
         self.__sample_dir = "sample_dir"
-        super().__init__(methodName)
 
     @patch("grader.utils.files.find_all_test_files")
     @patch("grader.utils.files.find_all_python_files")
@@ -120,12 +109,10 @@ class TestFindAllSourceFiles(unittest.TestCase):
         """
         # Arrange
         python_file_names = [f"file{i}" for i in range(1, 11)]
-        python_file_paths = [
-            os.path.join(self.__sample_dir, python_file_name) for python_file_name in python_file_names
-        ]
+        python_file_paths = [str(Path(self.__sample_dir, python_file_name)) for python_file_name in python_file_names]
 
         test_file_names = [f"file{i}" for i in range(1, 11, 3)]
-        test_file_paths = [os.path.join(self.__sample_dir, test_file_name) for test_file_name in test_file_names]
+        test_file_paths = [str(Path(self.__sample_dir, test_file_name)) for test_file_name in test_file_names]
 
         mocked_all_python_files.return_value = python_file_paths
         mocked_find_all_test_files.return_value = test_file_paths
@@ -137,24 +124,18 @@ class TestFindAllSourceFiles(unittest.TestCase):
         actual_files = find_all_source_files(self.__sample_dir)
 
         # Assert
-        self.assertEqual(sorted(expected_files), sorted(actual_files))
+        assert sorted(expected_files) == sorted(actual_files)
         mocked_all_python_files.assert_called_once_with(self.__sample_dir)
         mocked_find_all_test_files.assert_called_once_with(self.__sample_dir)
         mocked_tests_directory_name.assert_called_once_with(self.__sample_dir)
 
 
-class TestFindAllTestFiles(unittest.TestCase):
+class TestFindAllTestFiles:
     """Test cases for the find_all_test_files function."""
 
-    def __init__(self, methodName: str = "runTest") -> None:
-        """
-        Initialize the test case.
-
-        :param methodName: The name of the test method to run.
-        :type methodName: str
-        """
+    def setup_method(self) -> None:
+        """Set up the test environment."""
         self.__sample_dir = "sample_dir"
-        super().__init__(methodName)
 
     @patch("grader.utils.files.find_all_files_under_directory")
     def test_01_no_directory_provided(self, mocked_find_all_files_under_directory: MagicMock) -> None:
@@ -171,7 +152,7 @@ class TestFindAllTestFiles(unittest.TestCase):
         actual_value = find_all_test_files(tests_directory=None)
 
         # Assert
-        self.assertEqual(expected_value, actual_value)
+        assert expected_value == actual_value
         mocked_find_all_files_under_directory.assert_not_called()
 
     @patch("grader.utils.structure_validator.StructureValidator.get_matching_files")
@@ -184,8 +165,8 @@ class TestFindAllTestFiles(unittest.TestCase):
         """
         # Arrange
         expected_value: list[str] = [
-            os.path.join(self.__sample_dir, "file1.py"),
-            os.path.join(self.__sample_dir, "file2.py"),
+            str(Path(self.__sample_dir, "file1.py")),
+            str(Path(self.__sample_dir, "file2.py")),
         ]
 
         mocked_find_all_files_under_directory.return_value = expected_value
@@ -194,67 +175,60 @@ class TestFindAllTestFiles(unittest.TestCase):
         actual_value = find_all_test_files(self.__sample_dir)
 
         # Assert
-        self.assertEqual(expected_value, actual_value)
+        assert expected_value == actual_value
         mocked_find_all_files_under_directory.assert_called_once_with(self.__sample_dir)
 
 
-class TestGetTestsDirectoryName(unittest.TestCase):
+class TestGetTestsDirectoryName:
     """Test cases for the get_tests_directory_name function."""
 
-    def __init__(self, methodName: str = "runTest") -> None:
-        """
-        Initialize the test case.
-
-        :param methodName: The name of the test method to run.
-        :type methodName: str
-        """
+    def setup_method(self) -> None:
+        """Set up the test environment."""
         self.__sample_dir = "sample_dir"
-        super().__init__(methodName)
 
-    def tearDown(self) -> None:
+    def teardown_method(self) -> None:
         """Tear down the test environment."""
-        if os.path.exists(self.__sample_dir):
+        if Path(self.__sample_dir).exists():
             shutil.rmtree(self.__sample_dir)
-        return super().tearDown()
 
     def test_01_tests_directory(self) -> None:
         """Verify that get_tests_directory_name returns the proper directory name."""
         # Arrange
         test_dir_name = "tests"
-        expected_test_dir = os.path.join(self.__sample_dir, test_dir_name)
+        expected_test_dir = str(Path(self.__sample_dir, test_dir_name))
         self.__create_structure(self.__sample_dir, test_dir_name)
 
         # Act
         actual_test_dir = get_tests_directory_name(self.__sample_dir)
 
         # Assert
-        self.assertEqual(expected_test_dir, actual_test_dir)
+        assert expected_test_dir == actual_test_dir
 
     def test_02_test_directory(self) -> None:
         """Verify that get_tests_directory_name returns the proper directory name."""
         # Arrange
         test_dir_name = "test"
-        expected_test_dir = os.path.join(self.__sample_dir, test_dir_name)
+        expected_test_dir = str(Path(self.__sample_dir, test_dir_name))
         self.__create_structure(self.__sample_dir, test_dir_name)
 
         # Act
         actual_test_dir = get_tests_directory_name(self.__sample_dir)
 
         # Assert
-        self.assertEqual(expected_test_dir, actual_test_dir)
+        assert expected_test_dir == actual_test_dir
 
     def test_03_tst_directory(self) -> None:
         """Verify that get_tests_directory_name returns the proper directory name."""
         # Arrange
         test_dir_name = "tst"
-        expected_test_dir = os.path.join(self.__sample_dir, test_dir_name)
+        expected_test_dir = str(Path(self.__sample_dir, test_dir_name))
         self.__create_structure(self.__sample_dir, test_dir_name)
 
         # Act
         actual_test_dir = get_tests_directory_name(self.__sample_dir)
 
         # Assert
-        self.assertEqual(expected_test_dir, actual_test_dir)
+        assert expected_test_dir == actual_test_dir
 
     def test_04_no_directory(self) -> None:
         """Verify that get_tests_directory_name returns None when there is no tests directory."""
@@ -266,7 +240,7 @@ class TestGetTestsDirectoryName(unittest.TestCase):
         actual_test_dir = get_tests_directory_name(self.__sample_dir)
 
         # Assert
-        self.assertIsNone(actual_test_dir)
+        assert actual_test_dir is None
 
     @staticmethod
     def __create_structure(root_dir: str, tests_dir: str) -> None:
@@ -278,151 +252,53 @@ class TestGetTestsDirectoryName(unittest.TestCase):
         :param tests_dir: The tests directory.
         :type tests_dir: str
         """
-        full_path = os.path.join(root_dir, tests_dir)
-        os.makedirs(full_path)
+        full_path = str(Path(root_dir, tests_dir))
+        Path(full_path).mkdir(parents=True)
 
 
-class TestFindAllFilesUnderDirectory(unittest.TestCase):
+class TestFindAllFilesUnderDirectory:
     """Test cases for the find_all_files_under_directory function."""
 
-    type DirectoryStructure = list[tuple[str, list[str], list[str]]]
+    @staticmethod
+    def __build_tree(root: Path, files: list[str]) -> None:
+        for file in files:
+            (root / file).parent.mkdir(parents=True, exist_ok=True)
+            (root / file).touch()
 
-    def __init__(self, methodName: str = "runTest") -> None:
-        """
-        Initialize the test case.
+    def test_01_partial_files_result(self, tmp_path: Path) -> None:
+        """Verify that only files with the requested extension are returned, recursively."""
+        self.__build_tree(
+            tmp_path, ["file1.txt", "file2.csv", "dir/file3.txt", "dir/sub/file4.csv", "dir/sub/file5.txt"]
+        )
+        expected = sorted(str(tmp_path / name) for name in ["file1.txt", "dir/file3.txt", "dir/sub/file5.txt"])
 
-        :param methodName: The name of the test method to run.
-        :type methodName: str
-        """
-        self.__sample_dir = "sample_dir"
-        super().__init__(methodName)
+        assert sorted(find_all_files_under_directory(str(tmp_path), ".txt")) == expected
 
-    @patch("os.walk")
-    def test_01_partial_files_result(self, mocked_os_walk: MagicMock) -> None:
-        """
-        Verify that find_all_files_under_directory returns the proper files.
+    def test_02_all_files_result(self, tmp_path: Path) -> None:
+        """Verify that all files are returned when they all have the requested extension."""
+        names = ["file1.txt", "file2.txt", "dir/file3.txt", "dir/sub/file4.txt"]
+        self.__build_tree(tmp_path, names)
 
-        Tests with multiple files with different extensions.
+        assert sorted(find_all_files_under_directory(str(tmp_path), ".txt")) == sorted(str(tmp_path / n) for n in names)
 
-        :param mocked_os_walk: Mocked os.walk function.
-        :type mocked_os_walk: MagicMock
-        """
-        files = [
-            ["file1.txt", "file2.csv"],
-            ["file3.txt"],
-            ["file4.csv", "file5.txt"],
-            ["file6.csv"],
-        ]
-        mocked_files = self.__build_sample_files(files)
+    def test_03_no_files_result(self, tmp_path: Path) -> None:
+        """Verify that an empty list is returned when no file has the requested extension."""
+        self.__build_tree(tmp_path, ["file1.csv", "dir/file2.csv"])
 
-        self.__base_test(mocked_os_walk, mocked_files, extension_to_search_for=".txt")
+        assert not find_all_files_under_directory(str(tmp_path), ".py")
 
-    @patch("os.walk")
-    def test_02_all_files_result(self, mocked_os_walk: MagicMock) -> None:
-        """
-        Verify that find_all_files_under_directory returns the proper files.
+    def test_04_no_files_overall(self, tmp_path: Path) -> None:
+        """Verify that an empty list is returned for an empty directory."""
+        assert not find_all_files_under_directory(str(tmp_path), ".py")
 
-        Tests with multiple files with the same extension.
+    def test_05_directory_matching_extension_is_skipped(self, tmp_path: Path) -> None:
+        """Verify that a directory whose name ends with the extension is not returned."""
+        (tmp_path / "package.py").mkdir()
 
-        :param mocked_os_walk: Mocked os.walk function.
-        :type mocked_os_walk: MagicMock
-        """
-        files = [
-            ["file1.txt", "file2.txt"],
-            ["file3.txt"],
-            ["file4.txt", "file5.txt"],
-            ["file6.txt"],
-        ]
-        mocked_files = self.__build_sample_files(files)
-
-        self.__base_test(mocked_os_walk, mocked_files, extension_to_search_for=".txt")
-
-    @patch("os.walk")
-    def test_03_no_files_result(self, mocked_os_walk: MagicMock) -> None:
-        """
-        Verify that find_all_files_under_directory returns an empty list.
-
-        Tests when there are no files with the searched extension.
-
-        :param mocked_os_walk: Mocked os.walk function.
-        :type mocked_os_walk: MagicMock
-        """
-        # Arrange
-        files = [
-            ["file1.txt", "file2.csv"],
-            ["file3.txt"],
-            ["file4.csv", "file5.txt"],
-            ["file6.csv"],
-        ]
-        mocked_files = self.__build_sample_files(files)
-
-        self.__base_test(mocked_os_walk, mocked_files, extension_to_search_for=".py")
-
-    @patch("os.walk")
-    def test_03_no_files_overall(self, mocked_os_walk: MagicMock) -> None:
-        """
-        Verify that find_all_files_under_directory returns an empty list.
-
-        Tests when there are no files.
-
-        :param mocked_os_walk: Mocked os.walk function.
-        :type mocked_os_walk: MagicMock
-        """
-        self.__base_test(mocked_os_walk, mocked_files=[], extension_to_search_for=".py")
-
-    def __base_test(
-        self,
-        mocked_os_walk: MagicMock,
-        mocked_files: DirectoryStructure,
-        extension_to_search_for: str,
-    ) -> None:
-        """
-        Provide base test for find_all_files_under_directory.
-
-        :param mocked_os_walk: Mocked os.walk function.
-        :type mocked_os_walk: MagicMock
-        :param mocked_files: Mocked directory structure.
-        :type mocked_files: DirectoryStructure
-        :param extension_to_search_for: The file extension to search for.
-        :type extension_to_search_for: str
-        """
-        # Arrange
-        mocked_os_walk.return_value = mocked_files
-
-        expected_files = [
-            os.path.join(root, file)
-            for root, _, files in mocked_os_walk.return_value
-            for file in files
-            if file.endswith(extension_to_search_for)
-        ]
-
-        # Act
-        actual_files = find_all_files_under_directory(self.__sample_dir, extension_to_search_for)
-
-        # Assert
-        self.assertEqual(expected_files, actual_files)
-
-    def __build_sample_files(self, files: list[list[str]]) -> DirectoryStructure:
-        """
-        Build the sample files for the test.
-
-        :param files: The list of files in each directory.
-        :type files: list[list[str]]
-        :return: The directory structure.
-        :rtype: DirectoryStructure
-        """
-        root_dirs = [
-            os.path.join(os.sep, self.__sample_dir),
-            os.path.join(os.sep, self.__sample_dir, "folder1"),
-            os.path.join(os.sep, self.__sample_dir, "folder1", "subfolder1"),
-            os.path.join(os.sep, self.__sample_dir, "folder2"),
-        ]
-        subdirs = [["folder1", "folder2"], ["subfolder1"], []]
-
-        return list(zip(root_dirs, subdirs, files))
+        assert not find_all_files_under_directory(str(tmp_path), ".py")
 
 
-class TestUnzipArchive(unittest.TestCase):
+class TestUnzipArchive:
     """Test cases for the unzip_archive function."""
 
     @patch("zipfile.ZipFile")
@@ -438,7 +314,7 @@ class TestUnzipArchive(unittest.TestCase):
 
         # Assert
         mock_zip.extractall.assert_called_once()
-        self.assertIn("test_archive", result_dir)
+        assert "test_archive" in result_dir
 
     @patch("zipfile.ZipFile")
     def test_02_unzip_to_custom_directory(self, mock_zipfile: MagicMock) -> None:
@@ -451,18 +327,18 @@ class TestUnzipArchive(unittest.TestCase):
         result_dir = unzip_archive(archive_path, target_directory=custom_dir)
         # Assert
         mock_zip.extractall.assert_called_once_with(custom_dir)
-        self.assertEqual(result_dir, custom_dir)
+        assert result_dir == custom_dir
 
     @patch("zipfile.ZipFile", side_effect=zipfile.BadZipFile)
     def test_03_invalid_zip_file(self, mock_exists: MagicMock) -> None:
         """Verify that unzip_archive raises an exception for an invalid zip file."""
         archive_path = "/fake/path/invalid.zip"
-        with self.assertRaises(zipfile.BadZipFile):
+        with pytest.raises(zipfile.BadZipFile):
             unzip_archive(archive_path)
-        self.assertTrue(mock_exists.called)
+        assert mock_exists.called
 
     def test_04_nonexistent_zip_file(self) -> None:
         """Verify that unzip_archive raises an exception for a nonexistent file."""
         archive_path = "/nonexistent/path/to/file.zip"
-        with self.assertRaises(FileNotFoundError):
+        with pytest.raises(FileNotFoundError):
             unzip_archive(archive_path)

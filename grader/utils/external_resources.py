@@ -62,13 +62,11 @@ class Resource:
             return self._source
 
         content = self.read()
-        file_path = os.path.join(TEMP_FILES_DIR, self._filename)
-        os.makedirs(TEMP_FILES_DIR, exist_ok=True)
+        file_path = TEMP_FILES_DIR / self._filename
+        TEMP_FILES_DIR.mkdir(parents=True, exist_ok=True)
+        file_path.write_text(content, encoding="utf-8")
 
-        with open(file_path, "w+", encoding="utf-8") as file:
-            file.write(content)
-
-        return file_path
+        return str(file_path)
 
     @staticmethod
     def _sniff_resource_type(source: str) -> ResourceType:
@@ -127,7 +125,7 @@ class Resource:
         except requests.RequestException as exc:
             raise ResourceError(f"Error downloading file from {url}") from exc
 
-        filename = os.path.basename(urlparse(url).path) or "downloaded_file"
+        filename = Path(urlparse(url).path).name or "downloaded_file"
         # URLs that require tokens (Github private repos) are out of scope for now
         return response.text, filename
 

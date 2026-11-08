@@ -40,8 +40,8 @@ class TypeHintsCheck(ScoredCheck):
         """
         super().__init__(name, max_points, project_root, is_venv_required, env_vars, assets)
 
-        self.__mypy_binary = MYPY_PATH
-        self.__mypy_arguments = ["--config-file", MYPY_TYPE_HINT_CONFIG, "--linecount-report", REPORTS_TEMP_DIR]
+        self.__mypy_binary = str(MYPY_PATH)
+        self.__mypy_arguments = ["--config-file", MYPY_TYPE_HINT_CONFIG, "--linecount-report", str(REPORTS_TEMP_DIR)]
         self.__mypy_max_score = 1
 
     def run(self) -> ScoredCheckResult:

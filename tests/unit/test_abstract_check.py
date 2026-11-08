@@ -1,7 +1,8 @@
 """Unit tests for the AbstractCheck class in the abstract_check module."""
 
-import unittest
 from unittest.mock import MagicMock, call, patch
+
+import pytest
 
 from grader.checks.abstract_check import AbstractCheck
 from grader.exceptions import CheckError
@@ -17,7 +18,7 @@ class DummyCheck(AbstractCheck):
         return CheckResult("dummy", 0, "", "")
 
 
-class TestAbstractCheck(unittest.TestCase):
+class TestAbstractCheck:
     """Test cases for the AbstractCheck class."""
 
     def test_01_run_without_venv_when_required(self) -> None:
@@ -26,7 +27,7 @@ class TestAbstractCheck(unittest.TestCase):
         check = DummyCheck("dummy", "dummy", is_venv_required=True)
 
         # Act & Assert
-        with self.assertRaises(CheckError):
+        with pytest.raises(CheckError):
             check.run()
 
     def test_02_assets_default_to_empty_list(self) -> None:
@@ -35,7 +36,7 @@ class TestAbstractCheck(unittest.TestCase):
         check = DummyCheck("dummy", "dummy")
 
         # Assert
-        self.assertEqual(check.assets, [])
+        assert check.assets == []
 
     @patch("grader.checks.abstract_check.Resource")
     def test_03_assets_are_wrapped_in_resource(self, mocked_resource: MagicMock) -> None:
@@ -48,4 +49,4 @@ class TestAbstractCheck(unittest.TestCase):
 
         # Assert
         mocked_resource.assert_has_calls([call(source) for source in sources])
-        self.assertEqual(check.assets, [mocked_resource.return_value, mocked_resource.return_value])
+        assert check.assets == [mocked_resource.return_value, mocked_resource.return_value]

@@ -1,5 +1,12 @@
 # pygrader
 
+## 2.1.0
+
+- Add `complexity` check, which fails if any function exceeds a cognitive complexity threshold (via complexipy)
+- Ship a `py.typed` marker so library users get type information; mypy no longer ignores missing imports globally
+- Migrate from `os.path` to `pathlib` internally (public signatures still take `str`)
+- Migrate the test suite from `unittest` to `pytest`
+
 ## 2.0.0
 
 - Desktop Pygrader can now grade multiple projects via globs

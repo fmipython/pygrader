@@ -1,20 +1,20 @@
 """Unit tests for the reporter classes in the results_reporter module."""
 
 import json
-import unittest
+
+import pytest
 
 from grader.models.check_result import CheckResult, NonScoredCheckResult, ScoredCheckResult
 from grader.models.grading_result import GradingResult
 from grader.utils.results_reporter import CSVResultsReporter, JSONResultsReporter, PlainTextResultsReporter
 
 
-class TestJSONResultsReporter(unittest.TestCase):
+class TestJSONResultsReporter:
     """Test cases for the JSONResultsReporter class."""
 
-    def setUp(self) -> None:
+    def setup_method(self) -> None:
         """Set up the JSONResultsReporter instance for testing."""
         self.reporter = JSONResultsReporter()
-        return super().setUp()
 
     def test_01_no_results_returns_empty_list(self) -> None:
         """Test that to_string returns an empty JSON array when no results were added."""
@@ -22,7 +22,7 @@ class TestJSONResultsReporter(unittest.TestCase):
         actual = json.loads(self.reporter.to_string())
 
         # Assert
-        self.assertEqual(actual, [])
+        assert actual == []
 
     def test_02_single_run_non_verbose(self) -> None:
         """Test that a non-verbose run serializes scored and non-scored checks without info/error."""
@@ -47,7 +47,7 @@ class TestJSONResultsReporter(unittest.TestCase):
         actual = json.loads(self.reporter.to_string())
 
         # Assert
-        self.assertEqual(actual, expected)
+        assert actual == expected
 
     def test_03_verbose_includes_info_and_error(self) -> None:
         """Test that a verbose run includes the info and error fields for each check."""
@@ -77,7 +77,7 @@ class TestJSONResultsReporter(unittest.TestCase):
         actual = json.loads(self.reporter.to_string())
 
         # Assert
-        self.assertEqual(actual, expected)
+        assert actual == expected
 
     def test_04_multiple_runs_are_all_included(self) -> None:
         """Test that adding multiple GradingResults includes one entry per run in the output."""
@@ -89,7 +89,7 @@ class TestJSONResultsReporter(unittest.TestCase):
         actual = json.loads(self.reporter.to_string())
 
         # Assert
-        self.assertEqual([run["run_id"] for run in actual], ["student_1", "student_2"])
+        assert [run["run_id"] for run in actual] == ["student_1", "student_2"]
 
     def test_05_unknown_check_result_type_raises_value_error(self) -> None:
         """Test that a CheckResult that is neither scored nor non-scored raises a ValueError."""
@@ -98,18 +98,17 @@ class TestJSONResultsReporter(unittest.TestCase):
         self.reporter.add_result(GradingResult("student_1", 0, 0, [unknown_result]))
 
         # Act & Assert
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             self.reporter.to_string()
-        self.assertIn("mystery", str(context.exception))
+        assert "mystery" in str(context.value)
 
 
-class TestCSVResultsReporter(unittest.TestCase):
+class TestCSVResultsReporter:
     """Test cases for the CSVResultsReporter class."""
 
-    def setUp(self) -> None:
+    def setup_method(self) -> None:
         """Set up the CSVResultsReporter instance for testing."""
         self.reporter = CSVResultsReporter()
-        return super().setUp()
 
     def test_01_no_results_returns_only_header(self) -> None:
         """Test that to_string returns only the header row when no results were added."""
@@ -117,7 +116,7 @@ class TestCSVResultsReporter(unittest.TestCase):
         actual = self.reporter.to_string()
 
         # Assert
-        self.assertEqual(actual, "Run ID,Check,Score,Max Score\n")
+        assert actual == "Run ID,Check,Score,Max Score\n"
 
     def test_02_single_run_non_verbose(self) -> None:
         """Test that a non-verbose run emits one row per check without info/error columns."""
@@ -132,7 +131,7 @@ class TestCSVResultsReporter(unittest.TestCase):
         actual = self.reporter.to_string()
 
         # Assert
-        self.assertEqual(actual, expected)
+        assert actual == expected
 
     def test_03_verbose_includes_info_and_error_columns(self) -> None:
         """Test that a verbose run includes the info and error columns for each check."""
@@ -152,7 +151,7 @@ class TestCSVResultsReporter(unittest.TestCase):
         actual = self.reporter.to_string()
 
         # Assert
-        self.assertEqual(actual, expected)
+        assert actual == expected
 
     def test_04_multiple_runs_include_run_id_per_row(self) -> None:
         """Test that rows from different runs are each tagged with their own run id."""
@@ -166,7 +165,7 @@ class TestCSVResultsReporter(unittest.TestCase):
         actual = self.reporter.to_string()
 
         # Assert
-        self.assertEqual(actual, expected)
+        assert actual == expected
 
     def test_05_unknown_check_result_type_raises_value_error(self) -> None:
         """Test that a CheckResult that is neither scored nor non-scored raises a ValueError."""
@@ -175,18 +174,17 @@ class TestCSVResultsReporter(unittest.TestCase):
         self.reporter.add_result(GradingResult("student_1", 0, 0, [unknown_result]))
 
         # Act & Assert
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             self.reporter.to_string()
-        self.assertIn("mystery", str(context.exception))
+        assert "mystery" in str(context.value)
 
 
-class TestPlainTextResultsReporter(unittest.TestCase):
+class TestPlainTextResultsReporter:
     """Test cases for the PlainTextResultsReporter class."""
 
-    def setUp(self) -> None:
+    def setup_method(self) -> None:
         """Set up the PlainTextResultsReporter instance for testing."""
         self.reporter = PlainTextResultsReporter()
-        return super().setUp()
 
     def test_01_no_results_returns_empty_string(self) -> None:
         """Test that to_string returns a single newline when no results were added."""
@@ -194,7 +192,7 @@ class TestPlainTextResultsReporter(unittest.TestCase):
         actual = self.reporter.to_string()
 
         # Assert
-        self.assertEqual(actual, "\n")
+        assert actual == "\n"
 
     def test_02_single_run_non_verbose(self) -> None:
         """Test that a non-verbose run emits one line per check plus a total line, without info/error."""
@@ -213,7 +211,7 @@ class TestPlainTextResultsReporter(unittest.TestCase):
         actual = self.reporter.to_string()
 
         # Assert
-        self.assertEqual(actual, expected)
+        assert actual == expected
 
     def test_03_verbose_includes_info_and_error_when_present(self) -> None:
         """Test that a verbose run appends Info/Error segments when they are non-empty."""
@@ -231,7 +229,7 @@ class TestPlainTextResultsReporter(unittest.TestCase):
         actual = self.reporter.to_string()
 
         # Assert
-        self.assertEqual(actual, expected)
+        assert actual == expected
 
     def test_04_verbose_omits_info_and_error_when_empty(self) -> None:
         """Test that a verbose run does not append Info/Error segments when they are empty strings."""
@@ -246,7 +244,7 @@ class TestPlainTextResultsReporter(unittest.TestCase):
         actual = self.reporter.to_string()
 
         # Assert
-        self.assertEqual(actual, expected)
+        assert actual == expected
 
     def test_05_multiple_runs_each_get_their_own_total_line(self) -> None:
         """Test that each added run produces its own group of check lines and total line."""
@@ -265,7 +263,7 @@ class TestPlainTextResultsReporter(unittest.TestCase):
         actual = self.reporter.to_string()
 
         # Assert
-        self.assertEqual(actual, expected)
+        assert actual == expected
 
     def test_06_unknown_check_result_type_raises_value_error(self) -> None:
         """Test that a CheckResult that is neither scored nor non-scored raises a ValueError."""
@@ -274,18 +272,17 @@ class TestPlainTextResultsReporter(unittest.TestCase):
         self.reporter.add_result(GradingResult("student_1", 0, 0, [unknown_result]))
 
         # Act & Assert
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             self.reporter.to_string()
-        self.assertIn("mystery", str(context.exception))
+        assert "mystery" in str(context.value)
 
 
-class TestResultsReporterAddResult(unittest.TestCase):
+class TestResultsReporterAddResult:
     """Test cases for the shared ResultsReporter.add_result behavior."""
 
-    def setUp(self) -> None:
+    def setup_method(self) -> None:
         """Set up a concrete ResultsReporter instance for testing, since the base class is abstract."""
         self.reporter = PlainTextResultsReporter()
-        return super().setUp()
 
     def test_01_add_result_appends_to_results(self) -> None:
         """Test that add_result appends the given GradingResult to the internal results list."""
@@ -298,4 +295,4 @@ class TestResultsReporterAddResult(unittest.TestCase):
         self.reporter.add_result(second_result)
 
         # Assert
-        self.assertEqual(self.reporter._results, [first_result, second_result])  # pylint: disable=protected-access
+        assert self.reporter._results == [first_result, second_result]

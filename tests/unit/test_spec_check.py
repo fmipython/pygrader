@@ -1,9 +1,9 @@
 """Unit tests for the SpecCheck class in the spec_check module."""
 
 import json
-import unittest
 from unittest.mock import MagicMock, patch
 
+import pytest
 import requests
 
 from grader.checks.spec_check import SpecCheck
@@ -20,14 +20,18 @@ def _make_response(status_code: int = 200, json_body: dict | None = None, text: 
     return response
 
 
-class TestSpecCheck(unittest.TestCase):
+class TestSpecCheck:
     """Unit tests for the SpecCheck class."""
 
-    def setUp(self) -> None:
+    def setup_method(self) -> None:
         """Set up the test environment."""
         self.spec_check = SpecCheck("spec", "sample_dir", 10, is_venv_required=False)
         self.spec_check._assets = [MagicMock(read=MagicMock(return_value="# Spec\nDo the thing."))]
-        return super().setUp()
+
+    def teardown_method(self) -> None:
+        """Stop the open() patcher if a test started one."""
+        if hasattr(self, "open_patcher"):
+            self.open_patcher.stop()
 
     def _mock_source(self, mocked_find_all_source_files: MagicMock, files: dict) -> None:
         """Point find_all_source_files at fake files, patching open() to serve their contents."""
@@ -39,7 +43,7 @@ class TestSpecCheck(unittest.TestCase):
             return handle
 
         patcher = patch("builtins.open", side_effect=fake_open)
-        self.addCleanup(patcher.stop)
+        self.open_patcher = patcher
         patcher.start()
 
     @patch("grader.checks.spec_check.requests.post")
@@ -58,7 +62,7 @@ class TestSpecCheck(unittest.TestCase):
             actual = self.spec_check.run()
 
         # Assert
-        self.assertEqual(expected, actual)
+        assert expected == actual
 
     @patch("grader.checks.spec_check.requests.post")
     @patch("grader.checks.spec_check.find_all_source_files")
@@ -77,7 +81,7 @@ class TestSpecCheck(unittest.TestCase):
             actual = self.spec_check.run()
 
         # Assert
-        self.assertEqual(actual.result, 10.0)
+        assert actual.result == 10.0
 
     @patch("grader.checks.spec_check.requests.post")
     @patch("grader.checks.spec_check.find_all_source_files")
@@ -96,11 +100,11 @@ class TestSpecCheck(unittest.TestCase):
             actual = self.spec_check.run()
 
         # Assert
-        self.assertEqual(actual.result, 0.0)
+        assert actual.result == 0.0
 
     def test_04_missing_api_key_raises_check_error(self) -> None:
         """Verify that a missing API key environment variable raises a CheckError."""
-        with patch.dict("os.environ", {}, clear=True), self.assertRaises(CheckError):
+        with patch.dict("os.environ", {}, clear=True), pytest.raises(CheckError):
             self.spec_check.run()
 
     def test_05_missing_assets_raises_check_error(self) -> None:
@@ -109,7 +113,7 @@ class TestSpecCheck(unittest.TestCase):
         self.spec_check._assets = []
 
         # Act & Assert
-        with self.assertRaises(CheckError):
+        with pytest.raises(CheckError):
             self.spec_check.run()
 
     def test_06_unreadable_spec_file_raises_check_error(self) -> None:
@@ -118,7 +122,7 @@ class TestSpecCheck(unittest.TestCase):
         self.spec_check._assets = [MagicMock(read=MagicMock(side_effect=ResourceError("boom")))]
 
         # Act & Assert
-        with self.assertRaises(CheckError):
+        with pytest.raises(CheckError):
             self.spec_check.run()
 
     @patch("grader.checks.spec_check.requests.post")
@@ -132,10 +136,10 @@ class TestSpecCheck(unittest.TestCase):
         mocked_post.return_value = _make_response(500, text="internal error")
 
         # Act & Assert
-        with patch.dict("os.environ", {"OPENROUTER_API_KEY": "test_key"}), self.assertRaises(CheckError) as context:
+        with patch.dict("os.environ", {"OPENROUTER_API_KEY": "test_key"}), pytest.raises(CheckError) as context:
             self.spec_check.run()
 
-        self.assertIn("500", str(context.exception))
+        assert "500" in str(context.value)
 
     @patch("grader.checks.spec_check.requests.post")
     @patch("grader.checks.spec_check.find_all_source_files")
@@ -148,7 +152,7 @@ class TestSpecCheck(unittest.TestCase):
         mocked_post.side_effect = requests.ConnectionError("network down")
 
         # Act & Assert
-        with patch.dict("os.environ", {"OPENROUTER_API_KEY": "test_key"}), self.assertRaises(CheckError):
+        with patch.dict("os.environ", {"OPENROUTER_API_KEY": "test_key"}), pytest.raises(CheckError):
             self.spec_check.run()
 
     @patch("grader.checks.spec_check.requests.post")
@@ -162,7 +166,7 @@ class TestSpecCheck(unittest.TestCase):
         mocked_post.return_value = _make_response(200, {"error": {"message": "no credits"}})
 
         # Act & Assert
-        with patch.dict("os.environ", {"OPENROUTER_API_KEY": "test_key"}), self.assertRaises(CheckError):
+        with patch.dict("os.environ", {"OPENROUTER_API_KEY": "test_key"}), pytest.raises(CheckError):
             self.spec_check.run()
 
     @patch("grader.checks.spec_check.requests.post")
@@ -176,7 +180,7 @@ class TestSpecCheck(unittest.TestCase):
         mocked_post.return_value = _make_response(200, {"choices": [{"message": {"content": "not json at all"}}]})
 
         # Act & Assert
-        with patch.dict("os.environ", {"OPENROUTER_API_KEY": "test_key"}), self.assertRaises(CheckError):
+        with patch.dict("os.environ", {"OPENROUTER_API_KEY": "test_key"}), pytest.raises(CheckError):
             self.spec_check.run()
 
     @patch("grader.checks.spec_check.requests.post")
@@ -196,7 +200,7 @@ class TestSpecCheck(unittest.TestCase):
             actual = self.spec_check.run()
 
         # Assert
-        self.assertEqual(expected, actual)
+        assert expected == actual
 
     @patch("grader.checks.spec_check.requests.post")
     @patch("grader.checks.spec_check.find_all_source_files")
@@ -217,6 +221,6 @@ class TestSpecCheck(unittest.TestCase):
         # Assert
         sent_payload = mocked_post.call_args.kwargs["json"]
         user_message = sent_payload["messages"][1]["content"]
-        self.assertIn("main.py", user_message)
-        self.assertIn("print('hi')", user_message)
-        self.assertNotIn("test_main.py", user_message)
+        assert "main.py" in user_message
+        assert "print('hi')" in user_message
+        assert "test_main.py" not in user_message

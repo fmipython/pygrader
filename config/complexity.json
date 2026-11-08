@@ -1,0 +1,9 @@
+{
+  "checks": [
+    {
+      "name": "complexity",
+      "is_venv_required": false,
+      "max_complexity": 15
+    }
+  ]
+}

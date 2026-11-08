@@ -1,18 +1,19 @@
 """Unit tests for the TestsCheck class."""
 
-import unittest
+from collections.abc import Callable
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 from grader.checks.run_tests_check import RunTestsCheck
 from grader.exceptions import CheckError
 from grader.models.check_result import ScoredCheckResult
-from grader.utils.logger import VERBOSE
 
 
-class TestDownloadTest(unittest.TestCase):
+class TestDownloadTest:
     """Unit tests for resolving tests_path via Resource in _pre_run."""
 
-    def setUp(self) -> None:
+    def setup_method(self) -> None:
         """Set up a RunTestsCheck instance for testing."""
         self.name = "Test Check"
         self.project_root = "/path/to/project"
@@ -32,7 +33,7 @@ class TestDownloadTest(unittest.TestCase):
 
         # Assert
         mock_resource_cls.assert_called_once_with(path)
-        self.assertEqual(check._RunTestsCheck__tests_path, ["/tmp/test_file.py"])  # type: ignore[attr-defined]
+        assert check._RunTestsCheck__tests_path == ["/tmp/test_file.py"]  # type: ignore[attr-defined]
 
     @patch("grader.checks.run_tests_check.Resource")
     def test_02_mixed_paths_processed_correctly(self, mock_resource_cls: MagicMock) -> None:
@@ -56,16 +57,13 @@ class TestDownloadTest(unittest.TestCase):
         check._pre_run()
 
         # Assert
-        self.assertEqual(
-            check._RunTestsCheck__tests_path,  # type: ignore[attr-defined]
-            ["/tmp/test_cove.py", "/tmp/test_remote.py", local_path],
-        )
+        assert check._RunTestsCheck__tests_path == ["/tmp/test_cove.py", "/tmp/test_remote.py", local_path]  # type: ignore[attr-defined]
 
 
-class TestTestsCheck(unittest.TestCase):
+class TestTestsCheck:
     """Test cases for the TestsCheck class."""
 
-    def setUp(self) -> None:
+    def setup_method(self) -> None:
         """Set up the test environment."""
         self.name = "Test Check"
         self.project_root = "/path/to/project"
@@ -97,7 +95,7 @@ class TestTestsCheck(unittest.TestCase):
         score = self.tests_check.run()
 
         # Assert
-        self.assertEqual(score, expected_score)
+        assert score == expected_score
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
     def test_02_some_tests_fail(self, mock_pytest_run: MagicMock) -> None:
@@ -111,7 +109,7 @@ class TestTestsCheck(unittest.TestCase):
         score = self.tests_check.run()
 
         # Assert
-        self.assertEqual(score, expected_score)
+        assert score == expected_score
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
     def test_03_score_exceeds_max_points(self, mock_pytest_run: MagicMock) -> None:
@@ -132,22 +130,25 @@ class TestTestsCheck(unittest.TestCase):
         mock_pytest_run.return_value = "PASSED ::test_1::test_1\nPASSED ::test_2::test_2\nPASSED ::test_3::test_3"
 
         # Act & Assert
-        with self.assertRaises(CheckError):
+        with pytest.raises(CheckError):
             max_score_exceeded_check.run()
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
-    def test_04_logs_correct_passed_and_failed_counts(self, mock_pytest_run: MagicMock) -> None:
+    def test_04_logs_correct_passed_and_failed_counts(
+        self,
+        mock_pytest_run: MagicMock,
+        log_output: Callable[[], list[str]],
+    ) -> None:
         """Verify run logs the correct number of passed and failed tests."""
         # Arrange
         mock_pytest_run.return_value = "PASSED ::test_1::test_1\nFAILED ::test_2::test_2"
 
         # Act
-        with self.assertLogs("grader", level=VERBOSE) as log:
-            self.tests_check.run()
+        self.tests_check.run()
 
         # Assert
-        self.assertIn("VERBOSE:grader:Passed tests: 1/2", log.output)
-        self.assertIn("VERBOSE:grader:Failed tests: 1/2", log.output)
+        assert "VERBOSE:grader:Passed tests: 1/2" in log_output()
+        assert "VERBOSE:grader:Failed tests: 1/2" in log_output()
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
     def test_05_empty_test_results(self, mock_pytest_run: MagicMock) -> None:
@@ -160,7 +161,7 @@ class TestTestsCheck(unittest.TestCase):
         score = self.tests_check.run()
 
         # Assert
-        self.assertEqual(score, expected_score)
+        assert score == expected_score
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
     def test_06_invalid_pytest_output(self, mock_pytest_run: MagicMock) -> None:
@@ -173,7 +174,7 @@ class TestTestsCheck(unittest.TestCase):
         score = self.tests_check.run()
 
         # Assert
-        self.assertEqual(score, expected_score)
+        assert score == expected_score
 
     @patch("grader.utils.process.run")
     def test_07_pytest_raises_os_error(self, mock_run: MagicMock) -> None:
@@ -182,7 +183,7 @@ class TestTestsCheck(unittest.TestCase):
         mock_run.side_effect = OSError("Test error")
 
         # Act & Assert
-        with self.assertRaises(CheckError):
+        with pytest.raises(CheckError):
             self.tests_check.run()
 
     @patch("grader.utils.process.run")
@@ -192,7 +193,7 @@ class TestTestsCheck(unittest.TestCase):
         mock_run.side_effect = ValueError("Test error")
 
         # Act & Assert
-        with self.assertRaises(CheckError):
+        with pytest.raises(CheckError):
             self.tests_check.run()
 
     @patch("grader.utils.process.run")
@@ -202,7 +203,7 @@ class TestTestsCheck(unittest.TestCase):
         mock_run.return_value.returncode = 3
 
         # Act & Assert
-        with self.assertRaises(CheckError):
+        with pytest.raises(CheckError):
             self.tests_check.run()
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
@@ -218,7 +219,7 @@ class TestTestsCheck(unittest.TestCase):
         score = self.tests_check.run()
 
         # Assert
-        self.assertEqual(score, expected_score)
+        assert score == expected_score
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
     def test_11_test_scored_both_name_and_class(self, mock_pytest_run: MagicMock) -> None:
@@ -242,7 +243,7 @@ class TestTestsCheck(unittest.TestCase):
         score = tests_check.run()
 
         # Assert
-        self.assertEqual(score, expected_score)
+        assert score == expected_score
 
     @patch("grader.checks.run_tests_check.RunTestsCheck._RunTestsCheck__pytest_run")
     def test_12_test_default_scored(self, mock_pytest_run: MagicMock) -> None:
@@ -265,4 +266,4 @@ class TestTestsCheck(unittest.TestCase):
         score = tests_check.run()
 
         # Assert
-        self.assertEqual(score, expected_score)
+        assert score == expected_score

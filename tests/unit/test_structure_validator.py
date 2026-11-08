@@ -1,21 +1,21 @@
 """Unit tests for the StructureValidator class in the structure_validator module."""
 
 import os
-import unittest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 from grader.utils.structure_validator import StructureValidator
 
 
-class TestStructureValidator(unittest.TestCase):
+class TestStructureValidator:
     """Test cases for the StructureValidator class."""
 
-    def setUp(self) -> None:
+    def setup_method(self) -> None:
         """Set up the test case environment."""
         self.validator = StructureValidator(name="TestStructure", required=True, patterns=["*.py", "tests/*.py"])
         self.project_root = "sample_project"
-        return super().setUp()
 
     @patch("pathlib.Path.glob")
     def test_01_is_structure_valid_all_patterns_match(self, mocked_glob: MagicMock) -> None:
@@ -27,7 +27,7 @@ class TestStructureValidator(unittest.TestCase):
         result = self.validator.is_structure_valid(self.project_root)
 
         # Assert
-        self.assertTrue(result)
+        assert result
         mocked_glob.assert_any_call("*.py")
         mocked_glob.assert_any_call("tests/*.py")
 
@@ -41,20 +41,20 @@ class TestStructureValidator(unittest.TestCase):
         result = self.validator.is_structure_valid(self.project_root)
 
         # Assert
-        self.assertFalse(result)
+        assert not result
         mocked_glob.assert_any_call("*.py")
         mocked_glob.assert_any_call("tests/*.py")
 
-    @unittest.skipIf(os.name == "nt", "Skipping test on Windows due to path normalization.")
+    @pytest.mark.skipif(os.name == "nt", reason="Skipping test on Windows due to path normalization.")
     @patch("pathlib.Path.glob")
     def test_03_get_matching_files(self, mocked_glob: MagicMock) -> None:
         """Test that get_matching_files returns the correct list of matching files."""
         # Arrange
-        project_root_abs = os.path.abspath(self.project_root).lower()  # Normalize path for Windows
+        project_root_abs = str(Path(self.project_root).absolute()).lower()  # Normalize path for Windows
         matching_files = [
-            os.path.join(project_root_abs, "file1.py"),
-            os.path.join(project_root_abs, "file2.py"),
-            os.path.join(project_root_abs, "tests/test_file.py"),
+            str(Path(project_root_abs, "file1.py")),
+            str(Path(project_root_abs, "file2.py")),
+            str(Path(project_root_abs, "tests/test_file.py")),
         ]
         mocked_glob.side_effect = [
             [Path(file) for file in matching_files[:2]],
@@ -69,7 +69,7 @@ class TestStructureValidator(unittest.TestCase):
         actual_result = [filepath.lower() for filepath in actual_result]
 
         # Assert
-        self.assertEqual(actual_result, expected_result)
+        assert actual_result == expected_result
         mocked_glob.assert_any_call("*.py")
         mocked_glob.assert_any_call("tests/*.py")
 
@@ -82,9 +82,9 @@ class TestStructureValidator(unittest.TestCase):
         validator = StructureValidator.from_dict(raw_object)
 
         # Assert
-        self.assertEqual(validator.name, "SampleStructure")
-        self.assertFalse(validator.required)
-        self.assertEqual(validator.patterns, ["*.md", "docs/*.md"])
+        assert validator.name == "SampleStructure"
+        assert not validator.required
+        assert validator.patterns == ["*.md", "docs/*.md"]
 
     def test_05_init(self) -> None:
         """Test that the __init__ method correctly initializes attributes."""
@@ -97,9 +97,9 @@ class TestStructureValidator(unittest.TestCase):
         validator = StructureValidator(name, required, patterns)
 
         # Assert
-        self.assertEqual(validator.name, name)
-        self.assertTrue(validator.required)
-        self.assertEqual(validator.patterns, patterns)
+        assert validator.name == name
+        assert validator.required
+        assert validator.patterns == patterns
 
     @patch("pathlib.Path.glob")
     def test_06_is_structure_valid_empty_patterns(self, mocked_glob: MagicMock) -> None:
@@ -111,7 +111,7 @@ class TestStructureValidator(unittest.TestCase):
         result = self.validator.is_structure_valid(self.project_root)
 
         # Assert
-        self.assertTrue(result)
+        assert result
         mocked_glob.assert_not_called()
 
     @patch("pathlib.Path.glob")
@@ -124,7 +124,7 @@ class TestStructureValidator(unittest.TestCase):
         result = self.validator.get_matching_files(self.project_root)
 
         # Assert
-        self.assertEqual(result, [])
+        assert result == []
         mocked_glob.assert_not_called()
 
     @patch("pathlib.Path.glob")
@@ -134,7 +134,7 @@ class TestStructureValidator(unittest.TestCase):
         mocked_glob.side_effect = FileNotFoundError
 
         # Act
-        with self.assertRaises(FileNotFoundError):
+        with pytest.raises(FileNotFoundError):
             self.validator.is_structure_valid("invalid_path")
 
     @patch("pathlib.Path.glob")
@@ -144,5 +144,5 @@ class TestStructureValidator(unittest.TestCase):
         mocked_glob.side_effect = FileNotFoundError
 
         # Act
-        with self.assertRaises(FileNotFoundError):
+        with pytest.raises(FileNotFoundError):
             self.validator.get_matching_files("invalid_path")

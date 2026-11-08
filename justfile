@@ -10,20 +10,20 @@ init:
 lint:
     uv run ruff check {{project_content}} --fix
     uv run ruff format {{project_content}}
-    uv run mypy {{project_content}} --ignore-missing-imports
+    uv run mypy {{project_content}}
     uv run complexipy .
 
 # Tests
 test: unit_tests functional_tests
 
 unit_tests:
-    uv run -m unittest discover -s tests/unit -p "test_*.py" -v
+    uv run pytest tests/unit -v
 
 functional_tests:
-    uv run -m unittest discover -s tests/functional -p "test_*.py"
+    uv run pytest tests/functional
 
 coverage:
-    uv run coverage run --source={{packages}} -m unittest discover -s tests/unit -p "test_*.py"
+    uv run coverage run --source={{packages}} -m pytest tests/unit
     uv run coverage lcov -o lcov.info
     uv run coverage report -m --fail-under 85 --sort=cover
 

@@ -136,11 +136,11 @@ class RunTestsCheck(ScoredCheck):
             )
         except (OSError, ValueError) as e:
             logger.error("Tests run failed: %s", e)
-            raise CheckError("Tests run failed") from e
+            raise CheckError(f"Tests run failed: {e}") from e
 
         if output.returncode >= 2:  # 0: OK, 1: Tests failed
             logger.error("Tests run failed")
-            raise CheckError("Tests run failed")
+            raise CheckError(f"Tests run failed. stdout: {output.stdout}")
 
         return output.stdout
 
@@ -222,4 +222,8 @@ class RunTestsCheck(ScoredCheck):
             score = self.__default_test_score
 
         logger.debug("Test %s::%s scored %.2f", test_class, test_name, score)
+        return score
+        return score
+        return score
+        return score
         return score

@@ -1,5 +1,10 @@
 # pygrader
 
+## 2.1.1
+
+- Show pytest stdout as part of the exception
+
+
 ## 2.1.0
 
 - Add `complexity` check, which fails if any function exceeds a cognitive complexity threshold (via complexipy)

@@ -4,7 +4,9 @@ Module containing a class representing an abstract check.
 Each check should inherit from this class.
 """
 
+import itertools
 import logging
+import math
 from abc import ABC, abstractmethod
 
 from grader.exceptions import CheckError
@@ -109,7 +111,7 @@ class ScoredCheck(AbstractCheck[float]):
     def __init__(
         self,
         name: str,
-        max_points: int,
+        max_points: float,
         project_root: str,
         is_venv_requred: bool = False,
         env_vars: dict[str, str] | None = None,
@@ -129,8 +131,36 @@ class ScoredCheck(AbstractCheck[float]):
         self._max_points = max_points
 
     @property
-    def max_points(self) -> int:
+    def max_points(self) -> float:
         """Return the maximum amount of points that can be achieved by the check."""
+        return self._max_points
+
+    def _translate_score(self, value: float, value_max: float) -> float:
+        """
+        Split ``[0, value_max]`` into equal regions and award points based on the region ``value`` falls in.
+
+        There are ``ceil(max_points) + 1`` regions, awarding ``0, step, 2 * step, ..., max_points``
+        where ``step = max_points / ceil(max_points)``. For an integer ``max_points`` the step is 1.
+
+        :param value: The raw value produced by the tool (e.g. pylint score, coverage percentage).
+        :param value_max: The maximum raw value the tool can produce.
+        :raises CheckError: If max points is set to -1.
+        :return: The translated score.
+        """
+        if self._max_points == -1:
+            raise CheckError(f"Max points for {self.name} check is set to -1")
+
+        region_count = math.ceil(self._max_points)
+        points_per_region = self._max_points / region_count if region_count else 0
+
+        step = value_max / (region_count + 1)
+        steps = [i * step for i in range(region_count + 2)]
+
+        for region, (start, end) in enumerate(itertools.pairwise(steps)):
+            if round(start, 2) <= round(value, 2) < round(end, 2):
+                # Keep integer scores for integer max points
+                return region if points_per_region == 1 else round(region * points_per_region, 2)
+
         return self._max_points
 
 

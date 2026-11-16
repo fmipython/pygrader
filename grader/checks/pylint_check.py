@@ -3,7 +3,6 @@
 It uses the pylint python library directly to run the check.
 """
 
-import itertools
 import logging
 import re
 from io import StringIO
@@ -29,7 +28,7 @@ class PylintCheck(ScoredCheck):
         self,
         name: str,
         project_root: str,
-        max_points: int,
+        max_points: float,
         is_venv_required: bool,
         pylintrc_path: str | None = None,
         env_vars: dict[str, str] | None = None,
@@ -88,34 +87,11 @@ class PylintCheck(ScoredCheck):
         pylint_score = self.__get_pylint_score(results.stdout)
 
         logger.debug("Pylint score: %s", pylint_score)
-        score = self.__translate_score(pylint_score)
+        score = self._translate_score(pylint_score, self.__pylint_max_score)
 
         short_output = self.__summarize_output(results.stdout)
 
         return ScoredCheckResult(self.name, score, short_output, "", self.max_points)
-
-    def __translate_score(self, pylint_score: float) -> float:
-        """
-        Split the pylint score into regions and assign a score based on the region.
-
-        The amount of regions depends on the max points for the criteria.
-
-        :param pylint_score: The score from pylint to be translated
-        :return: The translated score
-        """
-        if self._max_points == -1:
-            raise CheckError("Max points for pylint check is set to -1")
-
-        step = self.__pylint_max_score / (self._max_points + 1)
-        steps = [i * step for i in range(self._max_points + 2)]
-
-        regions = list(itertools.pairwise(steps))
-
-        for score, (start, end) in enumerate(regions):
-            if round(start, 2) <= round(pylint_score, 2) < round(end, 2):
-                return score
-
-        return self._max_points
 
     def __get_pylint_score(self, pylint_output: str) -> float:
         """

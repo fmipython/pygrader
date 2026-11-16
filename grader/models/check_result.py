@@ -17,7 +17,7 @@ class CheckResult[T]:
 class ScoredCheckResult(CheckResult[float]):
     """Class representing the result of a scored check."""
 
-    max_score: int
+    max_score: float
 
 
 @dataclass

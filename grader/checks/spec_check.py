@@ -52,7 +52,7 @@ class SpecCheck(ScoredCheck):
         self,
         name: str,
         project_root: str,
-        max_points: int,
+        max_points: float,
         is_venv_required: bool = False,
         env_vars: dict[str, str] | None = None,
         assets: list[str] | None = None,

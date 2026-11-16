@@ -43,7 +43,7 @@ class RunTestsCheck(ScoredCheck):
         self,
         name: str,
         project_root: str,
-        max_points: int,
+        max_points: float,
         is_venv_required: bool,
         tests_path: list[str],
         default_test_score: float = 0.0,

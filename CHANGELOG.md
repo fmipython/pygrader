@@ -1,5 +1,9 @@
 # pygrader
 
+## 2.2.0
+
+- Scored checks can now have float max scores
+
 ## 2.1.1
 
 - Show pytest stdout as part of the exception

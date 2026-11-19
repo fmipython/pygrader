@@ -194,3 +194,19 @@ class TestCoverageCheck:
 
         # Assert
         assert ScoredCheckResult("Coverage", 2, "Tests cover 100.00% of the code", "", 2) == result
+
+    @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_run")
+    @patch("grader.checks.coverage_check.CoverageCheck._CoverageCheck__coverage_report")
+    def test_float_max_points(self, mocked_report: MagicMock, mocked_run: MagicMock) -> None:
+        """Test that a float max points value is scored in scaled steps."""
+        # Arrange
+        check = CoverageCheck("Coverage", "sample_dir", 1.5, is_venv_required=False)
+        mocked_run.return_value = True
+        mocked_report.return_value = 50
+        expected_score = ScoredCheckResult("Coverage", 0.75, "Tests cover 50.00% of the code", "", 1.5)
+
+        # Act
+        actual_score = check.run()
+
+        # Assert
+        assert expected_score == actual_score

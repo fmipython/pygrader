@@ -8,7 +8,7 @@ This document provides context and guidelines for Claude Sonnet 4.5 when working
 
 ### Key Information
 - **Language**: Python 3.10+
-- **Version**: 2.1.0
+- **Version**: 2.2.0
 - **License**: GPL-3.0
 - **Architecture**: Modular check-based system with CLI and web interfaces
 - **Current Branch**: `show-check-results` (default: `main`)

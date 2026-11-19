@@ -23,7 +23,7 @@ class RequirementsCheck(ScoredCheck):
         self,
         name: str,
         project_root: str,
-        max_points: int,
+        max_points: float,
         is_venv_required: bool,
         is_checking_install: bool = False,
         env_vars: dict[str, str] | None = None,

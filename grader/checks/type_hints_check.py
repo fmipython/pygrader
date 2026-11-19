@@ -4,7 +4,6 @@ Module containing the type hints check.
 It calls mypy as a subprocess to generate a report and then read from the report.
 """
 
-import itertools
 import logging
 
 from grader.checks.abstract_check import ScoredCheck
@@ -23,7 +22,7 @@ class TypeHintsCheck(ScoredCheck):
         self,
         name: str,
         project_root: str,
-        max_points: int,
+        max_points: float,
         is_venv_required: bool,
         env_vars: dict[str, str] | None = None,
         assets: list[str] | None = None,
@@ -95,7 +94,7 @@ class TypeHintsCheck(ScoredCheck):
 
         # Calculate score
         covered_lines_percentage = int(lines_with_type_annotations) / int(lines_total)
-        score = self.__translate_score(covered_lines_percentage)
+        score = self._translate_score(covered_lines_percentage, self.__mypy_max_score)
 
         return ScoredCheckResult(
             self.name,
@@ -104,26 +103,3 @@ class TypeHintsCheck(ScoredCheck):
             "",
             self.max_points,
         )
-
-    def __translate_score(self, mypy_score: float) -> float:
-        """
-        Split the mypy score into regions and assign a score based on the region.
-
-        The amount of regions depends on the max points for the criteria.
-
-        :param pylint_score: The score from pylint to be translated
-        :return: The translated score
-        """
-        if self._max_points == -1:
-            raise CheckError("Max points for type hints check is set to -1")
-
-        step = self.__mypy_max_score / (self._max_points + 1)
-        steps = [i * step for i in range(self._max_points + 2)]
-
-        regions = list(itertools.pairwise(steps))
-
-        for score, (start, end) in enumerate(regions):
-            if round(start, 2) <= round(mypy_score, 2) < round(end, 2):
-                return score
-
-        return self._max_points

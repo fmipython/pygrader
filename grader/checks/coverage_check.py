@@ -1,6 +1,5 @@
 """Module containing the unit test code coverage check."""
 
-import itertools
 import logging
 
 from grader.checks.abstract_check import ScoredCheck
@@ -26,7 +25,7 @@ class CoverageCheck(ScoredCheck):
         self,
         name: str,
         project_root: str,
-        max_points: int,
+        max_points: float,
         is_venv_required: bool,
         env_vars: dict[str, str] | None = None,
         assets: list[str] | None = None,
@@ -61,33 +60,10 @@ class CoverageCheck(ScoredCheck):
         if coverage_report_result is None:
             raise CheckError("Coverage report generation failed")
 
-        score = self.__translate_score(coverage_report_result)
+        score = self._translate_score(coverage_report_result, 100)
         return ScoredCheckResult(
             self.name, score, f"Tests cover {coverage_report_result:.2f}% of the code", "", self.max_points
         )
-
-    def __translate_score(self, coverage_score: float) -> float:
-        """
-        Split the coverage score into regions and assign a score based on the region.
-
-        The amount of regions depends on the max points for the criteria.
-
-        :param coverage_score: The score from pylint to be translated
-        :return: The translated score
-        """
-        if self._max_points == -1:
-            raise CheckError("Max points for coverage check is set to -1")
-
-        step = 100 / (self._max_points + 1)
-        steps = [i * step for i in range(self._max_points + 2)]
-
-        regions = list(itertools.pairwise(steps))
-
-        for score, (start, end) in enumerate(regions):
-            if round(start, 2) <= round(coverage_score, 2) < round(end, 2):
-                return score
-
-        return self._max_points
 
     def __coverage_run(self) -> None:
         """Run the coverage tool on the project."""

@@ -107,6 +107,12 @@ check's own section is rejected and makes the run fail.
     Can be an integer or float value.
     The ``structure`` and ``complexity`` checks are pass/fail and do not accept this field.
 
+    The ``pylint``, ``coverage`` and ``type-hints`` checks award points in steps: the tool's
+    result (pylint score 0-10, coverage 0-100%, type-hinted lines 0-100%) is split into
+    ``ceil(max_points) + 1`` equal regions, awarding ``0, step, 2 * step, ..., max_points``
+    with ``step = max_points / ceil(max_points)``. For example, ``"max_points": 2`` awards
+    ``0``, ``1`` or ``2``, while ``"max_points": 1.5`` awards ``0``, ``0.75`` or ``1.5``.
+
 ``is_venv_required`` (required)
     Boolean indicating if the check should be run within a virtual environment.
     Must be a JSON boolean (``true``/``false``). Strings are not parsed - ``"false"``
